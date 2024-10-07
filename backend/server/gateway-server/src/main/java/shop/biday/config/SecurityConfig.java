@@ -52,10 +52,7 @@ public class SecurityConfig {
                         .authenticationSuccessHandler(oauth2SuccessHandler))
                 .authorizeExchange(exchange -> exchange
                         .pathMatchers("/v3/api-docs/**",  "/swagger-ui/**", "/webjars/**").permitAll()
-<<<<<<< HEAD
-=======
                         .pathMatchers("/actuator/**",  "/*-service/**").permitAll()
->>>>>>> 7c4ea17b98e7778c248665e3e96a89bc0bb8f8f8
                         .pathMatchers("/login","/reissue", "/logout").permitAll()
                         .pathMatchers( "/api/auctions/**","/api/loginHistory/**", "/api/users/**", "/api/account/**","/api/addresses/**","/api/faqs/**","/api/images/**","/api/payments/**","/api/products/**","/api/sms/**").permitAll())
                       // .anyExchange().authenticated())
@@ -77,13 +74,10 @@ public class SecurityConfig {
         configuration.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowCredentials(true);
-<<<<<<< HEAD
         configuration.setAllowedHeaders(Collections.singletonList("*"));
-        configuration.setExposedHeaders(Arrays.asList("Authorization")); // Authorization 헤더 노출
-=======
+
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "UserInfo"));
         configuration.setExposedHeaders(Arrays.asList("Authorization"));
->>>>>>> 7c4ea17b98e7778c248665e3e96a89bc0bb8f8f8
         configuration.setMaxAge(3600L);
 
         // CORS 설정을 경로에 따라 등록
