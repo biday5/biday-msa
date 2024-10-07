@@ -35,6 +35,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Mono<UserDocument> save(UserModel userModel) {
+        System.out.println("password : "+userModel.getPassword());
         UserDocument userDocument = UserDocument.builder()
                 .name(userModel.getName())
                 .email(userModel.getEmail())
@@ -94,6 +95,10 @@ public class UserServiceImpl implements UserService {
     public Mono<String> changePassword(UserModel userModel) {
         return userRepository.findByEmail(userModel.getEmail())
                 .flatMap(user -> {
+                    // 로그로 전달된 평문 비밀번호와 저장된 비밀번호를 출력
+                    System.out.println("입력된 평문 비밀번호: " + userModel.getPassword());
+                    System.out.println("DB에 저장된 암호화된 비밀번호: " + user.getPassword());
+
                     if (passwordEncoder.matches(userModel.getPassword(), user.getPassword())) { // 비밀번호 비교
                         String encodedNewPassword = passwordEncoder.encode(userModel.getNewPassword()); // 새 비밀번호 해시
                         user.setPassword(encodedNewPassword);
@@ -103,7 +108,7 @@ public class UserServiceImpl implements UserService {
                         return Mono.just("예전 비밀번호가 틀렸습니다.");
                     }
                 })
-                .switchIfEmpty(Mono.just("이메일 대상이 없습니다."));
+                .switchIfEmpty(Mono.just("유저 대상이 없습니다."));
     }
 
     public Mono<UserDocument> register(UserModel userModel) {
@@ -119,7 +124,7 @@ public class UserServiceImpl implements UserService {
                             .oauthUser(userModel.getOauthName())
                             .name(userModel.getName())
                             .phone(userModel.getPhoneNum())
-                            .password(passwordEncoder.encode(userModel.getPassword())) // BCrypt 해시 사용
+                            .password(passwordEncoder.encode(userModel.getEmail())) // BCrypt 해시 사용
                             .role(Collections.singletonList(Role.ROLE_USER))
                             .status(true)
                             .totalRating(2.0)

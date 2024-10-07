@@ -43,7 +43,7 @@ public class SecurityConfig {
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                //.cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
                 .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
@@ -53,7 +53,9 @@ public class SecurityConfig {
                         .authorizedClientService(authorizedClientService())
                         .authenticationSuccessHandler(oauth2SuccessHandler))
                 .authorizeExchange(exchange -> exchange
-                        .pathMatchers("/login","/reissue", "/logout","/api/loginHistory/**", "/api/users/**", "/api/account/**","/api/addresses/**").permitAll())
+                        .pathMatchers("/v3/api-docs/**",  "/swagger-ui/**", "/webjars/**").permitAll()
+                        .pathMatchers("/login","/reissue", "/logout").permitAll()
+                        .pathMatchers( "/api/auctions/**","/api/loginHistory/**", "/api/users/**", "/api/account/**","/api/addresses/**","/api/faqs/**","/api/images/**","/api/payments/**","/api/products/**","/api/sms/**").permitAll())
                       // .anyExchange().authenticated())
                 .addFilterAt(loginFilter(loginSuccessHandler()), SecurityWebFiltersOrder.AUTHORIZATION)
                 .addFilterBefore(new CustomLogoutFilter(jwtUtil, redisTemplateUtils), SecurityWebFiltersOrder.LOGOUT)
@@ -73,6 +75,7 @@ public class SecurityConfig {
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowCredentials(true);
         configuration.setAllowedHeaders(Collections.singletonList("*"));
+        configuration.setExposedHeaders(Arrays.asList("Authorization")); // Authorization 헤더 노출
         configuration.setMaxAge(3600L);
 
         // CORS 설정을 경로에 따라 등록

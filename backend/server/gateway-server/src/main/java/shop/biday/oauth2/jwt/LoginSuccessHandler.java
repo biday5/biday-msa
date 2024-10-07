@@ -59,7 +59,6 @@ public class LoginSuccessHandler {
                     exchange.getResponse().setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
                     return exchange.getResponse().setComplete();
                 });
-
     }
 
 
@@ -113,6 +112,4 @@ public class LoginSuccessHandler {
             }
         }).log().then();
     }
-
-
 }
