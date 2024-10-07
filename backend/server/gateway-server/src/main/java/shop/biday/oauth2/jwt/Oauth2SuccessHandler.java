@@ -30,20 +30,6 @@ public class Oauth2SuccessHandler implements ServerAuthenticationSuccessHandler 
     private static final String ACCESS_TOKEN_TYPE = "access";
     private static final String REFRESH_TOKEN_TYPE = "refresh";
     private static final String REDIRECT_URL = "http://localhost:3000/";
-    // 이걸 바꿔보라고 하심 리스폰 값으로 바꿔주는게 아니라 스테이스로 내려준잖아.
-    // 스테이터스 임시로 페이지를 만들언서 유알엘을 유도를 해봐.
-    // 유도를 하잖아. 그러면 백엔드
-    // 아무 페이지를 만들어서 거기서 처리를 하고 인덱스로 가지게 처리를 해보자.
-    //
-
-    // 걱정인거는 인덱스에서는 로그가 안찍혔잖아.
-    // 그러면 똑갈을꺼야. 다른 페이지를 한다고 하더라도,
-    // 우리가 중요한 것은 헤더에 쿠키가 있냐 없냐잖아. 토큰이 있냐 없냐인데,
-
-    // 백에서는 주고 있잖아. 형님 말은, 일반 로그인 처럼 리스폰 했을 때 헤더 뭘 하잖아.
-    // 무조건 하게 하는거야.
-    // 이 토큰이 가질 수 있냐 없냐 이게 문제이다. 이게 못갖고 오는지 이해가 안된다.
-
 
     private final JWTUtil jwtUtil;
     private final WebClient webClient;
@@ -115,8 +101,6 @@ public class Oauth2SuccessHandler implements ServerAuthenticationSuccessHandler 
                 .maxAge(COOKIE_MAX_AGE_SECONDS)
                 .path("/")
                 .httpOnly(true)
-                .secure(true)  // HTTPS에서만 전송
-                .sameSite("None")  // Cross-site 요청 허용
                 .build();
     }
 

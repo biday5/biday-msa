@@ -20,4 +20,5 @@ public class AddressModel {
     private String type;
     private boolean pick;
     private String email;
+
 }

@@ -21,4 +21,5 @@ public class SocialClientRegistration {
                 .userNameAttributeName("response")
                 .build();
     }
+
 }
