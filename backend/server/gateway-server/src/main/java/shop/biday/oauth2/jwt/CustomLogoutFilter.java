@@ -21,7 +21,6 @@ public class CustomLogoutFilter implements WebFilter {
     private final JWTUtil jwtUtil;
     private final RedisTemplateUtils<String> redisTemplateUtils;
 
-    @Autowired
     public CustomLogoutFilter(JWTUtil jwtUtil, RedisTemplateUtils<String> redisTemplateUtils) {
         this.jwtUtil = jwtUtil;
         this.redisTemplateUtils = redisTemplateUtils;

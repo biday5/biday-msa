@@ -44,7 +44,6 @@ public class UserController {
     public ResponseEntity<Mono<UserDocument>> register(@RequestBody UserModel model) {
         return new ResponseEntity<>(userService.register(model), HttpStatus.OK);
     }
-    //TODO 예전 비번이랑 바꾸는 비번이랑 같을 경우 체크?
     @PatchMapping("/changepass")
     @Operation(summary = "비밀번호 변경", description = "사용자의 비밀번호를 변경합니다.")
     @ApiResponses(value = {
@@ -57,8 +56,7 @@ public class UserController {
         return ResponseEntity.ok(userService.changePassword(userModel));
     }
 
-    //TODO 아이디 찾기 핸드폰 인증 후 폰번호로 요청시 email 클라이언트측으로 전달
-    @PostMapping("/retrieve ")
+    @PostMapping("/retrieve")
     @Operation(summary = "전화번호로 이메일 조회", description = "제공된 전화번호에 연결된 이메일 주소를 조회합니다."
     )
     @ApiResponses(value = {
@@ -73,7 +71,6 @@ public class UserController {
         return ResponseEntity.ok(userService.getEmailByPhone(userModel));
     }
 
-    //TODO 확인완료
     @PostMapping("/password")
     @Operation(summary = "유저 비밀번호 검증", description = "소셜 로그인 후 이메일과 비밀번호 같은 검증 api")
     @ApiResponses(value = {
