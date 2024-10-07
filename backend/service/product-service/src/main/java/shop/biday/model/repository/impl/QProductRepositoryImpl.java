@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import shop.biday.model.domain.ProductModel;
 import shop.biday.model.domain.SizeModel;
 import shop.biday.model.dto.ProductDto;
+import shop.biday.model.entity.*;
 import shop.biday.model.repository.QProductRepository;
 
 import java.util.List;
