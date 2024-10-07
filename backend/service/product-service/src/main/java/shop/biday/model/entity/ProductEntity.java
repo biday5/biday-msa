@@ -49,7 +49,7 @@ public class ProductEntity {
     @Column(name = "color", nullable = true)
     private Color color;
 
-    @Column(name = "description", nullable = false)
+    @Column(name = "description", nullable = false, columnDefinition = "LONGTEXT")
     private String description;
 
     @CreationTimestamp

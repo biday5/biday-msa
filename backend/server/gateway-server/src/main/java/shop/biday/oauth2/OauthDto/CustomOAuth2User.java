@@ -3,10 +3,8 @@ package shop.biday.oauth2.OauthDto;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
-
 import shop.biday.model.domain.UserModel;
 import shop.biday.model.enums.Role;
-
 
 import java.util.ArrayList;
 import java.util.Collection;

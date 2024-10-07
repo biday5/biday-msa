@@ -1,5 +1,6 @@
 package shop.biday.controller;
 
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -18,6 +19,7 @@ import shop.biday.model.domain.AccountModel;
 import shop.biday.service.impl.AccountServiceImpl;
 
 
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -27,7 +29,7 @@ public class AccountController {
 
     private final AccountServiceImpl accountService;
 
-    @GetMapping("/{userId}")
+    @GetMapping()
     @Operation(summary = "판매자 계좌조회", description = "판매자 계좌조회")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "1000", description = "조회에 성공하였습니다.", content = @Content(mediaType = "application/json")),
@@ -37,8 +39,8 @@ public class AccountController {
     @Parameters({
             @Parameter(name = "userId", description = "유저번호", example = "66f3601fd3d86243cceb4718")
     })
-    public ResponseEntity<Mono<AccountDocument>> findById(@PathVariable String userId) {
-        return new ResponseEntity<>(accountService.findByUserId(userId), HttpStatus.OK);
+    public ResponseEntity<Mono<AccountDocument>> findById(@RequestHeader("UserInfo") String userInfoHeader) {
+        return new ResponseEntity<>(accountService.findByUserId(userInfoHeader), HttpStatus.OK);
     }
 
     @PostMapping("/save")

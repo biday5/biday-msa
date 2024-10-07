@@ -13,5 +13,8 @@ public class PasswordEncoderConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(); // BCrypt 해시 사용
     }
+<<<<<<< HEAD
 
+=======
+>>>>>>> 7c4ea17b98e7778c248665e3e96a89bc0bb8f8f8
 }

@@ -10,9 +10,9 @@ public interface CategoryService {
 
     CategoryModel findById(Long id);
 
-    CategoryEntity save(String role, CategoryModel category);
+    CategoryEntity save(String userInfoHeader, CategoryModel category);
 
-    CategoryEntity update(String role, CategoryModel category);
+    CategoryEntity update(String userInfoHeader, CategoryModel category);
 
-    String deleteById(String role, Long id);
+    String deleteById(String userInfoHeader, Long id);
 }

@@ -52,7 +52,7 @@ public class SizeController {
             @ApiResponse(responseCode = "404", description = "사이즈 등록 할 수 없음")
     })
     @Parameters({
-            @Parameter(name = "role", description = "현재 로그인한 사용자 token에서 추출한 role", example = "ROLE_ADMIN"),
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 token", example = ""),
             @Parameter(examples = {
                     @ExampleObject(name = "exampleSizeModel", value = """ 
                         { 
@@ -63,9 +63,9 @@ public class SizeController {
                     """)})
     })
     public ResponseEntity<SizeEntity> create(
-            @RequestHeader String role,
+            @RequestHeader("UserInfo") String userInfoHeader,
             @RequestBody SizeModel size) {
-        return ResponseEntity.ok(sizeService.save(role, size));
+        return ResponseEntity.ok(sizeService.save(userInfoHeader, size));
     }
 
     @PatchMapping
@@ -75,7 +75,7 @@ public class SizeController {
             @ApiResponse(responseCode = "404", description = "사이즈 수정 할 수 없음")
     })
     @Parameters({
-            @Parameter(name = "role", description = "현재 로그인한 사용자 token에서 추출한 role", example = "ROLE_ADMIN"),
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 token", example = ""),
             @Parameter(examples = {
                     @ExampleObject(name = "exampleSizeModel", value = """ 
                         { 
@@ -86,9 +86,9 @@ public class SizeController {
                     """)})
     })
     public ResponseEntity<SizeEntity> update(
-            @RequestHeader String role,
+            @RequestHeader("UserInfo") String userInfoHeader,
             @RequestBody SizeModel size) {
-        return ResponseEntity.ok(sizeService.update(role, size));
+        return ResponseEntity.ok(sizeService.update(userInfoHeader, size));
     }
 
     @DeleteMapping
@@ -97,10 +97,13 @@ public class SizeController {
             @ApiResponse(responseCode = "200", description = "사이즈 삭제 성공"),
             @ApiResponse(responseCode = "404", description = "사이즈 삭제 할 수 없음")
     })
-    @Parameter(name = "id", description = "사이즈 id", example = "1")
+    @Parameters({
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 token", example = ""),
+            @Parameter(name = "sizeId", description = "사이즈 id", example = "1")
+    })
     public ResponseEntity<String> delete(
-            @RequestHeader String role,
+            @RequestHeader("UserInfo") String userInfoHeader,
             @RequestParam Long id) {
-        return ResponseEntity.ok(sizeService.deleteById(role, id));
+        return ResponseEntity.ok(sizeService.deleteById(userInfoHeader, id));
     }
 }

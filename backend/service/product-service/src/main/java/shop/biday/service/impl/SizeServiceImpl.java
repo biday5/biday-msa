@@ -4,11 +4,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import shop.biday.model.domain.SizeModel;
+import shop.biday.model.domain.UserInfoModel;
 import shop.biday.model.entity.SizeEntity;
 import shop.biday.model.entity.enums.Size;
 import shop.biday.model.repository.ProductRepository;
 import shop.biday.model.repository.SizeRepository;
 import shop.biday.service.SizeService;
+import shop.biday.utils.UserInfoUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,6 +22,7 @@ import java.util.Optional;
 public class SizeServiceImpl implements SizeService {
     private final SizeRepository sizeRepository;
     private final ProductRepository productRepository;
+    private final UserInfoUtils userInfoUtils;
 
     @Override
     public List<SizeEntity> findAll() {
@@ -40,9 +43,9 @@ public class SizeServiceImpl implements SizeService {
     }
 
     @Override
-    public SizeEntity save(String role, SizeModel size) {
-        log.info("Saving size started with role: {}", role);
-        return validateUser(role)
+    public SizeEntity save(String userInfoHeader, SizeModel size) {
+        log.info("Saving size started with user: {}", userInfoHeader);
+        return validateUser(userInfoHeader)
                 .map(t -> {
                     SizeEntity newSize = createSizeEntity(size);
                     log.info("Size saved successfully: {}", newSize);
@@ -52,9 +55,9 @@ public class SizeServiceImpl implements SizeService {
     }
 
     @Override
-    public SizeEntity update(String role, SizeModel size) {
+    public SizeEntity update(String userInfoHeader, SizeModel size) {
         log.info("Updating size started for id: {}", size.getId());
-        return validateUser(role)
+        return validateUser(userInfoHeader)
                 .filter(t -> {
                     boolean exists = sizeRepository.existsById(size.getId());
                     if (!exists) {
@@ -72,9 +75,9 @@ public class SizeServiceImpl implements SizeService {
     }
 
     @Override
-    public String deleteById(String role, Long id) {
+    public String deleteById(String userInfoHeader, Long id) {
         log.info("Deleting size started for id: {}", id);
-        return validateUser(role).map(t -> {
+        return validateUser(userInfoHeader).map(t -> {
             if (!sizeRepository.existsById(id)) {
                 log.error("Size not found with id: {}", id);
                 return "사이즈 삭제 실패: 사이즈를 찾을 수 없습니다.";
@@ -89,12 +92,13 @@ public class SizeServiceImpl implements SizeService {
         });
     }
 
-    private Optional<String> validateUser(String role) {
-        log.info("Validating user role: {}", role);
-        return Optional.ofNullable(role)
+    private Optional<String> validateUser(String userInfoHeader) {
+        log.info("Validating user user: {}", userInfoHeader);
+        UserInfoModel userInfoModel = userInfoUtils.extractUserInfo(userInfoHeader);
+        return Optional.ofNullable(userInfoModel.getUserRole())
                 .filter(t -> t.equalsIgnoreCase("ROLE_ADMIN"))
                 .or(() -> {
-                    log.error("User does not have role ADMIN: {}", role);
+                    log.error("User does not have role ADMIN: {}", userInfoModel.getUserRole());
                     return Optional.empty();
                 });
     }

@@ -4,9 +4,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import shop.biday.model.domain.CategoryModel;
+import shop.biday.model.domain.UserInfoModel;
 import shop.biday.model.entity.CategoryEntity;
 import shop.biday.model.repository.CategoryRepository;
 import shop.biday.service.CategoryService;
+import shop.biday.utils.UserInfoUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,6 +18,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
+    private final UserInfoUtils userInfoUtils;
 
     @Override
     public List<CategoryModel> findAll() {
@@ -45,9 +48,9 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public CategoryEntity save(String role, CategoryModel category) {
-        log.info("Saving category started with role: {}", role);
-        return isAdmin(role)
+    public CategoryEntity save(String userInfoHeader, CategoryModel category) {
+        log.info("Saving category started with user: {}", userInfoHeader);
+        return isAdmin(userInfoHeader)
                 .map(t -> {
                     CategoryEntity savedCategory = categoryRepository.save(CategoryEntity.builder()
                             .name(category.getName())
@@ -59,9 +62,9 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public CategoryEntity update(String role, CategoryModel category) {
+    public CategoryEntity update(String userInfoHeader, CategoryModel category) {
         log.info("Updating category started for id: {}", category.getId());
-        return isAdmin(role)
+        return isAdmin(userInfoHeader)
                 .filter(t -> {
                     boolean exists = categoryRepository.existsById(category.getId());
                     if (!exists) {
@@ -81,10 +84,10 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public String deleteById(String role, Long id) {
+    public String deleteById(String userInfoHeader, Long id) {
         log.info("Deleting category started for id: {}", id);
 
-        return isAdmin(role).map(t -> {
+        return isAdmin(userInfoHeader).map(t -> {
             if (!categoryRepository.existsById(id)) {
                 log.error("Category not found with id: {}", id);
                 return "카테고리 삭제 실패: 카테고리를 찾을 수 없습니다";
@@ -99,12 +102,13 @@ public class CategoryServiceImpl implements CategoryService {
         });
     }
 
-    private Optional<String> isAdmin(String role) {
-        log.info("Validating user role: {}", role);
-        return Optional.of(role)
+    private Optional<String> isAdmin(String userInfoHeader) {
+        log.info("Validate User role: {}", userInfoHeader);
+        UserInfoModel userInfoModel = userInfoUtils.extractUserInfo(userInfoHeader);
+        return Optional.of(userInfoModel.getUserRole())
                 .filter(t -> t.equalsIgnoreCase("ROLE_ADMIN"))
                 .or(() -> {
-                    log.error("User does not have role ADMIN: {}", role);
+                    log.error("User does not have role ADMIN: {}", userInfoModel.getUserRole());
                     return Optional.empty();
                 });
     }

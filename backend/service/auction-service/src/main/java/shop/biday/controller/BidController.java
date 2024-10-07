@@ -8,16 +8,22 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.Sinks;
 import shop.biday.model.domain.BidModel;
 import shop.biday.model.dto.BidResponse;
+import shop.biday.service.AuctionService;
 import shop.biday.service.BidService;
 
+import java.io.IOException;
+import java.math.BigInteger;
+import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeoutException;
 
 @Slf4j
 @CrossOrigin
@@ -30,6 +36,7 @@ public class BidController {
     private final Map<Long, Sinks.Many<BidResponse>> bidSinks = new ConcurrentHashMap<>();
 
     private final BidService bidService;
+    private final AuctionService auctionService;
 
     @Operation(summary = "입찰 조회", description = "auctionId로 최고 입찰가를 조회합니다.(SSE)")
     @Parameters({
@@ -41,15 +48,55 @@ public class BidController {
         log.info("stream auctionId: {}", auctionId);
         Sinks.Many<BidResponse> bidSink = bidSinks.computeIfAbsent(auctionId, id ->
                 Sinks.many().multicast().onBackpressureBuffer());
-        return bidSink.asFlux().log();
+
+        Mono<BidResponse> findBid = bidService.findTopBidByAuctionId(auctionId)
+                .flatMap(bid -> bidService.countByAuctionId(auctionId)
+                        .map(count -> BidResponse.builder()
+                                .auctionId(bid.getAuctionId())
+                                .currentBid(bid.getCurrentBid())
+                                .award(bid.isAward())
+                                .count(count)
+                                .bidedAt(bid.getBidedAt())
+                                .build())
+                )
+                .switchIfEmpty(
+                        Mono.defer(() -> auctionService.findByAuctionId(auctionId)
+                                .map(auction -> BidResponse.builder()
+                                        .auctionId(auction.getId())
+                                        .currentBid(BigInteger.valueOf(auction.getCurrentBid()))
+                                        .award(false)
+                                        .count(0L)
+                                        .bidedAt(auction.getStartedAt())
+                                        .build())
+                        )
+                );
+
+        return findBid.doOnNext(bidSink::tryEmitNext)
+                .thenMany(bidSink.asFlux())
+                .onErrorResume(IOException.class, e -> {
+                    log.warn("IOException 발생 클라이언트 연결 끊김, auctionId: {}", auctionId);
+                    bidSinks.remove(auctionId);
+                    return Flux.empty();
+                })
+                .timeout(Duration.ofMinutes(10))
+                .onErrorResume(TimeoutException.class, e -> {
+                    log.warn("SSE 연결이 타임아웃되었습니다. auctionId: {}", auctionId);
+                    bidSinks.remove(auctionId);
+                    return Flux.empty();
+                })
+                .doOnCancel(() -> {
+                    log.warn("클라이언트가 연결을 끊었습니다. auctionId: {}", auctionId);
+                    bidSinks.remove(auctionId);
+                }).log();
     }
 
     @Operation(summary = "입찰 저장", description = "입찰 데이터를 저장합니다.")
     @ApiResponse(responseCode = "200", description = "성공")
     @PostMapping
-    public Mono<BidResponse> save(@RequestBody BidModel bidModel) {
-        log.info("save bidModel: {}", bidModel);
-        return bidService.save(bidModel)
+    public Mono<BidResponse> save(@RequestHeader("UserInfo") String userInfo,
+                                  @RequestBody @Validated BidModel bidModel) {
+        log.info("save bidModel: {}, userInfo: {}", bidModel, userInfo);
+        return bidService.save(userInfo, bidModel)
                 .doOnNext(bid -> {
                     Sinks.Many<BidResponse> bidSink = bidSinks.get(bid.getAuctionId());
                     if (bidSink != null) {
@@ -58,7 +105,7 @@ public class BidController {
                 });
     }
 
-    public boolean doOnClose(Long auctionId) {
+    public boolean sinkClose(Long auctionId) {
         if (bidSinks.containsKey(auctionId)) {
             Sinks.Many<BidResponse> bidSink = bidSinks.get(auctionId);
             bidSink.tryEmitComplete();

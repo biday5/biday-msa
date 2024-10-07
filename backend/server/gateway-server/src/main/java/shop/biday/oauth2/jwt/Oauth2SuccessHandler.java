@@ -15,7 +15,6 @@ import shop.biday.model.domain.LoginHistoryModel;
 import shop.biday.oauth2.OauthDto.CustomOAuth2User;
 import shop.biday.utils.RedisTemplateUtils;
 
-
 import java.net.URI;
 import java.util.Collection;
 import java.util.Iterator;

@@ -6,6 +6,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.FieldType;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
@@ -29,7 +30,7 @@ public class BidDocument {
     @Field(write = Write.ALWAYS)
     private String userId;
 
-    @Field(write = Write.ALWAYS)
+    @Field(write = Write.ALWAYS, targetType = FieldType.DECIMAL128)
     private BigInteger currentBid;
 
     @Builder.Default

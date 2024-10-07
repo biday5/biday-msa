@@ -28,8 +28,8 @@ public class FaqController {
     @GetMapping
     @Operation(summary = "모든 질문 조회", description = "DB에 저장된 모든 질문 목록을 조회합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "질문 목록 조회 성공", content = @Content(mediaType = "application/json")),
-            @ApiResponse(responseCode = "500", description = "서버 오류로 인한 질문 목록 조회 실패", content = @Content(mediaType = "application/json"))
+            @ApiResponse(responseCode = "200", description = "질문 목록 조회 성공"),
+            @ApiResponse(responseCode = "500", description = "서버 오류로 인한 질문 목록 조회 실패")
     })
     public ResponseEntity<List<FaqModel>> findAll() {
         return ResponseEntity.ok(faqService.findAll());
@@ -38,9 +38,9 @@ public class FaqController {
     @GetMapping("/{id}")
     @Operation(summary = "특정 질문 조회", description = "ID로 특정 질문을 조회합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "질문 조회 성공", content = @Content(mediaType = "application/json")),
-            @ApiResponse(responseCode = "404", description = "질문을 찾을 수 없음", content = @Content(mediaType = "application/json")),
-            @ApiResponse(responseCode = "500", description = "서버 오류로 인한 질문 조회 실패", content = @Content(mediaType = "application/json"))
+            @ApiResponse(responseCode = "200", description = "질문 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "질문을 찾을 수 없음"),
+            @ApiResponse(responseCode = "500", description = "서버 오류로 인한 질문 조회 실패")
     })
     @Parameter(name = "id", description = "조회할 질문의 ID", example = "1")
     public ResponseEntity<FaqModel> findById(@PathVariable Long id) {
@@ -50,23 +50,24 @@ public class FaqController {
     @PostMapping
     @Operation(summary = "새로운 질문 추가", description = "새로운 질문을 추가합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "질문 추가 성공", content = @Content(mediaType = "application/json")),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청으로 질문 추가 실패", content = @Content(mediaType = "application/json"))
+            @ApiResponse(responseCode = "201", description = "질문 추가 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청으로 질문 추가 실패")
     })
-    public ResponseEntity<FaqModel> addQuestion(@RequestBody FaqModel questionModel) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(faqService.save(questionModel));
+    public ResponseEntity<FaqModel> addQuestion(@RequestHeader("UserInfo") String userInfo,
+                                                @RequestBody FaqModel questionModel) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(faqService.save(userInfo, questionModel));
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "질문 삭제", description = "ID로 특정 질문을 삭제합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "질문 삭제 성공", content = @Content(mediaType = "application/json")),
-            @ApiResponse(responseCode = "404", description = "삭제할 질문을 찾을 수 없음", content = @Content(mediaType = "application/json")),
-            @ApiResponse(responseCode = "500", description = "서버 오류로 인한 질문 삭제 실패", content = @Content(mediaType = "application/json"))
+            @ApiResponse(responseCode = "204", description = "질문 삭제 성공"),
+            @ApiResponse(responseCode = "404", description = "삭제할 질문을 찾을 수 없음"),
+            @ApiResponse(responseCode = "500", description = "서버 오류로 인한 질문 삭제 실패")
     })
     @Parameter(name = "id", description = "삭제할 질문의 ID", example = "1")
-    public ResponseEntity<Boolean> deleteById(@PathVariable Long id) {
-        return ResponseEntity.ok(faqService.deleteById(id));
+    public ResponseEntity<Boolean> deleteById(@PathVariable Long id, @RequestHeader("UserInfo") String userInfo) {
+        return ResponseEntity.ok(faqService.deleteById(id, userInfo));
     }
 
     @GetMapping("/exists/{id}")

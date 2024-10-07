@@ -10,9 +10,9 @@ public interface BrandService {
 
     BrandModel findById(Long id);
 
-    BrandEntity save(String role, BrandModel brand);
+    BrandEntity save(String userInfoHeader, BrandModel brand);
 
-    BrandEntity update(String role, BrandModel brand);
+    BrandEntity update(String userInfoHeader, BrandModel brand);
 
-    String deleteById(String role, Long id);
+    String deleteById(String userInfoHeader, Long id);
 }

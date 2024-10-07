@@ -40,7 +40,7 @@ public class QuartzJob implements Job {
         log.info("SchedulerJob findTopBid: {}", findTopBid);
         if (findTopBid == null) {
             log.info("입찰자가 없습니다.");
-            bidController.doOnClose(auctionId);
+            bidController.sinkClose(auctionId);
             TriggerKey triggerKey = context.getTrigger().getKey();
             try {
                 context.getScheduler().unscheduleJob(triggerKey);
@@ -64,6 +64,6 @@ public class QuartzJob implements Job {
                 .count(count)
                 .build());
 
-        bidController.doOnClose(auctionId);
+        bidController.sinkClose(auctionId);
     }
 }

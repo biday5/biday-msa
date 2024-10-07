@@ -15,7 +15,6 @@ import shop.biday.model.entity.ShipperEntity;
 import shop.biday.service.ShipperService;
 
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -24,7 +23,6 @@ import java.util.Optional;
 @Tag(name = "shippers", description = "Shipper Controller")
 public class ShipperController {
 
-    // TODO: @RequestHeader token 부분 전체 수정 필요
     private final ShipperService shipperService;
 
     @GetMapping
@@ -56,8 +54,10 @@ public class ShipperController {
             @ApiResponse(responseCode = "404", description = "배송 등록 할 수 없음")
     })
     @Parameter(name = "name", description = "배송 이름", example = "나이키(Nike)")
-    public ResponseEntity<ShipperEntity> create(@RequestHeader("Authorization") String token, @RequestBody ShipperModel shipper) {
-        return ResponseEntity.ok(shipperService.save(token, shipper));
+    public ResponseEntity<ShipperEntity> create(@RequestHeader("UserInfo") String userInfo,
+                                                @RequestBody ShipperModel shipper) {
+        log.info("Shipper Controller create userInfo: {}, shipperModel: {}", userInfo, shipper);
+        return ResponseEntity.ok(shipperService.save(userInfo, shipper));
     }
 
     @PatchMapping
@@ -71,8 +71,9 @@ public class ShipperController {
             @Parameter(name = "createdAt", description = "등록 시간", example = "localDateTime 값"),
             @Parameter(name = "updatedAt", description = "수정 시간", example = "localDateTime 값")
     })
-    public ResponseEntity<ShipperEntity> update(@RequestHeader("Authorization") String token, @RequestBody ShipperModel shipper) {
-        return ResponseEntity.ok(shipperService.update(token, shipper));
+    public ResponseEntity<ShipperEntity> update(@RequestHeader("UserInfo") String userInfo,
+                                                @RequestBody ShipperModel shipper) {
+        return ResponseEntity.ok(shipperService.update(userInfo, shipper));
     }
 
     @DeleteMapping
@@ -82,7 +83,7 @@ public class ShipperController {
             @ApiResponse(responseCode = "404", description = "배송 삭제 할 수 없음")
     })
     @Parameter(name = "id", description = "배송 id", example = "1")
-    public ResponseEntity<String> delete(@RequestHeader("Authorization") String token, @RequestParam Long id) {
-        return ResponseEntity.ok(shipperService.deleteById(token, id));
+    public ResponseEntity<String> delete(@RequestHeader("UserInfo") String userInfo, @RequestParam Long id) {
+        return ResponseEntity.ok(shipperService.deleteById(userInfo, id));
     }
 }

@@ -3,17 +3,16 @@ package shop.biday.service;
 import shop.biday.model.domain.FaqModel;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface FaqService {
 
     List<FaqModel> findAll();
 
-    FaqModel save(FaqModel questionModel);
+    FaqModel save(String userInfo, FaqModel questionModel);
 
     FaqModel findById(Long id);
 
-    boolean deleteById(Long id);
+    boolean deleteById(Long id, String userInfo);
 
     boolean existsById(Long id);
 }

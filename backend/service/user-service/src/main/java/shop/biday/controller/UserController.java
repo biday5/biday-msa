@@ -27,8 +27,6 @@ import shop.biday.service.impl.UserServiceImpl;
 public class UserController {
     private final UserServiceImpl userService;
 
-
-
     @PostMapping("/register")
     @Operation(summary = "유저 회원가입", description = "oauth 유저 회원가입할 때 사용하는 api")
     @ApiResponses(value = {
@@ -47,12 +45,6 @@ public class UserController {
         return new ResponseEntity<>(userService.register(model), HttpStatus.OK);
     }
     //TODO 예전 비번이랑 바꾸는 비번이랑 같을 경우 체크?
-//    {
-//        "email": "gnltps18@naver.com",
-//            "password": "gnltps18@naver.com",
-//            "newPassword": "gnltps18@naver.com"
-//
-//    }
     @PatchMapping("/changepass")
     @Operation(summary = "비밀번호 변경", description = "사용자의 비밀번호를 변경합니다.")
     @ApiResponses(value = {
@@ -82,9 +74,6 @@ public class UserController {
     }
 
     //TODO 확인완료
-//    {
-//        "email": "gnltps18@naver.com"
-//    }
     @PostMapping("/password")
     @Operation(summary = "유저 비밀번호 검증", description = "소셜 로그인 후 이메일과 비밀번호 같은 검증 api")
     @ApiResponses(value = {
@@ -96,7 +85,6 @@ public class UserController {
         return new ResponseEntity<>(userService.existsByPasswordAndEmail(userModel), HttpStatus.OK);
     }
 
-    //TODO 내일 확인
     @PostMapping("/join")
     @Operation(summary = "유저 회원가입", description = "유저 회원가입할 때 사용하는 api")
     @ApiResponses(value = {

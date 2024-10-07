@@ -5,12 +5,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import shop.biday.model.domain.AuctionModel;
+import shop.biday.model.domain.UserInfoModel;
 import shop.biday.model.dto.AuctionDto;
 import shop.biday.model.entity.AuctionEntity;
 import shop.biday.model.repository.AuctionRepository;
 import shop.biday.scheduler.QuartzService;
 import shop.biday.service.AuctionService;
+import shop.biday.utils.UserInfoUtils;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -22,6 +26,7 @@ import java.util.Optional;
 public class AuctionServiceImpl implements AuctionService {
     private final AuctionRepository auctionRepository;
     private final QuartzService quartzService;
+    private final UserInfoUtils userInfoUtils;
 
     @Override
     public AuctionModel findById(Long id) {
@@ -31,6 +36,19 @@ public class AuctionServiceImpl implements AuctionService {
                     log.warn("Auction not found for id: {}", id);
                     return null;
                 });
+    }
+
+    @Override
+    public Mono<AuctionDto> findByAuctionId(Long auctionId) {
+        return Mono.fromCallable(() -> auctionRepository.findById(auctionId))
+                .subscribeOn(Schedulers.boundedElastic())
+                .map(auctionEntity -> auctionEntity
+                        .map(auction -> AuctionDto.builder()
+                                .id(auction.getId())
+                                .currentBid(auction.getCurrentBid())
+                                .startedAt(auction.getStartedAt())
+                                .build())
+                        .orElseThrow(() -> new IllegalArgumentException("잘못된 요청입니다.")));
     }
 
     @Override
@@ -52,10 +70,10 @@ public class AuctionServiceImpl implements AuctionService {
     }
 
     @Override
-    public Slice<AuctionDto> findByUser(String role, String userId, String period, Long cursor, Pageable pageable) {
-        log.info("Find All Auctions By User: {}", userId);
-        return validateUser(role)
-                .map(t -> auctionRepository.findByUser(userId, period, cursor, pageable))
+    public Slice<AuctionDto> findByUser(String userInfoHeader, String period, Long cursor, Pageable pageable) {
+        log.info("Find All Auctions By User: {}", userInfoHeader);
+        return validateUser(userInfoHeader)
+                .map(t -> auctionRepository.findByUser(userInfoUtils.extractUserInfo(userInfoHeader).getUserId(), period, cursor, pageable))
                 .orElseThrow(() -> new IllegalArgumentException("User does not exist or invalid role"));
     }
 
@@ -69,11 +87,11 @@ public class AuctionServiceImpl implements AuctionService {
     }
 
     @Override
-    public AuctionEntity save(String role, String userId, AuctionModel auction) {
+    public AuctionEntity save(String userInfoHeader, AuctionModel auction) {
         log.info("Save Auction started");
-        AuctionEntity auctionEntity = validateUser(role)
+        AuctionEntity auctionEntity = validateUser(userInfoHeader)
                 .map(t -> auctionRepository.save(AuctionEntity.builder()
-                        .userId(userId)
+                        .userId(userInfoUtils.extractUserInfo(userInfoHeader).getUserId())
                         .sizeId(auction.getSize())
                         .description(auction.getDescription())
                         .startingBid(auction.getStartingBid())
@@ -88,17 +106,17 @@ public class AuctionServiceImpl implements AuctionService {
     }
 
     @Override
-    public AuctionEntity update(String role, String userId, AuctionModel auction) {
+    public AuctionEntity update(String userInfoHeader, AuctionModel auction) {
         log.info("Update Auction started for id: {}", auction.getId());
-        return validateUser(role)
+        return validateUser(userInfoHeader)
                 .map(t -> {
                     Long auctionId = auction.getId();
                     String auctionUserId = auctionRepository.findById(auctionId)
                             .orElseThrow(() -> new IllegalArgumentException("Auction not found"))
                             .getUserId();
 
-                    if (!auctionUserId.equals(userId)) {
-                        log.error("User with ID {} does not have Update Authority for auction id: {}", userId, auctionId);
+                    if (!auctionUserId.equals(userInfoUtils.extractUserInfo(userInfoHeader).getUserId())) {
+                        log.error("User with ID {} does not have Update Authority for auction id: {}", userInfoUtils.extractUserInfo(userInfoHeader).getUserId(), auctionId);
                         throw new SecurityException("User does not have permission to update this auction.");
                     } else {
                         AuctionEntity auctionEntity = auctionRepository.save(AuctionEntity.builder()
@@ -121,16 +139,16 @@ public class AuctionServiceImpl implements AuctionService {
     }
 
     @Override
-    public String deleteById(String role, String userId, Long id) {
+    public String deleteById(String userInfoHeader, Long id) {
         log.info("Delete Auction started for id: {}", id);
-        return validateUser(role)
+        return validateUser(userInfoHeader)
                 .map(t -> {
                     String auctionUserId = auctionRepository.findById(id)
                             .orElseThrow(() -> new IllegalArgumentException("Auction not found"))
                             .getUserId();
 
-                    if (!auctionUserId.equals(userId)) {
-                        log.error("User with ID {} does not have Delete Authority for auction id: {}", userId, id);
+                    if (!auctionUserId.equals(userInfoUtils.extractUserInfo(userInfoHeader).getUserId())) {
+                        log.error("User with ID {} does not have Delete Authority for auction id: {}", userInfoUtils.extractUserInfo(userInfoHeader).getUserId(), id);
                         return "삭제 권한이 없습니다";
                     } else {
                         auctionRepository.deleteById(id);
@@ -144,12 +162,13 @@ public class AuctionServiceImpl implements AuctionService {
                 });
     }
 
-    private Optional<String> validateUser(String role) {
-        log.info("Validating user role: {}", role);
-        return Optional.ofNullable(role)
+    private Optional<String> validateUser(String userInfoHeader) {
+        log.info("Validating user: {}", userInfoHeader);
+        UserInfoModel userInfoModel = userInfoUtils.extractUserInfo(userInfoHeader);
+        return Optional.ofNullable(userInfoModel.getUserRole())
                 .filter(t -> t.equalsIgnoreCase("ROLE_SELLER"))
                 .or(() -> {
-                    log.error("User does not have role SELLER: {}", role);
+                    log.error("User does not have role SELLER: {}", userInfoModel.getUserRole());
                     return Optional.empty();
                 });
     }

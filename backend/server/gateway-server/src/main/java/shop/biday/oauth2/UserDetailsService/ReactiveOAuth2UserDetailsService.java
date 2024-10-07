@@ -18,7 +18,6 @@ import shop.biday.oauth2.OauthDto.NaverResponse;
 import shop.biday.oauth2.OauthDto.OAuth2Response;
 import shop.biday.oauth2.OauthDto.UserRegistrationRequest;
 
-
 import java.util.Collections;
 import java.util.Map;
 

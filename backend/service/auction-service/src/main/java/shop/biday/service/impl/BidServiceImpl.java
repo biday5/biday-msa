@@ -6,9 +6,11 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import shop.biday.model.document.BidDocument;
 import shop.biday.model.domain.BidModel;
+import shop.biday.model.domain.UserInfoModel;
 import shop.biday.model.dto.BidResponse;
 import shop.biday.model.repository.BidRepository;
 import shop.biday.service.BidService;
+import shop.biday.utils.UserInfoUtils;
 
 @Slf4j
 @Service
@@ -16,12 +18,15 @@ import shop.biday.service.BidService;
 public class BidServiceImpl implements BidService {
 
     private final BidRepository bidRepository;
+    private final UserInfoUtils userInfoUtils;
 
     @Override
-    public Mono<BidResponse> save(BidModel bid) {
+    public Mono<BidResponse> save(String userInfo, BidModel bid) {
+        UserInfoModel userInfoModel = userInfoUtils.extractUserInfo(userInfo);
+
         BidDocument bidDocument = BidDocument.builder()
                 .auctionId(bid.auctionId())
-                .userId(bid.userId())
+                .userId(userInfoModel.getUserId())
                 .currentBid(bid.currentBid())
                 .build();
 
@@ -59,5 +64,10 @@ public class BidServiceImpl implements BidService {
     @Override
     public Mono<Long> countBidByAuctionIdAndUserId(Long auctionId, String userId) {
         return bidRepository.countByAuctionIdAndUserId(auctionId, userId);
+    }
+
+    @Override
+    public Mono<Long> countByAuctionId(Long auctionId) {
+        return bidRepository.countByAuctionId(auctionId);
     }
 }

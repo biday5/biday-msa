@@ -4,13 +4,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import shop.biday.model.domain.AnnouncementModel;
+import shop.biday.model.domain.UserInfoModel;
 import shop.biday.model.entity.AnnouncementEntity;
 import shop.biday.model.repository.AnnouncementRepository;
 import shop.biday.service.AnnouncementService;
+import shop.biday.utils.UserInfoUtils;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 public class AnnouncementServiceImpl implements AnnouncementService {
 
     private final AnnouncementRepository announcementRepository;
+    private final UserInfoUtils userInfoUtils;
 
     @Override
     public List<AnnouncementModel> findAll() {
@@ -28,10 +29,12 @@ public class AnnouncementServiceImpl implements AnnouncementService {
     }
 
     @Override
-    public AnnouncementModel save(AnnouncementModel announcementModel) {
+    public AnnouncementModel save(String userInfo, AnnouncementModel announcementModel) {
+        UserInfoModel userInfoModel = getUserInfoModel(userInfo);
+
         return AnnouncementModel.of(announcementRepository.save(
                 AnnouncementEntity.builder()
-                        .userId(announcementModel.getUserId())
+                        .userId(userInfoModel.getUserId())
                         .title(announcementModel.getTitle())
                         .content(announcementModel.getContent())
                         .build()));
@@ -44,7 +47,9 @@ public class AnnouncementServiceImpl implements AnnouncementService {
     }
 
     @Override
-    public boolean deleteById(Long id) {
+    public boolean deleteById(Long id, String userInfo) {
+        getUserInfoModel(userInfo);
+
         if (!existsById(id)) {
             return false;
         }
@@ -55,5 +60,13 @@ public class AnnouncementServiceImpl implements AnnouncementService {
     @Override
     public boolean existsById(Long id) {
         return announcementRepository.existsById(id);
+    }
+
+    private UserInfoModel getUserInfoModel(String userInfo) {
+        UserInfoModel userInfoModel = userInfoUtils.extractUserInfo(userInfo);
+        if (!userInfoModel.getUserRole().equalsIgnoreCase("ROLE_ADMIN")) {
+            throw new IllegalArgumentException("사용자 정보가 올바르지 않습니다.");
+        }
+        return userInfoModel;
     }
 }

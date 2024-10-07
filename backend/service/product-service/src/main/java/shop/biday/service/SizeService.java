@@ -13,9 +13,9 @@ public interface SizeService {
 
     List<SizeModel> findAllByProductId(Long productId);
 
-    SizeEntity save(String role, SizeModel size);
+    SizeEntity save(String userInfoHeader, SizeModel size);
 
-    SizeEntity update(String role, SizeModel size);
+    SizeEntity update(String userInfoHeader, SizeModel size);
 
-    String deleteById(String role, Long id);
+    String deleteById(String userInfoHeader, Long id);
 }

@@ -4,26 +4,25 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import shop.biday.model.domain.ShipperModel;
+import shop.biday.model.domain.UserInfoModel;
 import shop.biday.model.entity.PaymentEntity;
 import shop.biday.model.entity.ShipperEntity;
 import shop.biday.model.repository.ShipperRepository;
 import shop.biday.service.PaymentService;
 import shop.biday.service.ShipperService;
+import shop.biday.utils.UserInfoUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class ShipperServiceImpl implements ShipperService {
 
-    // TODO: validate 메소드 전체 삭제
     private final PaymentService paymentService;
     private final ShipperRepository shipperRepository;
-//    private final JWTUtil jwtUtil;
-//    private final UserRepository userRepository;
+    private final UserInfoUtils userInfoUtils;
 
     @Override
     public List<ShipperModel> findAll() {
@@ -42,83 +41,70 @@ public class ShipperServiceImpl implements ShipperService {
     }
 
     @Override
-    public ShipperEntity save(String token, ShipperModel shipper) {
+    public ShipperEntity save(String userInfo, ShipperModel shipper) {
         log.info("Save shipper started");
+        getUserInfoModel(userInfo);
+
         PaymentEntity payment = paymentService.findById(shipper.getPaymentId());
 
-        return validateUser(token)
-                .map(t -> shipperRepository.save(ShipperEntity.builder()
-                        .payment(payment)
-                        .carrier(shipper.getCarrier())
-                        .trackingNumber(shipper.getTrackingNumber())
-                        .shipmentDate(shipper.getShipmentDate())
-                        .estimatedDeliveryDate(shipper.getEstimatedDeliveryDate())
-                        .deliveryAddress(shipper.getDeliveryAddress())
-                        .status("준비중")
-                        .deliveryAddress(shipper.getDeliveryAddress())
-                        .createdAt(LocalDateTime.now())
-                        .build()))
-                .orElseThrow(() -> new RuntimeException("Save shipper failed"));
+        return shipperRepository.save(ShipperEntity.builder()
+                .payment(payment)
+                .carrier(shipper.getCarrier())
+                .trackingNumber(shipper.getTrackingNumber())
+                .shipmentDate(shipper.getShipmentDate())
+                .estimatedDeliveryDate(shipper.getEstimatedDeliveryDate())
+                .deliveryAddress(shipper.getDeliveryAddress())
+                .status("준비중")
+                .deliveryAddress(shipper.getDeliveryAddress())
+                .createdAt(LocalDateTime.now())
+                .build());
     }
 
     @Override
-    public ShipperEntity update(String token, ShipperModel shipper) {
+    public ShipperEntity update(String userInfo, ShipperModel shipper) {
         log.info("Update shipper started");
+        getUserInfoModel(userInfo);
+
         PaymentEntity payment = paymentService.findById(shipper.getPaymentId());
 
-        return validateUser(token)
-                .filter(t -> {
-                    boolean exists = shipperRepository.existsById(shipper.getId());
-                    if (!exists) {
-                        log.error("Not found shipper: {}", shipper.getId());
-                    }
-                    return exists;
-                })
-                .map(t -> shipperRepository.save(ShipperEntity.builder()
-                        .id(shipper.getId())
-                        .payment(payment)
-                        .carrier(shipper.getCarrier())
-                        .trackingNumber(shipper.getTrackingNumber())
-                        .shipmentDate(shipper.getShipmentDate())
-                        .estimatedDeliveryDate(shipper.getEstimatedDeliveryDate())
-                        .deliveryAddress(shipper.getDeliveryAddress())
-                        .status(shipper.getStatus())
-                        .deliveryAddress(shipper.getDeliveryAddress())
-                        .createdAt(shipper.getCreatedAt())
-                        .updatedAt(LocalDateTime.now())
-                        .build()))
-                .orElseThrow(() -> new RuntimeException("Update shipper failed: shipper not found"));
+        if (!shipperRepository.existsById(shipper.getId())) {
+            log.error("Not found shipper: {}", shipper.getId());
+            throw new IllegalArgumentException("잘못된 요청입니다.");
+        }
+
+        return shipperRepository.save(ShipperEntity.builder()
+                .id(shipper.getId())
+                .payment(payment)
+                .carrier(shipper.getCarrier())
+                .trackingNumber(shipper.getTrackingNumber())
+                .shipmentDate(shipper.getShipmentDate())
+                .estimatedDeliveryDate(shipper.getEstimatedDeliveryDate())
+                .deliveryAddress(shipper.getDeliveryAddress())
+                .status(shipper.getStatus())
+                .deliveryAddress(shipper.getDeliveryAddress())
+                .createdAt(shipper.getCreatedAt())
+                .updatedAt(LocalDateTime.now())
+                .build());
     }
 
     @Override
-    public String deleteById(String token, Long id) {
+    public String deleteById(String userInfo, Long id) {
         log.info("Delete shipper started for id: {}", id);
+        getUserInfoModel(userInfo);
 
-        return validateUser(token).map(t -> {
-            if (!shipperRepository.existsById(id)) {
-                log.error("Not found shipper: {}", id);
-                return "배송지 삭제 실패";
-            }
+        if (!shipperRepository.existsById(id)) {
+            log.error("배송 정보를 찾을수 없습니다: {}", id);
+            return "배송지 삭제 실패";
+        }
 
-            shipperRepository.deleteById(id);
-            log.info("Shipper deleted: {}", id);
-            return "배송지 삭제 성공";
-        }).orElseGet(() -> {
-            log.error("User does not have role SELLER or does not exist");
-            return "유효하지 않은 사용자";
-        });
+        shipperRepository.deleteById(id);
+        return "배송지 삭제 성공";
     }
 
-
-    private Optional<String> validateUser(String token) {
-        log.info("Validate User started");
-//        return Optional.of(token)
-//                .filter(t -> jwtUtil.getRole(t).equalsIgnoreCase("ROLE_SELLER"))
-//                .filter(t -> userRepository.existsByEmail(jwtUtil.getEmail(t)))
-//                .or(() -> {
-//                    log.error("User does not have role SELLER or does not exist");
-//                    return Optional.empty();
-//                });
-        return null;
+    private void getUserInfoModel(String userInfo) {
+        UserInfoModel userInfoModel = userInfoUtils.extractUserInfo(userInfo);
+        if (!userInfoModel.getUserRole().equalsIgnoreCase("ROLE_SELLER")) {
+            throw new IllegalArgumentException("사용자 정보가 올바르지 않습니다.");
+        }
     }
 }

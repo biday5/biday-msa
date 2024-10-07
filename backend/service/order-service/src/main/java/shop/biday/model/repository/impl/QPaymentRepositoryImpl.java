@@ -21,7 +21,6 @@ public class QPaymentRepositoryImpl implements QPaymentRepository {
     public List<PaymentRequest> findByUser(String userId) {
         return queryFactory
                 .select(Projections.constructor(PaymentRequest.class,
-                        qPayment.userId,
                         qPayment.awardId,
                         qPayment.paymentKey,
                         qPayment.totalAmount,

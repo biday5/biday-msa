@@ -11,7 +11,6 @@ import org.springframework.security.oauth2.client.InMemoryReactiveOAuth2Authoriz
 import org.springframework.security.oauth2.client.ReactiveOAuth2AuthorizedClientService;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.context.NoOpServerSecurityContextRepository;
-import org.springframework.security.web.server.context.WebSessionServerSecurityContextRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsConfigurationSource;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
@@ -22,7 +21,6 @@ import shop.biday.oauth2.UserDetailsService.CustomReactiveAuthenticationManager;
 import shop.biday.oauth2.jwt.*;
 import shop.biday.oauth2.social.CustomClientRegistrationRepo;
 import shop.biday.utils.RedisTemplateUtils;
-
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -54,6 +52,10 @@ public class SecurityConfig {
                         .authenticationSuccessHandler(oauth2SuccessHandler))
                 .authorizeExchange(exchange -> exchange
                         .pathMatchers("/v3/api-docs/**",  "/swagger-ui/**", "/webjars/**").permitAll()
+<<<<<<< HEAD
+=======
+                        .pathMatchers("/actuator/**",  "/*-service/**").permitAll()
+>>>>>>> 7c4ea17b98e7778c248665e3e96a89bc0bb8f8f8
                         .pathMatchers("/login","/reissue", "/logout").permitAll()
                         .pathMatchers( "/api/auctions/**","/api/loginHistory/**", "/api/users/**", "/api/account/**","/api/addresses/**","/api/faqs/**","/api/images/**","/api/payments/**","/api/products/**","/api/sms/**").permitAll())
                       // .anyExchange().authenticated())
@@ -62,6 +64,7 @@ public class SecurityConfig {
                 .securityContextRepository(NoOpServerSecurityContextRepository.getInstance());
         return http.build();
     }
+
 
     @Bean
     public WebSessionStore webSessionStore() {
@@ -74,15 +77,20 @@ public class SecurityConfig {
         configuration.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowCredentials(true);
+<<<<<<< HEAD
         configuration.setAllowedHeaders(Collections.singletonList("*"));
         configuration.setExposedHeaders(Arrays.asList("Authorization")); // Authorization 헤더 노출
+=======
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "UserInfo"));
+        configuration.setExposedHeaders(Arrays.asList("Authorization"));
+>>>>>>> 7c4ea17b98e7778c248665e3e96a89bc0bb8f8f8
         configuration.setMaxAge(3600L);
 
         // CORS 설정을 경로에 따라 등록
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration); // 모든 경로에 CORS 설정 적용
 
-        return request -> configuration;
+        return source;
     }
 
     @Bean

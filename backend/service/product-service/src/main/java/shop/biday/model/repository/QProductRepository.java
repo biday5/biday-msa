@@ -9,7 +9,9 @@ import java.util.Map;
 public interface QProductRepository {
     Map<Long, ProductModel> findAllProduct();
 
-    Map<Long, ProductModel> findByProductId(Long id, String name);
+    Map<Long, ProductModel> findAllByProductName(Long id, String name);
+
+    Map<Long, ProductModel> findByProductId(Long id);
 
     List<ProductDto> findProducts(Long categoryId, Long brandId, String keyword, String color, String order, Long lastItemId);
 }

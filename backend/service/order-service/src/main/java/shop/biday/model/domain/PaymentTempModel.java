@@ -10,10 +10,6 @@ public record PaymentTempModel(
         @NotBlank(message = "주문번호는 반드시 존재하고, 빈 값과 공백일 수 없습니다.")
         String orderId,
 
-//        @Schema(description = "사용자 아이디", example = "1")
-//        @NotBlank(message = "사용자 아이디는 반드시 존재하고, 빈 값과 공백일 수 없습니다.")
-//        String userId,
-
         @Schema(description = "낙찰 아이디", example = "2")
         @Positive
         @NotNull(message = "필수 값입니다.")

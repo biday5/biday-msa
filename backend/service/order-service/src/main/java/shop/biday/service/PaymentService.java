@@ -10,9 +10,9 @@ import java.util.List;
 
 public interface PaymentService {
 
-    void savePaymentTemp(PaymentTempModel paymentTempModel);
+    void savePaymentTemp(String userInfo, PaymentTempModel paymentTempModel);
 
-    Boolean save(PaymentRequest paymentRequest);
+    Boolean save(String userInfo, PaymentRequest paymentRequest);
 
     PaymentEntity findById(Long id);
 

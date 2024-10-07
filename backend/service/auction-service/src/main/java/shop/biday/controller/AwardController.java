@@ -39,13 +39,13 @@ public class AwardController {
             @Parameter(name = "size", description = "한 페이지에서 보여질 경매의 개수", example = "20"),
     })
     public ResponseEntity<Slice<AwardModel>> findByUser(
-            @RequestHeader String userId,
+            @RequestHeader("UserInfo") String userInfoHeader,
             @RequestParam(value = "period", required = false, defaultValue = "3개월") String period,
             @RequestParam(value = "cursor", required = false) LocalDateTime cursor,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "5") int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return ResponseEntity.ok(awardService.findByUser(userId, period, cursor, pageable));
+        return ResponseEntity.ok(awardService.findByUser(userInfoHeader, period, cursor, pageable));
     }
 
     @GetMapping("/findById")
@@ -59,8 +59,8 @@ public class AwardController {
             @Parameter(name = "id", description = "상세보기할 낙찰의 id", example = "1")
     })
     public ResponseEntity<AwardModel> findById(
-            @RequestHeader String userId,
+            @RequestHeader("UserInfo") String userInfoHeader,
             @RequestParam(value = "awardId", required = true) Long awardId) {
-        return ResponseEntity.ok(awardService.findByAwardId(userId, awardId));
+        return ResponseEntity.ok(awardService.findByAwardId(userInfoHeader, awardId));
     }
 }

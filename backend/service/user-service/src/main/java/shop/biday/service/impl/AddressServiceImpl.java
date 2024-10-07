@@ -7,9 +7,11 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import shop.biday.model.document.AddressDocument;
 import shop.biday.model.domain.AddressModel;
+import shop.biday.model.domain.UserInfoModel;
 import shop.biday.model.enums.AddressType;
 import shop.biday.model.repository.MAddressRepository;
 import shop.biday.service.AddressService;
+import shop.biday.utils.UserInfoUtils;
 
 
 @Slf4j
@@ -17,6 +19,7 @@ import shop.biday.service.AddressService;
 @RequiredArgsConstructor
 public class AddressServiceImpl implements AddressService {
     private final MAddressRepository addressRepository;
+    private final UserInfoUtils userInfoUtils;
 
     @Override
     public Flux<AddressDocument> findAll() {
@@ -76,8 +79,9 @@ public class AddressServiceImpl implements AddressService {
         return addressRepository.deleteById(id).hasElement();
     }
 
-    public Mono<Long> countByUserId(String userId) {
-        return addressRepository.countByUserId(userId);
+    public Mono<Long> countByUserId(String userInfoHeader) {
+        UserInfoModel userInfoModel = userInfoUtils.extractUserInfo(userInfoHeader);
+        return addressRepository.countByUserId(userInfoModel.getUserId());
     }
 
     public Mono<String> pick(String id) {
@@ -100,7 +104,8 @@ public class AddressServiceImpl implements AddressService {
                 .switchIfEmpty(Mono.error(new RuntimeException("주소를 찾지 못했습니다.")));
     }
 
-    public Flux<AddressDocument> findAllByUserId(String userId) {
-        return addressRepository.findAllByUserId(userId);
+    public Flux<AddressDocument> findAllByUserId(String userInfoHeader) {
+        UserInfoModel userInfoModel = userInfoUtils.extractUserInfo(userInfoHeader);
+        return addressRepository.findAllByUserId(userInfoModel.getUserId());
     }
 }

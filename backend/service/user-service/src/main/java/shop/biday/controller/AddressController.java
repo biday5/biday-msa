@@ -32,11 +32,8 @@ public class AddressController {
             @ApiResponse(responseCode = "404", description = "주소를 찾을 수 없습니다.")
     })
     @Parameter(name = "access", description = "{token}", example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...")
-    public ResponseEntity<Flux<AddressDocument>> findAllByUserId(
-            @RequestHeader("userId") String userId,
-            @RequestHeader("role") String role,
-            @RequestHeader("name") String name) {
-        return ResponseEntity.ok(addressService.findAllByUserId(userId));
+    public ResponseEntity<Flux<AddressDocument>> findAllByUserId(@RequestHeader("UserInfo") String userInfoHeader) {
+        return ResponseEntity.ok(addressService.findAllByUserId(userInfoHeader));
     }
 
     @PutMapping("/pick")
@@ -63,8 +60,8 @@ public class AddressController {
             @ApiResponse(responseCode = "400", description = "잘못된 요청입니다.", content = @Content)
     })
     @Parameter(name = "email", description = "주소 리스트의 이메일", example = "example@naver.com")
-    public ResponseEntity<Mono<Long>> count(@RequestHeader("Authorization") String token) {
-        return ResponseEntity.ok(addressService.countByUserId(token));
+    public ResponseEntity<Mono<Long>> count(@RequestHeader("UserInfo") String userInfoHeader) {
+        return ResponseEntity.ok(addressService.countByUserId(userInfoHeader));
     }
 
     @DeleteMapping("/deleteById")

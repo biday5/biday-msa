@@ -31,9 +31,10 @@ public class PaymentController {
     @Operation(summary = "결제 데이터 임시 저장", description = "결제 요청 전 데이터 임시 저장합니다.")
     @ApiResponse(responseCode = "201", description = "성공")
     @PostMapping("/temp")
-    public ResponseEntity<?> savePaymentTemp(@RequestBody @Validated PaymentTempModel paymentTempModel) {
-        log.info("paymentTempModel: {}", paymentTempModel);
-        paymentService.savePaymentTemp(paymentTempModel);
+    public ResponseEntity<?> savePaymentTemp(@RequestHeader("UserInfo") String userInfo,
+                                             @RequestBody @Validated PaymentTempModel paymentTempModel) {
+        log.info("paymentTempModel: {}, userInfo: {}", paymentTempModel, userInfo);
+        paymentService.savePaymentTemp(userInfo, paymentTempModel);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
@@ -43,9 +44,10 @@ public class PaymentController {
             @ApiResponse(responseCode = "400", description = "결제 승인 실패")
     })
     @PostMapping
-    public ResponseEntity<?> savePayment(@RequestBody @Validated PaymentRequest paymentRequest) {
-        log.info("paymentRequest: {}", paymentRequest);
-        return new ResponseEntity<>(paymentService.save(paymentRequest), HttpStatus.CREATED);
+    public ResponseEntity<?> savePayment(@RequestHeader("UserInfo") String userInfo,
+                                         @RequestBody @Validated PaymentRequest paymentRequest) {
+        log.info("paymentRequest: {}: userInfo: {}", paymentRequest, userInfo);
+        return new ResponseEntity<>(paymentService.save(userInfo, paymentRequest), HttpStatus.CREATED);
     }
 
     @Operation(summary = "결제 조회", description = "paymentKey로 결제 조회합니다.")
@@ -62,8 +64,8 @@ public class PaymentController {
     @Operation(summary = "사용자 기준 결제 내역 조회", description = "userId로 결제 조회합니다.")
     @ApiResponse(responseCode = "200", description = "성공")
     @GetMapping("/findByUser")
-    public ResponseEntity<List<PaymentRequest>> findByUser(@RequestHeader("Authorization") String token) {
-        log.info("findByUser: {}", token);
-        return new ResponseEntity<>(paymentService.findByUser(token), HttpStatus.OK);
+    public ResponseEntity<List<PaymentRequest>> findByUser(@RequestHeader("UserInfo") String userInfo) {
+        log.info("findByUser: {}", userInfo);
+        return new ResponseEntity<>(paymentService.findByUser(userInfo), HttpStatus.OK);
     }
 }

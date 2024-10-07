@@ -85,22 +85,20 @@ public class AuctionController {
             @ApiResponse(responseCode = "404", description = "경매 목록 찾을 수 없음")
     })
     @Parameters({
-            @Parameter(name = "role", description = "현재 로그인한 사용자 token에서 추출한 role", example = "ROLE_SELLER"),
-            @Parameter(name = "userId", description = "현재 로그인한 사용자 token에서 추출한 userId", example = "66f1442a7415bc47b04b3477"),
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 token", example = ""),
             @Parameter(name = "period", description = "기간별 정렬", example = "3개월"),
             @Parameter(name = "cursor", description = "현재 페이지에서 가장 마지막 경매의 id", example = "1"),
             @Parameter(name = "page", description = "페이지 번호", example = "1"),
             @Parameter(name = "size", description = "한 페이지에서 보여질 경매의 개수", example = "20"),
     })
     public ResponseEntity<Slice<AuctionDto>> findByUser(
-            @RequestHeader String role,
-            @RequestHeader String userId,
+            @RequestHeader("UserInfo") String userInfoHeader,
             @RequestParam(value = "period", required = false, defaultValue = "3개월") String period,
             @RequestParam(value = "cursor", required = false) Long cursor,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "5") int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return ResponseEntity.ok(auctionService.findByUser(role, userId, period, cursor, pageable));
+        return ResponseEntity.ok(auctionService.findByUser(userInfoHeader, period, cursor, pageable));
     }
 
     @PostMapping
@@ -110,8 +108,7 @@ public class AuctionController {
             @ApiResponse(responseCode = "404", description = "경매 등록 할 수 없음")
     })
     @Parameters({
-            @Parameter(name = "role", description = "현재 로그인한 사용자 token에서 추출한 role", example = "ROLE_ADMIN"),
-            @Parameter(name = "userId", description = "현재 로그인한 사용자 token에서 추출한 userId", example = "66f1442a7415bc47b04b3477"),
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 token", example = ""),
             @Parameter(examples = {
                     @ExampleObject(name = "exampleProductModel", value = """ 
                         { 
@@ -126,10 +123,9 @@ public class AuctionController {
                     """)})
     })
     public ResponseEntity<AuctionEntity> save(
-            @RequestHeader String role,
-            @RequestHeader String userId,
+            @RequestHeader("UserInfo") String userInfoHeader,
             @RequestBody AuctionModel auctionModel) {
-        return ResponseEntity.ok(auctionService.save(role, userId, auctionModel));
+        return ResponseEntity.ok(auctionService.save(userInfoHeader, auctionModel));
     }
 
     @PatchMapping
@@ -139,8 +135,7 @@ public class AuctionController {
             @ApiResponse(responseCode = "404", description = "경매 수정 할 수 없음")
     })
     @Parameters({
-            @Parameter(name = "role", description = "현재 로그인한 사용자 token에서 추출한 role", example = "ROLE_ADMIN"),
-            @Parameter(name = "userId", description = "현재 로그인한 사용자 token에서 추출한 userId", example = "66f1442a7415bc47b04b3477"),
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 token", example = ""),
             @Parameter(examples = {
                     @ExampleObject(name = "exampleProductModel", value = """ 
                         { 
@@ -156,10 +151,9 @@ public class AuctionController {
                     """)})
     })
     public ResponseEntity<AuctionEntity> update(
-            @RequestHeader String role,
-            @RequestHeader String userId,
+            @RequestHeader("UserInfo") String userInfoHeader,
             @RequestBody AuctionModel auctionModel) {
-        return ResponseEntity.ok(auctionService.update(role, userId, auctionModel));
+        return ResponseEntity.ok(auctionService.update(userInfoHeader, auctionModel));
     }
 
     @DeleteMapping
@@ -169,14 +163,13 @@ public class AuctionController {
             @ApiResponse(responseCode = "404", description = "경매 찾을 수 없음")
     })
     @Parameters({
-            @Parameter(name = "role", description = "현재 로그인한 사용자 token에서 추출한 role", example = "ROLE_ADMIN"),
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 token", example = ""),
             @Parameter(name = "userId", description = "현재 로그인한 사용자 token에서 추출한 userId", example = "66f1442a7415bc47b04b3477"),
             @Parameter(name = "brandId", description = "브랜드 id", example = "1")
     })
     public ResponseEntity<String> delete(
-            @RequestHeader String role,
-            @RequestHeader String userId,
+            @RequestHeader("UserInfo") String userInfoHeader,
             @RequestParam Long id) {
-        return ResponseEntity.ok(auctionService.deleteById(role, userId, id));
+        return ResponseEntity.ok(auctionService.deleteById(userInfoHeader, id));
     }
 }

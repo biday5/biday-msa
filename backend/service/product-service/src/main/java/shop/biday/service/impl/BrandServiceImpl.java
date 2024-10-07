@@ -4,9 +4,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import shop.biday.model.domain.BrandModel;
+import shop.biday.model.domain.UserInfoModel;
 import shop.biday.model.entity.BrandEntity;
 import shop.biday.model.repository.BrandRepository;
 import shop.biday.service.BrandService;
+import shop.biday.utils.UserInfoUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,6 +18,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class BrandServiceImpl implements BrandService {
     private final BrandRepository brandRepository;
+    private final UserInfoUtils userInfoUtils;
 
     @Override
     public List<BrandModel> findAll() {
@@ -45,9 +48,9 @@ public class BrandServiceImpl implements BrandService {
     }
 
     @Override
-    public BrandEntity save(String role, BrandModel brand) {
-        log.info("Save Brand started with role: {}", role);
-        return isAdmin(role)
+    public BrandEntity save(String userInfoHeader, BrandModel brand) {
+        log.info("Save Brand started with user: {}", userInfoHeader);
+        return isAdmin(userInfoHeader)
                 .map(t -> {
                     BrandEntity savedBrand = brandRepository.save(BrandEntity.builder()
                             .name(brand.getName())
@@ -59,9 +62,9 @@ public class BrandServiceImpl implements BrandService {
     }
 
     @Override
-    public BrandEntity update(String role, BrandModel brand) {
+    public BrandEntity update(String userInfoHeader, BrandModel brand) {
         log.info("Update Brand started for id: {}", brand.getId());
-        return isAdmin(role)
+        return isAdmin(userInfoHeader)
                 .filter(t -> {
                     boolean exists = brandRepository.existsById(brand.getId());
                     if (!exists) {
@@ -81,10 +84,10 @@ public class BrandServiceImpl implements BrandService {
     }
 
     @Override
-    public String deleteById(String role, Long id) {
+    public String deleteById(String userInfoHeader, Long id) {
         log.info("Delete Brand started for id: {}", id);
 
-        return isAdmin(role).map(t -> {
+        return isAdmin(userInfoHeader).map(t -> {
             if (!brandRepository.existsById(id)) {
                 log.error("Not found brand with id: {}", id);
                 return "브랜드 삭제 실패: 브랜드를 찾을 수 없습니다";
@@ -99,12 +102,13 @@ public class BrandServiceImpl implements BrandService {
         });
     }
 
-    private Optional<String> isAdmin(String role) {
-        log.info("Validate User role: {}", role);
-        return Optional.of(role)
+    private Optional<String> isAdmin(String userInfoHeader) {
+        log.info("Validate User role: {}", userInfoHeader);
+        UserInfoModel userInfoModel = userInfoUtils.extractUserInfo(userInfoHeader);
+        return Optional.of(userInfoModel.getUserRole())
                 .filter(t -> t.equalsIgnoreCase("ROLE_ADMIN"))
                 .or(() -> {
-                    log.error("User does not have role ADMIN: {}", role);
+                    log.error("User does not have role ADMIN: {}", userInfoModel.getUserRole());
                     return Optional.empty();
                 });
     }

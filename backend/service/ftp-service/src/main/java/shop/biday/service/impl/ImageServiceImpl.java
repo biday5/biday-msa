@@ -10,12 +10,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import shop.biday.model.document.ImageDocument;
 import shop.biday.model.domain.ImageModel;
+import shop.biday.model.domain.UserInfoModel;
 import shop.biday.model.repository.ImageRepository;
 import shop.biday.service.ImageService;
+import shop.biday.utils.UserInfoUtils;
 import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.*;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
+import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,14 +36,15 @@ import java.util.UUID;
 public class ImageServiceImpl implements ImageService {
     private final ImageRepository imageRepository;
     private final S3Client amazonS3Client;
+    private final UserInfoUtils userInfoUtils;
 
     @Value("${spring.s3.bucket}")
     private String bucketName;
 
     @Override
-    public String uploadFileByAdmin(String role, List<MultipartFile> multipartFiles, String filePath, String type, Long referencedId) {
+    public String uploadFileByAdmin(String userInfoHeader, List<MultipartFile> multipartFiles, String filePath, String type, Long referencedId) {
         log.info("Image upload By Admin started");
-        return validateRole(role, "ROLE_ADMIN")
+        return validateRole(userInfoHeader, "ROLE_ADMIN")
                 .map(validRole -> uploadFiles(multipartFiles, filePath, type, referencedId))
                 .orElseThrow(() -> new IllegalArgumentException("User does not have the necessary permissions or the role is invalid."));
     }
@@ -228,12 +234,13 @@ public class ImageServiceImpl implements ImageService {
                 .orElse("이미지 삭제 실패");
     }
 
-    private Optional<String> validateRole(String role, String... validRoles) {
-        log.info("Validate role started for role: {}", role);
-        return Optional.of(role)
+    private Optional<String> validateRole(String userInfoHeader, String... validRoles) {
+        log.info("Validate role started for user: {}", userInfoHeader);
+        UserInfoModel userInfoModel = userInfoUtils.extractUserInfo(userInfoHeader);
+        return Optional.of(userInfoModel.getUserRole())
                 .filter(r -> Arrays.stream(validRoles).anyMatch(validRole -> validRole.equalsIgnoreCase(r)))
                 .or(() -> {
-                    log.error("User does not have a valid role: {}", role);
+                    log.error("User does not have a valid role: {}", userInfoModel.getUserRole());
                     return Optional.empty();
                 });
     }

@@ -12,10 +12,6 @@ public record BidModel(
         @NotNull(message = "필수 값입니다.")
         Long auctionId,
 
-        @Schema(description = "사용자 아이디", example = "1")
-        @NotNull(message = "필수 값입니다.")
-        String userId,
-
         @Schema(description = "입찰 가격", example = "1000")
         @Positive
         @NotNull(message = "필수 값입니다.")

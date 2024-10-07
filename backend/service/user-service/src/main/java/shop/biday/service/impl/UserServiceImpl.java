@@ -6,13 +6,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
 import shop.biday.model.document.UserDocument;
 import shop.biday.model.domain.UserModel;
 import shop.biday.model.enums.Role;
 import shop.biday.model.repository.MUserRepository;
 import shop.biday.service.UserService;
-
 
 import java.util.Collections;
 
@@ -124,7 +122,7 @@ public class UserServiceImpl implements UserService {
                             .oauthUser(userModel.getOauthName())
                             .name(userModel.getName())
                             .phone(userModel.getPhoneNum())
-                            .password(passwordEncoder.encode(userModel.getEmail())) // BCrypt 해시 사용
+                            .password(passwordEncoder.encode(userModel.getEmail()))
                             .role(Collections.singletonList(Role.ROLE_USER))
                             .status(true)
                             .totalRating(2.0)

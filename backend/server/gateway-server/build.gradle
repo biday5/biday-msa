@@ -57,7 +57,7 @@ dependencies {
     implementation group: 'io.micrometer', name: 'micrometer-registry-prometheus', version: '1.13.4'
 
     // spring doc
-    implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.2.0'
+    implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.6.0'
 
     // config
     implementation 'org.springframework.cloud:spring-cloud-config:4.1.3'

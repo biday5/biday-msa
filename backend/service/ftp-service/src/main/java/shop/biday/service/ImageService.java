@@ -2,20 +2,17 @@ package shop.biday.service;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
-import shop.biday.model.document.ImageDocument;
-import shop.biday.model.domain.ImageModel;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface ImageService {
-    String uploadFileByAdmin(String role, List<MultipartFile> multipartFiles, String filePath, String type, Long referencedId);
+    String uploadFileByAdmin(String userInfoHeader, List<MultipartFile> multipartFiles, String filePath, String type, Long referencedId);
 
-    String uploadFilesByUser(String role, List<MultipartFile> multipartFiles, String filePath, String type, Long referencedId);
+    String uploadFilesByUser(String userInfoHeader, List<MultipartFile> multipartFiles, String filePath, String type, Long referencedId);
 
-    String update(String role, List<MultipartFile> multipartFiles, String id);
+    String update(String userInfoHeader, List<MultipartFile> multipartFiles, String id);
 
-    String deleteById(String role, String id);
+    String deleteById(String userInfoHeader, String id);
 
     ResponseEntity<byte[]> getImage(String id);
 

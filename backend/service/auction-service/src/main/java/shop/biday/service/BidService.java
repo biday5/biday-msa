@@ -7,11 +7,13 @@ import shop.biday.model.dto.BidResponse;
 
 public interface BidService {
 
-    Mono<BidResponse> save(BidModel bid);
+    Mono<BidResponse> save(String userInfo, BidModel bid);
 
     Mono<BidDocument> findTopBidByAuctionId(Long auctionId);
 
     Mono<Boolean> updateAward(Long auctionId);
 
     Mono<Long> countBidByAuctionIdAndUserId(Long auctionId, String userId);
+
+    Mono<Long> countByAuctionId(Long auctionId);
 }

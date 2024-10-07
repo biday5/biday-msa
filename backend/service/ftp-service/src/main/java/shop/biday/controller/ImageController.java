@@ -43,21 +43,21 @@ public class ImageController {
             @ApiResponse(responseCode = "404", description = "사진 등록 실패")
     })
     @Parameters(value = {
-            @Parameter(name = "role", description = "현재 로그인한 사용자 token에서 추출한 role", example = "ROLE_ADMIN"),
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 token", example = ""),
             @Parameter(name = "files", description = "업로드할 이미지 파일", example = "단일 사진 파일"),
             @Parameter(name = "filePath", description = "NCloud storage 업로드 폴더 경로 지정", example = "brand 혹은 product 혹은 rate 혹은 error"),
             @Parameter(name = "type", description = "이미지 타입", example = "브랜드 or 상품 or 평점 or 에러"),
             @Parameter(name = "referencedId", description = "이미지의 참조 ID, 평점이나 에러는 아무 값이나 줘도 상관 x")
     })
     public String uploadImage(
-            @RequestHeader String role,
+            @RequestHeader("UserInfo") String userInfoHeader,
             @RequestPart("files") List<MultipartFile> files,
             @RequestParam("filePath") String filePath,
             @RequestParam("type") String type,
             @RequestParam("referenceId") Long referenceId
     ) {
         log.info("이미지 업로드 중");
-        return imageService.uploadFileByAdmin(role, files, filePath, type, referenceId).toString();
+        return imageService.uploadFileByAdmin(userInfoHeader, files, filePath, type, referenceId).toString();
     }
 
     @PostMapping("/uploadByUser")
@@ -67,21 +67,21 @@ public class ImageController {
             @ApiResponse(responseCode = "404", description = "사진 등록 실패")
     })
     @Parameters(value = {
-            @Parameter(name = "role", description = "현재 로그인한 사용자 token에서 추출한 role", example = "ROLE_ADMIN"),
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 token", example = ""),
             @Parameter(name = "files", description = "업로드할 이미지 파일 목록", example = "여러 사진 파일"),
             @Parameter(name = "filePath", description = "NCloud storage 업로드 폴더 경로 지정", example = "auctions 혹은 refunds"),
             @Parameter(name = "type", description = "이미지 타입", example = "경매 or 환불"),
             @Parameter(name = "referencedId", description = "이미지의 참조 ID")
     })
     public String uploadImages(
-            @RequestHeader String role,
+            @RequestHeader("UserInfo") String userInfoHeader,
             @RequestPart("files") List<MultipartFile> files,
             @RequestParam("filePath") String filePath,
             @RequestParam("type") String type,
             @RequestParam("referenceId") Long referenceId
     ) {
         log.info("이미지 업로드 중");
-        return imageService.uploadFilesByUser(role, files, filePath, type, referenceId).toString();
+        return imageService.uploadFilesByUser(userInfoHeader, files, filePath, type, referenceId).toString();
     }
 
     @PatchMapping
@@ -91,16 +91,16 @@ public class ImageController {
             @ApiResponse(responseCode = "404", description = "사진 수정 실패")
     })
     @Parameters(value = {
-            @Parameter(name = "role", description = "현재 로그인한 사용자 token에서 추출한 role", example = "ROLE_ADMIN"),
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 token", example = ""),
             @Parameter(description = "업데이트할 이미지 파일"),
             @Parameter(description = "업데이트할 이미지의 ID")
     })
     public String updateImages(
-            @RequestHeader String role,
+            @RequestHeader("UserInfo") String userInfoHeader,
             @RequestParam("files") List<MultipartFile> files,
             @RequestParam("id") String id) {
         log.info("이미지 업데이트 중");
-        return imageService.update(role, files, id);
+        return imageService.update(userInfoHeader, files, id);
     }
 
     @DeleteMapping
@@ -110,14 +110,14 @@ public class ImageController {
             @ApiResponse(responseCode = "404", description = "사진 삭제 실패")
     })
     @Parameters({
-            @Parameter(name = "role", description = "현재 로그인한 사용자 token에서 추출한 role", example = "ROLE_ADMIN"),
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 token", example = ""),
             @Parameter(name = "imageId", description = "삭제할 이미지의 id", example = "1")
     })
     public String deleteImages(
-            @RequestHeader String role,
+            @RequestHeader("UserInfo") String userInfoHeader,
             @RequestParam("id") String id) {
         log.info("이미지 삭제 중");
-        return imageService.deleteById(role, id);
+        return imageService.deleteById(userInfoHeader, id);
     }
 
 }

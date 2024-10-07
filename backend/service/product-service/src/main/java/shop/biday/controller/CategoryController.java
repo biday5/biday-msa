@@ -52,7 +52,7 @@ public class CategoryController {
             @ApiResponse(responseCode = "404", description = "카테고리 등록 할 수 없음")
     })
     @Parameters({
-            @Parameter(name = "role", description = "현재 로그인한 사용자 token에서 추출한 role", example = "ROLE_ADMIN"),
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 token", example = ""),
             @Parameter(examples = {
                     @ExampleObject(name = "exampleCategoryModel", value = """ 
                         { 
@@ -63,9 +63,9 @@ public class CategoryController {
                     """)})
     })
     public ResponseEntity<CategoryEntity> create(
-            @RequestHeader("role") String role,
+            @RequestHeader("UserInfo") String userInfoHeader,
             @RequestBody CategoryModel category) {
-        return ResponseEntity.ok(categoryService.save(role, category));
+        return ResponseEntity.ok(categoryService.save(userInfoHeader, category));
     }
 
     @PatchMapping
@@ -75,7 +75,7 @@ public class CategoryController {
             @ApiResponse(responseCode = "404", description = "카테고리 수정 할 수 없음")
     })
     @Parameters({
-            @Parameter(name = "role", description = "현재 로그인한 사용자 token에서 추출한 role", example = "ROLE_ADMIN"),
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 token", example = ""),
             @Parameter(examples = {
                     @ExampleObject(name = "exampleCategoryModel", value = """ 
                         { 
@@ -87,9 +87,9 @@ public class CategoryController {
                     """)})
     })
     public ResponseEntity<CategoryEntity> update(
-            @RequestHeader("role") String role,
+            @RequestHeader("UserInfo") String userInfoHeader,
             @RequestBody CategoryModel category) {
-        return ResponseEntity.ok(categoryService.update(role, category));
+        return ResponseEntity.ok(categoryService.update(userInfoHeader, category));
     }
 
     @DeleteMapping
@@ -99,12 +99,12 @@ public class CategoryController {
             @ApiResponse(responseCode = "404", description = "카테고리 삭제 할 수 없음")
     })
     @Parameters({
-            @Parameter(name = "role", description = "현재 로그인한 사용자 token에서 추출한 role", example = "ROLE_ADMIN"),
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 token", example = ""),
             @Parameter(name = "brandId", description = "브랜드 id", example = "1")
     })
     public ResponseEntity<String> delete(
-            @RequestHeader("role") String role,
+            @RequestHeader("UserInfo") String userInfoHeader,
             @RequestParam Long id) {
-        return ResponseEntity.ok(categoryService.deleteById(role, id));
+        return ResponseEntity.ok(categoryService.deleteById(userInfoHeader, id));
     }
 }

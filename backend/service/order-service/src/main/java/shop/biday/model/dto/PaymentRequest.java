@@ -6,10 +6,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
 public record PaymentRequest(
-//        @Schema(description = "사용자 아이디", example = "1")
-//        @NotNull(message = "필수 값입니다.")
-//        String userId,
-
         @Schema(description = "낙찰 아이디", example = "2")
         @Positive
         @NotNull(message = "필수 값입니다.")

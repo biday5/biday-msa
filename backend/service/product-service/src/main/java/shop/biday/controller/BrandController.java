@@ -53,7 +53,7 @@ public class BrandController {
     })
 
     @Parameters({
-            @Parameter(name = "role", description = "현재 로그인한 사용자 token에서 추출한 role", example = "ROLE_ADMIN"),
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 token", example = ""),
             @Parameter(examples = {
                     @ExampleObject(name = "exampleBrandModel", value = """ 
                         { 
@@ -64,9 +64,9 @@ public class BrandController {
                     """)})
     })
     public ResponseEntity<BrandEntity> create(
-            @RequestHeader String role,
+            @RequestHeader("UserInfo") String userInfoHeader,
             @RequestBody BrandModel brand) {
-        return ResponseEntity.ok(brandService.save(role, brand));
+        return ResponseEntity.ok(brandService.save(userInfoHeader, brand));
     }
 
     @PatchMapping
@@ -76,7 +76,7 @@ public class BrandController {
             @ApiResponse(responseCode = "404", description = "브랜드 수정 할 수 없음")
     })
     @Parameters({
-            @Parameter(name = "role", description = "현재 로그인한 사용자 token에서 추출한 role", example = "ROLE_ADMIN"),
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 token", example = ""),
             @Parameter(examples = {
                     @ExampleObject(name = "exampleBrandModel", value = """ 
                         { 
@@ -88,9 +88,9 @@ public class BrandController {
                     """)})
     })
     public ResponseEntity<BrandEntity> update(
-            @RequestHeader String role,
+            @RequestHeader("UserInfo") String userInfoHeader,
             @RequestBody BrandModel brand) {
-        return ResponseEntity.ok(brandService.update(role, brand));
+        return ResponseEntity.ok(brandService.update(userInfoHeader, brand));
     }
 
     @DeleteMapping
@@ -100,12 +100,12 @@ public class BrandController {
             @ApiResponse(responseCode = "404", description = "브랜드 삭제 할 수 없음")
     })
     @Parameters({
-            @Parameter(name = "role", description = "현재 로그인한 사용자 token에서 추출한 role", example = "ROLE_ADMIN"),
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 token", example = ""),
             @Parameter(name = "brandId", description = "브랜드 id", example = "1")
     })
     public ResponseEntity<String> delete(
-            @RequestHeader String role,
+            @RequestHeader("UserInfo") String userInfoHeader,
             @RequestParam("brandId") Long id) {
-        return ResponseEntity.ok(brandService.deleteById(role, id));
+        return ResponseEntity.ok(brandService.deleteById(userInfoHeader, id));
     }
 }

@@ -9,7 +9,6 @@ import shop.biday.model.domain.LoginHistoryModel;
 import shop.biday.model.repository.MLoginHistoryRepository;
 import shop.biday.service.LoginHistoryService;
 
-
 import java.time.LocalDateTime;
 
 @Slf4j

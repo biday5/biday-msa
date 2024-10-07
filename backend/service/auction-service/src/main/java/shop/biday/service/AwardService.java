@@ -16,7 +16,7 @@ public interface AwardService {
 
     AwardEntity save(AwardEntity award);
 
-    AwardModel findByAwardId(String userId, Long awardId);
+    AwardModel findByAwardId(String userInfoHeader, Long awardId);
 
-    Slice<AwardModel> findByUser(String userId, String period, LocalDateTime cursor, Pageable pageable);
+    Slice<AwardModel> findByUser(String userInfoHeader, String period, LocalDateTime cursor, Pageable pageable);
 }

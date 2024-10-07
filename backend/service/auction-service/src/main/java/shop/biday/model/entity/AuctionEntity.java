@@ -32,7 +32,7 @@ public class AuctionEntity {
 //    private SizeEntity size;
     private Long sizeId;
 
-    @Column(name = "description", nullable = false)
+    @Column(name = "description", nullable = false, columnDefinition = "LONGTEXT")
     private String description;
 
     @Column(name = "starting_bid", nullable = false)

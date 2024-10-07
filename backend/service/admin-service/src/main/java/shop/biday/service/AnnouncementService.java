@@ -8,11 +8,11 @@ public interface AnnouncementService {
 
     List<AnnouncementModel> findAll();
 
-    AnnouncementModel save(AnnouncementModel announcementModel);
+    AnnouncementModel save(String userInfo, AnnouncementModel announcementModel);
 
     AnnouncementModel findById(Long id);
 
-    boolean deleteById(Long id);
+    boolean deleteById(Long id, String userInfo);
 
     boolean existsById(Long id);
 }
