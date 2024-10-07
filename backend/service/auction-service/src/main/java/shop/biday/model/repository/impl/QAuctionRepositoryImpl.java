@@ -29,7 +29,6 @@ public class QAuctionRepositoryImpl implements QAuctionRepository {
     private final QAuctionEntity qAuction = QAuctionEntity.auctionEntity;
     private final QAwardEntity qAward = QAwardEntity.awardEntity;
 
-    // TODO : USER Q클래스 사용할 수 없기 때문에,  클래스 호출해서 Id랑 사진만 담아서 보내지는지 확인 할 것
     @Override
     public AuctionModel findByAuctionId(Long id) {
         AuctionModel auction = queryFactory
