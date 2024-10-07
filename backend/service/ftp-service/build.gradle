@@ -14,32 +14,52 @@ java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(17)
     }
+    sourceCompatibility = JavaVersion.VERSION_17
 }
 
 repositories {
     mavenCentral()
 }
 
+ext {
+    set('springCloudVersion', "2023.0.2")
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
 dependencies {
-
-    implementation 'org.springframework.cloud:spring-cloud-starter-gateway:4.1.5'
-    implementation 'org.springframework.cloud:spring-cloud-starter-circuitbreaker-reactor-resilience4j:3.1.2'
-    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client:4.1.3'
-
-// spring boot
+    // spring boot
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
 
     // mongoDB
-//    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 
     // image-storage
-//    implementation platform('com.amazonaws:aws-java-sdk-bom:1.12.529')
-    implementation platform('com.amazonaws:aws-java-sdk-bom:1.12.767')
-    implementation 'com.amazonaws:aws-java-sdk-s3'
+    implementation platform('software.amazon.awssdk:bom:2.20.0') // 최신 버전으로 수정
+    implementation 'software.amazon.awssdk:s3'
+
+    // apache
+    implementation 'commons-io:commons-io:2.11.0'
 
     // lombok
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
+
+    // jwt
+    implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.12.6'
+    runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.12.6'
+    runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.12.6'
+
+    // swagger
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
+
+    implementation 'org.springframework.cloud:spring-cloud-starter-config'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
     // test
     testImplementation 'io.projectreactor:reactor-test'
@@ -47,11 +67,8 @@ dependencies {
     testImplementation 'org.springframework.batch:spring-batch-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-
-    testImplementation platform('org.junit:junit-bom:5.10.0')
-    testImplementation 'org.junit.jupiter:junit-jupiter'
 }
 
-test {
+tasks.named('test') {
     useJUnitPlatform()
 }

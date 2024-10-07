@@ -1,23 +1,11 @@
 rootProject.name = 'biday'
-
 include 'server:config-server'
-
 include 'server:eureka-server'
-
 include 'server:gateway-server'
-
 include 'service:admin-service'
-
 include 'service:auction-service'
-
 include 'service:ftp-service'
-
 include 'service:order-service'
-
 include 'service:product-service'
-
 include 'service:sms-service'
-
 include 'service:user-service'
-
-

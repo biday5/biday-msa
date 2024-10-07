@@ -1,7 +1,7 @@
 plugins {
-    id 'java'
-    id 'org.springframework.boot' version '3.3.4'
-    id 'io.spring.dependency-management' version '1.1.6'
+	id 'java'
+	id 'org.springframework.boot' version '3.3.4'
+	id 'io.spring.dependency-management' version '1.1.6'
 }
 
 group = 'shop.biday'
@@ -24,7 +24,7 @@ subprojects {
     group = 'shop.biday'
     version = '0.0.1'
 
-    java{
+    java {
         sourceCompatibility = JavaVersion.VERSION_17
     }
 

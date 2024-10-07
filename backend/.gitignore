@@ -48,3 +48,7 @@ out/
 
 # 환경 파일
 .env
+
+# Ignore MySQL socket files
+backend/mysql/demo/var/lib/mysql/mysql.sock
+backend/mysql/demo/var/lib/mysql/*
