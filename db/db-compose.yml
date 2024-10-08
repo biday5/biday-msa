@@ -1,0 +1,70 @@
+services:
+  mysql:
+    container_name: mysql
+    image: mysql:latest
+    volumes:
+      - ./mysql/demo/etc/mysql/conf.d:/etc/mysql/conf.d:ro
+      - ./mysql/demo/var/lib/mysql:/var/lib/mysql
+      - ./mysql/demo/var/log/mysql:/var/log/mysql
+    environment:
+      - MYSQL_DATABASE=bidaydb
+      - MYSQL_ROOT_PASSWORD=biday
+      - MYSQL_ROOT_HOST=%
+    command: [ '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci' ]
+    ports:
+      - "3306:3306"
+    restart: always
+    networks:
+      - biday-network
+#    hostname: mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "mysql"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  redis:
+    container_name: redis
+    image: redis:latest
+    ports:
+      - 6379:6379
+    command: redis-server --requirepass biday
+    volumes:
+      - ./redis/data:/data
+      - ./redis/conf/redis.conf:/usr/local/conf/redis.conf
+    labels:
+      - "name=redis"
+      - "mode=standalone"
+    restart: always
+    networks:
+      - biday-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "redis"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  mongo:
+    container_name: mongo
+    image: mongo:latest
+    ports:
+      - 27017:27017
+    volumes:
+      - ./mongodb:/data/mydb
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=biday
+      - MONGO_INITDB_DATABASE=bidaydb
+    restart: always
+    networks:
+      - biday-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "mongo"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+networks:
+  biday-network:
+#    driver: bridge
+    external: true

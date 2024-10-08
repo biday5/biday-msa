@@ -6,7 +6,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface ImageService {
-    String uploadFileByAdmin(String userInfoHeader, List<MultipartFile> multipartFiles, String filePath, String type, Long referencedId);
+//    String uploadFileByAdmin(String userInfoHeader, List<MultipartFile> multipartFiles, String filePath, String type, Long referencedId);
+    String uploadFileByAdmin(List<MultipartFile> multipartFiles, String filePath, String type, Long referencedId);
 
     String uploadFilesByUser(String userInfoHeader, List<MultipartFile> multipartFiles, String filePath, String type, Long referencedId);
 

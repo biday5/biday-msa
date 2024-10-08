@@ -50,14 +50,15 @@ public class ImageController {
             @Parameter(name = "referencedId", description = "이미지의 참조 ID, 평점이나 에러는 아무 값이나 줘도 상관 x")
     })
     public String uploadImage(
-            @RequestHeader("UserInfo") String userInfoHeader,
+//            @RequestHeader("UserInfo") String userInfoHeader,
             @RequestPart("files") List<MultipartFile> files,
             @RequestParam("filePath") String filePath,
             @RequestParam("type") String type,
             @RequestParam("referenceId") Long referenceId
     ) {
         log.info("이미지 업로드 중");
-        return imageService.uploadFileByAdmin(userInfoHeader, files, filePath, type, referenceId).toString();
+        return imageService.uploadFileByAdmin(files, filePath, type, referenceId).toString();
+//        return imageService.uploadFileByAdmin(userInfoHeader, files, filePath, type, referenceId).toString();
     }
 
     @PostMapping("/uploadByUser")
