@@ -37,7 +37,8 @@ public class AccountController {
             @ApiResponse(responseCode = "4011", description = "조회에 실패하였습니다.", content = @Content(mediaType = "application/json"))
     })
     @Parameters({
-            @Parameter(name = "userId", description = "유저번호", example = "66f3601fd3d86243cceb4718")
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
+                    example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}"),
     })
     public ResponseEntity<Mono<AccountDocument>> findById(@RequestHeader("UserInfo") String userInfoHeader) {
         return new ResponseEntity<>(accountService.findByUserId(userInfoHeader), HttpStatus.OK);

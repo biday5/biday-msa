@@ -27,9 +27,7 @@ public class AuctionEntity {
     @Column(name = "user_id", nullable = false)
     private String userId;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "size_id", nullable = false)
-//    private SizeEntity size;
+    @Column(name = "size_id", nullable = false)
     private Long sizeId;
 
     @Column(name = "description", nullable = false, columnDefinition = "LONGTEXT")

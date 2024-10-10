@@ -3,6 +3,7 @@ package shop.biday.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,13 @@ public class RefundController {
 
     @Operation(summary = "결제 취소", description = "결제 취소를 합니다.")
     @Parameters({
-            @Parameter(name = "id", description = "결제 ID", example = "1")
+            @Parameter(name = "id", description = "결제 ID", example = "1"),
+            @Parameter(examples = {
+                    @ExampleObject(name = "exampleRefundRequest", value = """ 
+                        { 
+                            "cancelReason" : "취소 사유"
+                        } 
+                    """)})
     })
     @ApiResponse(responseCode = "200", description = "성공")
     @PostMapping

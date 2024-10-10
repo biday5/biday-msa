@@ -2,7 +2,9 @@ package shop.biday.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -53,6 +55,18 @@ public class FaqController {
             @ApiResponse(responseCode = "201", description = "질문 추가 성공"),
             @ApiResponse(responseCode = "400", description = "잘못된 요청으로 질문 추가 실패")
     })
+    @Parameters({
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
+                    example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}"),
+            @Parameter(examples = {
+                    @ExampleObject(name = "exampleFaqModel", value = """ 
+                        { 
+                            "userId" : "작성자 id", 
+                            "title" : "질문 제목", 
+                            "content" : "질문 내용"
+                        } 
+                    """)})
+    })
     public ResponseEntity<FaqModel> addQuestion(@RequestHeader("UserInfo") String userInfo,
                                                 @RequestBody FaqModel questionModel) {
         return ResponseEntity.status(HttpStatus.CREATED).body(faqService.save(userInfo, questionModel));
@@ -65,8 +79,14 @@ public class FaqController {
             @ApiResponse(responseCode = "404", description = "삭제할 질문을 찾을 수 없음"),
             @ApiResponse(responseCode = "500", description = "서버 오류로 인한 질문 삭제 실패")
     })
-    @Parameter(name = "id", description = "삭제할 질문의 ID", example = "1")
-    public ResponseEntity<Boolean> deleteById(@PathVariable Long id, @RequestHeader("UserInfo") String userInfo) {
+    @Parameters({
+            @Parameter(name = "id", description = "삭제할 질문의 ID", example = "1"),
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
+                    example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}")
+    })
+    public ResponseEntity<Boolean> deleteById(
+            @PathVariable Long id,
+            @RequestHeader("UserInfo") String userInfo) {
         return ResponseEntity.ok(faqService.deleteById(id, userInfo));
     }
 

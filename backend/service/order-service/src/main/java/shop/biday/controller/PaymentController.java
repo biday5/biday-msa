@@ -3,6 +3,7 @@ package shop.biday.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -30,11 +31,19 @@ public class PaymentController {
 
     @Operation(summary = "결제 데이터 임시 저장", description = "결제 요청 전 데이터 임시 저장합니다.")
     @ApiResponse(responseCode = "201", description = "성공")
+    @PostMapping("/temp")
     @Parameters({
             @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
                     example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}"),
+            @Parameter(examples = {
+                    @ExampleObject(name = "examplePaymentTempModel", value = """ 
+                        { 
+                            "orderId" : "주문번호",
+                            "awardId: : "낙찰 id",
+                            "amount" : "결제 가격"
+                        } 
+                    """)})
     })
-    @PostMapping("/temp")
     public ResponseEntity<?> savePaymentTemp(@RequestHeader("UserInfo") String userInfo,
                                              @RequestBody @Validated PaymentTempModel paymentTempModel) {
         log.info("paymentTempModel: {}, userInfo: {}", paymentTempModel, userInfo);
@@ -47,11 +56,20 @@ public class PaymentController {
             @ApiResponse(responseCode = "200", description = "결제 승인 성공"),
             @ApiResponse(responseCode = "400", description = "결제 승인 실패")
     })
+    @PostMapping
     @Parameters({
             @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
                     example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}"),
+            @Parameter(examples = {
+                    @ExampleObject(name = "examplePaymentRequest", value = """ 
+                        { 
+                            "awardId" : "낙찰 id",
+                            "paymentKey" : "주문번호",
+                            "amount" : "결제 가격",
+                            "orderId" : "주문번호"
+                        } 
+                    """)})
     })
-    @PostMapping
     public ResponseEntity<?> savePayment(@RequestHeader("UserInfo") String userInfo,
                                          @RequestBody @Validated PaymentRequest paymentRequest) {
         log.info("paymentRequest: {}: userInfo: {}", paymentRequest, userInfo);

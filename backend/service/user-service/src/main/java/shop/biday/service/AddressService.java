@@ -7,10 +7,14 @@ import shop.biday.model.domain.AddressModel;
 
 
 public interface AddressService {
-    Flux<AddressDocument> findAll();
-    Mono<AddressDocument> findById(String id);
-    Mono<AddressDocument> save(String token , AddressModel addressModel);
-    Mono<Boolean> existsById(String id);
-    Mono<Long> count();
-    Mono<Boolean> deleteById(String id);
+    Flux<AddressDocument> findAllByUserId(String userInfoHeader);
+    Mono<String> pick(String id);
+    Mono<Long> countByUserId(String userInfoHeader);
+    Mono<AddressDocument> save(String userInfoHeader , AddressModel addressModel);
+    Mono<Boolean> deleteById(String userInfoHeader, String id);
+
+//    Flux<AddressDocument> findAll();
+//    Mono<AddressDocument> findById(String id);
+//    Mono<Boolean> existsById(String id);
+//    Mono<Long> count();
 }

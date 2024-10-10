@@ -52,13 +52,12 @@ public class CategoryController {
             @ApiResponse(responseCode = "404", description = "카테고리 등록 할 수 없음")
     })
     @Parameters({
-            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 token", example = ""),
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
+                    example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}"),
             @Parameter(examples = {
                     @ExampleObject(name = "exampleCategoryModel", value = """ 
                         { 
-                            "name" : "카테고리 이름", 
-                            "createdAt" : "등록 시간", 
-                            "updatedAt" : "시간 시간"
+                            "name" : "카테고리 이름"
                         } 
                     """)})
     })
@@ -75,14 +74,14 @@ public class CategoryController {
             @ApiResponse(responseCode = "404", description = "카테고리 수정 할 수 없음")
     })
     @Parameters({
-            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 token", example = ""),
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
+                    example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}"),
             @Parameter(examples = {
                     @ExampleObject(name = "exampleCategoryModel", value = """ 
                         { 
                             "id" : "변경할 카테고리 id"
-                            "name" : "카테고리 이름", 
-                            "createdAt" : "등록 시간", 
-                            "updatedAt" : "시간 시간"
+                            "name" : "카테고리 이름",
+                            "updatedAt" : "수정한 시간"
                         } 
                     """)})
     })
@@ -99,12 +98,13 @@ public class CategoryController {
             @ApiResponse(responseCode = "404", description = "카테고리 삭제 할 수 없음")
     })
     @Parameters({
-            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 token", example = ""),
-            @Parameter(name = "brandId", description = "브랜드 id", example = "1")
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
+                    example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}"),
+            @Parameter(name = "categoryId", description = "카테고리 id", example = "1")
     })
     public ResponseEntity<String> delete(
             @RequestHeader("UserInfo") String userInfoHeader,
-            @RequestParam Long id) {
+            @RequestParam("categoryId") Long id) {
         return ResponseEntity.ok(categoryService.deleteById(userInfoHeader, id));
     }
 }

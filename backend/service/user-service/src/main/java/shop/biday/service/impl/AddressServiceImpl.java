@@ -22,17 +22,6 @@ public class AddressServiceImpl implements AddressService {
     private final UserInfoUtils userInfoUtils;
 
     @Override
-    public Flux<AddressDocument> findAll() {
-        return addressRepository.findAll();
-    }
-
-    @Override
-    public Mono<AddressDocument> findById(String id) {
-        return addressRepository.findById(id)
-                .switchIfEmpty(Mono.error(new RuntimeException("주소를 찾지 못했습니다.")));
-    }
-
-    @Override
     public Mono<AddressDocument> save(String userId, AddressModel addressModel) {
 
         AddressType addressType;
@@ -65,25 +54,23 @@ public class AddressServiceImpl implements AddressService {
     }
 
     @Override
-    public Mono<Boolean> existsById(String id) {
-        return addressRepository.existsById(id);
-    }
+    public Mono<Boolean> deleteById(String userInfoHeader, String id) {
+        UserInfoModel userInfo = userInfoUtils.extractUserInfo(userInfoHeader);
 
-    @Override
-    public Mono<Long> count() {
-        return addressRepository.count();
-    }
+        if (userInfo.getUserId() == null) {
+            return Mono.error(new IllegalArgumentException("유저 ID는 없습니다."));
+        }
 
-    @Override
-    public Mono<Boolean> deleteById(String id) {
         return addressRepository.deleteById(id).hasElement();
     }
 
+    @Override
     public Mono<Long> countByUserId(String userInfoHeader) {
         UserInfoModel userInfoModel = userInfoUtils.extractUserInfo(userInfoHeader);
         return addressRepository.countByUserId(userInfoModel.getUserId());
     }
 
+    @Override
     public Mono<String> pick(String id) {
         return addressRepository.findById(id)
                 .flatMap(selectedAddress -> {
@@ -104,8 +91,30 @@ public class AddressServiceImpl implements AddressService {
                 .switchIfEmpty(Mono.error(new RuntimeException("주소를 찾지 못했습니다.")));
     }
 
+    @Override
     public Flux<AddressDocument> findAllByUserId(String userInfoHeader) {
         UserInfoModel userInfoModel = userInfoUtils.extractUserInfo(userInfoHeader);
         return addressRepository.findAllByUserId(userInfoModel.getUserId());
     }
+
+//    @Override
+//    public Flux<AddressDocument> findAll() {
+//        return addressRepository.findAll();
+//    }
+//
+//    @Override
+//    public Mono<AddressDocument> findById(String id) {
+//        return addressRepository.findById(id)
+//                .switchIfEmpty(Mono.error(new RuntimeException("주소를 찾지 못했습니다.")));
+//    }
+//
+//    @Override
+//    public Mono<Boolean> existsById(String id) {
+//        return addressRepository.existsById(id);
+//    }
+//
+//    @Override
+//    public Mono<Long> count() {
+//        return addressRepository.count();
+//    }
 }

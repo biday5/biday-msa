@@ -41,7 +41,7 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.findById(id)
                 .map(product -> {
                     String productName = product.getName();
-                    log.info("Product found: {} with name: {}", id, productName);
+                    log.debug("Product found: {} with name: {}", id, productName);
 
                     Map<Long, ProductModel> map = productRepository.findAllByProductName(id, removeParentheses(productName));
                     return Objects.requireNonNull(map).entrySet().stream().toList();
@@ -58,7 +58,7 @@ public class ProductServiceImpl implements ProductService {
 
         return productRepository.findById(id)
                 .map(product -> {
-                    log.info("Product found: {}", product);
+                    log.debug("Product found: {}", product);
                     return productRepository.findByProductId(id);
                 })
                 .orElseGet(() -> {
@@ -78,7 +78,7 @@ public class ProductServiceImpl implements ProductService {
         return validateUser(userInfoHeader)
                 .map(t -> {
                     ProductEntity savedProduct = createProductEntity(product);
-                    log.info("Product saved successfully: {}", savedProduct.getId());
+                    log.debug("Product saved successfully: {}", savedProduct.getId());
                     return productRepository.save(savedProduct);
                 })
                 .orElseThrow(() -> new RuntimeException("Save Product failed: User does not have permission"));
@@ -98,7 +98,7 @@ public class ProductServiceImpl implements ProductService {
                 .map(t -> {
                     ProductEntity updatedProduct = createProductEntity(product);
                     updatedProduct.setId(product.getId());
-                    log.info("Product updated successfully: {}", updatedProduct.getId());
+                    log.debug("Product updated successfully: {}", updatedProduct.getId());
                     return productRepository.save(updatedProduct);
                 })
                 .orElseThrow(() -> new RuntimeException("Update Product failed: Product not found or user does not have permission"));
@@ -107,20 +107,23 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public String deleteById(String userInfoHeader, Long id) {
         log.info("Deleting product started for id: {}", id);
-
-        return validateUser(userInfoHeader).map(t -> {
-            if (!productRepository.existsById(id)) {
-                log.error("Product not found with id: {}", id);
-                return "상품 삭제 실패: 상품을 찾을 수 없습니다";
-            }
-
-            productRepository.deleteById(id);
-            log.info("Product deleted successfully: {}", id);
-            return "상품 삭제 성공";
-        }).orElseGet(() -> {
-            log.error("User does not have role ADMIN or does not exist");
-            return "유효하지 않은 사용자: 관리자 권한이 필요합니다";
-        });
+        return validateUser(userInfoHeader)
+                .filter(t -> {
+                    boolean exists = productRepository.existsById(id);
+                    if (!exists) {
+                        log.error("Product not found with id: {}", id);
+                    }
+                    return exists;
+                })
+                .map(t -> {
+                    productRepository.deleteById(id);
+                    log.debug("Product deleted successfully: {}", id);
+                    return "상품 삭제 성공";
+                })
+                .orElseGet(() -> {
+                    log.error("User does not have role ADMIN or does not exist");
+                    return "유효하지 않은 사용자: 관리자 권한이 필요합니다";
+                });
     }
 
     @Override

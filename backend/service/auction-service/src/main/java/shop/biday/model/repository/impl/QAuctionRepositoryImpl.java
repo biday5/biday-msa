@@ -138,6 +138,7 @@ public class QAuctionRepositoryImpl implements QAuctionRepository {
                 qAuction.id,
                 qAuction.userId,
                 qAuction.sizeId,
+                qAuction.description,
                 qAuction.startingBid,
                 qAuction.currentBid,
                 qAuction.startedAt,

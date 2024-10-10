@@ -87,17 +87,18 @@ public class AuctionServiceImpl implements AuctionService {
     }
 
     @Override
-    public AuctionEntity save(String userInfoHeader, AuctionModel auction) {
+    public AuctionEntity save(String userInfoHeader, AuctionDto auction) {
         log.info("Save Auction started");
         AuctionEntity auctionEntity = validateUser(userInfoHeader)
                 .map(t -> auctionRepository.save(AuctionEntity.builder()
                         .userId(userInfoUtils.extractUserInfo(userInfoHeader).getUserId())
-                        .sizeId(auction.getSize())
+                        .sizeId(auction.getSizeId())
                         .description(auction.getDescription())
                         .startingBid(auction.getStartingBid())
                         .currentBid(auction.getCurrentBid())
                         .startedAt(auction.getStartedAt())
                         .endedAt(auction.getEndedAt())
+                        .status(false)
                         .build()))
                 .orElseThrow(() -> new IllegalArgumentException("Invalid role or not a seller"));
 
@@ -106,7 +107,7 @@ public class AuctionServiceImpl implements AuctionService {
     }
 
     @Override
-    public AuctionEntity update(String userInfoHeader, AuctionModel auction) {
+    public AuctionEntity update(String userInfoHeader, AuctionDto auction) {
         log.info("Update Auction started for id: {}", auction.getId());
         return validateUser(userInfoHeader)
                 .map(t -> {
@@ -120,13 +121,14 @@ public class AuctionServiceImpl implements AuctionService {
                         throw new SecurityException("User does not have permission to update this auction.");
                     } else {
                         AuctionEntity auctionEntity = auctionRepository.save(AuctionEntity.builder()
-                                .userId(auction.getUser())
-                                .sizeId(auction.getSize())
+                                .userId(auction.getUserId())
+                                .sizeId(auction.getSizeId())
                                 .description(auction.getDescription())
                                 .startingBid(auction.getStartingBid())
                                 .currentBid(auction.getCurrentBid())
                                 .startedAt(auction.getStartedAt())
                                 .endedAt(auction.getEndedAt())
+                                .status(false)
                                 .build());
                         log.debug("Update Auction By User for id: {}", auctionId);
                         return auctionEntity;

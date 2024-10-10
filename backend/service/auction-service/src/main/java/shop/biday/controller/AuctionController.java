@@ -85,7 +85,8 @@ public class AuctionController {
             @ApiResponse(responseCode = "404", description = "경매 목록 찾을 수 없음")
     })
     @Parameters({
-            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 token", example = ""),
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
+                    example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}"),
             @Parameter(name = "period", description = "기간별 정렬", example = "3개월"),
             @Parameter(name = "cursor", description = "현재 페이지에서 가장 마지막 경매의 id", example = "1"),
             @Parameter(name = "page", description = "페이지 번호", example = "1"),
@@ -108,13 +109,14 @@ public class AuctionController {
             @ApiResponse(responseCode = "404", description = "경매 등록 할 수 없음")
     })
     @Parameters({
-            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 token", example = ""),
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
+                    example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}"),
             @Parameter(examples = {
-                    @ExampleObject(name = "exampleProductModel", value = """ 
+                    @ExampleObject(name = "exampleAuctionModel", value = """ 
                         { 
                             "userId" : "변경 불가, 판매자 userId",
-                            "product" : "변경 불가, 경매로 등록할 상품, product의 findById 사용해서 선택!", 
-                            "description" : "변경 불가, 경매로 등록할 판매자 상품의 사진", 
+                            "sizeId" : "변경 불가, 경매로 등록할 상품의 sizeId, size의 findById 사용해서 선택!", 
+                            "description" : "변경 불가, 경매로 등록할 판매자 상품의 설명", 
                             "startingBid" : "변경 불가, 경매 시작가, 상품 가격의 반값or40%로 시작",
                             "currentBid" : "변경 불가, 현재 경매가",
                             "startedAt" : "만약 이미 시작되었다면 변경 불가, 시작 날짜",
@@ -124,7 +126,7 @@ public class AuctionController {
     })
     public ResponseEntity<AuctionEntity> save(
             @RequestHeader("UserInfo") String userInfoHeader,
-            @RequestBody AuctionModel auctionModel) {
+            @RequestBody AuctionDto auctionModel) {
         return ResponseEntity.ok(auctionService.save(userInfoHeader, auctionModel));
     }
 
@@ -135,13 +137,14 @@ public class AuctionController {
             @ApiResponse(responseCode = "404", description = "경매 수정 할 수 없음")
     })
     @Parameters({
-            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 token", example = ""),
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
+                    example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}"),
             @Parameter(examples = {
                     @ExampleObject(name = "exampleProductModel", value = """ 
                         { 
                             "id" : "경매 id"
                             "userId" : "변경 불가, 판매자 userId",
-                            "product" : "변경 불가, 경매로 등록할 상품, product의 findById 사용해서 선택!", 
+                            "sizeId" : "변경 불가, 경매로 등록할 상품의 sizeId, size의 findById 사용해서 선택!", 
                             "description" : "변경 불가, 경매로 등록할 판매자 상품의 사진", 
                             "startingBid" : "변경 불가, 경매 시작가, 상품 가격의 반값 or 40%로 시작",
                             "currentBid" : "변경 불가, 현재 경매가",
@@ -152,7 +155,7 @@ public class AuctionController {
     })
     public ResponseEntity<AuctionEntity> update(
             @RequestHeader("UserInfo") String userInfoHeader,
-            @RequestBody AuctionModel auctionModel) {
+            @RequestBody AuctionDto auctionModel) {
         return ResponseEntity.ok(auctionService.update(userInfoHeader, auctionModel));
     }
 
@@ -163,7 +166,8 @@ public class AuctionController {
             @ApiResponse(responseCode = "404", description = "경매 찾을 수 없음")
     })
     @Parameters({
-            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 token", example = ""),
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
+                    example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}"),
             @Parameter(name = "userId", description = "현재 로그인한 사용자 token에서 추출한 userId", example = "66f1442a7415bc47b04b3477"),
             @Parameter(name = "brandId", description = "브랜드 id", example = "1")
     })

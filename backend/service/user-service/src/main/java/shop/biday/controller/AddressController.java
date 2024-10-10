@@ -2,7 +2,9 @@ package shop.biday.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -14,7 +16,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import shop.biday.model.document.AddressDocument;
 import shop.biday.model.domain.AddressModel;
-import shop.biday.service.impl.AddressServiceImpl;
+import shop.biday.service.AddressService;
 
 
 @Slf4j
@@ -23,7 +25,7 @@ import shop.biday.service.impl.AddressServiceImpl;
 @RequestMapping("/api/addresses")
 @Tag(name = "addresses", description = "Address Controller")
 public class AddressController {
-    private final AddressServiceImpl addressService;
+    private final AddressService addressService;
 
     @GetMapping("/list")
     @Operation(summary = "주소 목록", description = "상품 등록이나 메인/검색 페이지에서 카테고리 목록을 불러올 때 사용합니다.")
@@ -31,7 +33,8 @@ public class AddressController {
             @ApiResponse(responseCode = "200", description = "주소 목록을 성공적으로 불러왔습니다."),
             @ApiResponse(responseCode = "404", description = "주소를 찾을 수 없습니다.")
     })
-    @Parameter(name = "access", description = "{token}", example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...")
+    @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
+            example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}")
     public ResponseEntity<Flux<AddressDocument>> findAllByUserId(@RequestHeader("UserInfo") String userInfoHeader) {
         return ResponseEntity.ok(addressService.findAllByUserId(userInfoHeader));
     }
@@ -59,11 +62,13 @@ public class AddressController {
             @ApiResponse(responseCode = "200", description = "이메일과 연관된 주소의 수."),
             @ApiResponse(responseCode = "400", description = "잘못된 요청입니다.", content = @Content)
     })
-    @Parameter(name = "email", description = "주소 리스트의 이메일", example = "example@naver.com")
+    @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
+            example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}")
     public ResponseEntity<Mono<Long>> count(@RequestHeader("UserInfo") String userInfoHeader) {
         return ResponseEntity.ok(addressService.countByUserId(userInfoHeader));
     }
 
+    // TODO UserInfo 넣기!
     @DeleteMapping("/deleteById")
     @Operation(
             summary = "주소 삭제",
@@ -73,10 +78,15 @@ public class AddressController {
             @ApiResponse(responseCode = "204", description = "주소가 성공적으로 삭제되었습니다."),
             @ApiResponse(responseCode = "404", description = "주소를 찾을 수 없습니다.", content = @Content)
     })
-    @Parameter(name = "id", description = "삭제 할 주소를 선택 id", example = "1L")
-    public ResponseEntity<Mono<Boolean>> deleteById(@RequestParam @Parameter(description = "삭제할 주소의 ID") String id) {
+    @Parameters({
+        @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
+                example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}"),
+        @Parameter(name = "id", description = "삭제 할 주소를 선택 id", example = "1L")
+    })
+    public ResponseEntity<Mono<Boolean>> deleteById(@RequestHeader("UserInfo") String userInfoHeader,
+                                                    @RequestParam @Parameter(description = "삭제할 주소의 ID") String id) {
         try {
-            addressService.deleteById(id);
+            addressService.deleteById(userInfoHeader,id);
             return ResponseEntity.noContent().build();
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
@@ -93,11 +103,27 @@ public class AddressController {
             @ApiResponse(responseCode = "400", description = "잘못된 입력입니다.", content = @Content(mediaType = "application/json")),
             @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.", content = @Content(mediaType = "application/json"))
     })
+    @Parameters({
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
+                    example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}"),
+            @Parameter(examples = {
+                    @ExampleObject(name = "exampleAddressModel", value = """ 
+                        { 
+                            "userId" : "사용자 id",
+                            "streetAddress" : "도로명 주소", 
+                            "detailAddress" : "상세 주소",
+                            "zipcode" : "우편번호",
+                            "type" : "",
+                            "pick" : "기본 주소 선택 여부",
+                            "email" : "??"
+                        } 
+                    """)})
+    })
     public ResponseEntity<Mono<AddressDocument>> insert(
-            @RequestHeader("Authorization") String token,
+            @RequestHeader("UserInfo") String userInfo,
             @RequestBody @Parameter(description = "주소 세부 사항을 포함하는 모델") AddressModel addressModel) {
         log.info("addressModel : {}",addressModel);
-        return ResponseEntity.ok(addressService.save(token,addressModel));
+        return ResponseEntity.ok(addressService.save(userInfo,addressModel));
     }
 
 }

@@ -2,6 +2,8 @@ package shop.biday.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -51,6 +53,18 @@ public class AnnouncementController {
             @ApiResponse(responseCode = "201", description = "공지사항 추가 성공"),
             @ApiResponse(responseCode = "400", description = "잘못된 요청으로 인한 공지사항 추가 실패")
     })
+    @Parameters({
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
+                    example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}"),
+            @Parameter(examples = {
+                    @ExampleObject(name = "exampleAnnouncemnetModel", value = """ 
+                        { 
+                            "userId" : "사용자 id",
+                            "title" : "공지사항 제목", 
+                            "content" : "공지사항 내용"
+                        } 
+                    """)})
+    })
     public ResponseEntity<AnnouncementModel> addAnnouncement(@RequestHeader("UserInfo") String userInfo,
                                                              @RequestBody AnnouncementModel announcementModel) {
         return ResponseEntity.ok(announcementService.save(userInfo, announcementModel));
@@ -63,7 +77,11 @@ public class AnnouncementController {
             @ApiResponse(responseCode = "404", description = "삭제할 공지사항을 찾을 수 없음"),
             @ApiResponse(responseCode = "500", description = "서버 오류로 인해 공지사항 삭제 실패")
     })
-    @Parameter(name = "id", description = "삭제할 공지사항의 ID", example = "1")
+    @Parameters({
+            @Parameter(name = "id", description = "삭제할 공지사항의 ID", example = "1"),
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
+                    example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}")
+    })
     public ResponseEntity<Boolean> deleteById(@PathVariable Long id, @RequestHeader("UserInfo") String userInfo) {
         return ResponseEntity.ok(announcementService.deleteById(id, userInfo));
     }
