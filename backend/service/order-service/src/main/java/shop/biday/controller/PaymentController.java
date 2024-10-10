@@ -30,6 +30,10 @@ public class PaymentController {
 
     @Operation(summary = "결제 데이터 임시 저장", description = "결제 요청 전 데이터 임시 저장합니다.")
     @ApiResponse(responseCode = "201", description = "성공")
+    @Parameters({
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
+                    example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}"),
+    })
     @PostMapping("/temp")
     public ResponseEntity<?> savePaymentTemp(@RequestHeader("UserInfo") String userInfo,
                                              @RequestBody @Validated PaymentTempModel paymentTempModel) {
@@ -42,6 +46,10 @@ public class PaymentController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "결제 승인 성공"),
             @ApiResponse(responseCode = "400", description = "결제 승인 실패")
+    })
+    @Parameters({
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
+                    example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}"),
     })
     @PostMapping
     public ResponseEntity<?> savePayment(@RequestHeader("UserInfo") String userInfo,
@@ -63,6 +71,10 @@ public class PaymentController {
 
     @Operation(summary = "사용자 기준 결제 내역 조회", description = "userId로 결제 조회합니다.")
     @ApiResponse(responseCode = "200", description = "성공")
+    @Parameters({
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
+                    example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}"),
+    })
     @GetMapping("/findByUser")
     public ResponseEntity<List<PaymentRequest>> findByUser(@RequestHeader("UserInfo") String userInfo) {
         log.info("findByUser: {}", userInfo);

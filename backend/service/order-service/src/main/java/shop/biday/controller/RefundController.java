@@ -29,7 +29,8 @@ public class RefundController {
     })
     @ApiResponse(responseCode = "200", description = "성공")
     @PostMapping
-    public ResponseEntity<?> cancelPayment(@RequestParam("id") Long id, @RequestBody @Validated RefundRequest cancelRequest) {
+    public ResponseEntity<?> cancelPayment(@RequestParam("id") Long id,
+                                           @RequestBody @Validated RefundRequest cancelRequest) {
         log.info("cancelPayment id: {}, paymentCancelRequest: {}", id, cancelRequest);
         return new ResponseEntity<>(refundService.cancel(id, cancelRequest), HttpStatus.CREATED);
     }
