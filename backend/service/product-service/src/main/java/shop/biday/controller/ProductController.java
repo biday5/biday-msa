@@ -121,6 +121,7 @@ public class ProductController {
             @Parameter(examples = {
                     @ExampleObject(name = "exampleProductModel", value = """ 
                         { 
+                            "id" : "상품 id",
                             "brand" : "브랜드 이름",
                             "category" : "카테고리 이름", 
                             "name" : "상품명", 

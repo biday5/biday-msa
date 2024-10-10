@@ -56,9 +56,7 @@ public class CategoryController {
             @Parameter(examples = {
                     @ExampleObject(name = "exampleCategoryModel", value = """ 
                         { 
-                            "name" : "카테고리 이름", 
-                            "createdAt" : "등록 시간", 
-                            "updatedAt" : "시간 시간"
+                            "name" : "카테고리 이름"
                         } 
                     """)})
     })
@@ -80,9 +78,8 @@ public class CategoryController {
                     @ExampleObject(name = "exampleCategoryModel", value = """ 
                         { 
                             "id" : "변경할 카테고리 id"
-                            "name" : "카테고리 이름", 
-                            "createdAt" : "등록 시간", 
-                            "updatedAt" : "시간 시간"
+                            "name" : "카테고리 이름",
+                            "updatedAt" : "수정한 시간"
                         } 
                     """)})
     })

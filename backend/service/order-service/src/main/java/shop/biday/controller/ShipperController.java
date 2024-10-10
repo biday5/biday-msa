@@ -3,6 +3,7 @@ package shop.biday.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -53,7 +54,23 @@ public class ShipperController {
             @ApiResponse(responseCode = "200", description = "배송 등록 성공"),
             @ApiResponse(responseCode = "404", description = "배송 등록 할 수 없음")
     })
-    @Parameter(name = "name", description = "배송 이름", example = "나이키(Nike)")
+    @Parameters({
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
+                    example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}"),
+            @Parameter(examples = {
+                    @ExampleObject(name = "exampleShipperModel", value = """ 
+                        { 
+                            "paymentId" : "결제 id",
+                            "carrier" : "운송업체 이름", 
+                            "trackingNumber" : "운송장번호", 
+                            "shipmentDate" : "배송 시작 날짜",
+                            "estimatedDeliveryDate" : "예상 배송 완료 날짜",
+                            "deliveryDate" : "실제 배송 완료 날짜",
+                            "status" : "상태",
+                            "deliveryAddress" : "배송 주소"
+                        } 
+                    """)})
+    })
     public ResponseEntity<ShipperEntity> create(@RequestHeader("UserInfo") String userInfo,
                                                 @RequestBody ShipperModel shipper) {
         log.info("Shipper Controller create userInfo: {}, shipperModel: {}", userInfo, shipper);
@@ -67,9 +84,22 @@ public class ShipperController {
             @ApiResponse(responseCode = "404", description = "배송 수정 할 수 없음")
     })
     @Parameters({
-            @Parameter(name = "name", description = "배송 이름", example = "나이키(Nike)"),
-            @Parameter(name = "createdAt", description = "등록 시간", example = "localDateTime 값"),
-            @Parameter(name = "updatedAt", description = "수정 시간", example = "localDateTime 값")
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
+                    example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}"),
+            @Parameter(examples = {
+                    @ExampleObject(name = "exampleShipperModel", value = """ 
+                        { 
+                            "id" : "배송 id",
+                            "paymentId" : "결제 id",
+                            "carrier" : "운송업체 이름", 
+                            "trackingNumber" : "운송장번호", 
+                            "shipmentDate" : "배송 시작 날짜",
+                            "estimatedDeliveryDate" : "예상 배송 완료 날짜",
+                            "deliveryDate" : "실제 배송 완료 날짜",
+                            "status" : "상태",
+                            "deliveryAddress" : "배송 주소"
+                        } 
+                    """)})
     })
     public ResponseEntity<ShipperEntity> update(@RequestHeader("UserInfo") String userInfo,
                                                 @RequestBody ShipperModel shipper) {
@@ -82,7 +112,11 @@ public class ShipperController {
             @ApiResponse(responseCode = "200", description = "배송 삭제 성공"),
             @ApiResponse(responseCode = "404", description = "배송 삭제 할 수 없음")
     })
-    @Parameter(name = "id", description = "배송 id", example = "1")
+    @Parameters({
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
+                    example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}"),
+            @Parameter(name = "id", description = "삭제할 배송 id", example = "1")
+    })
     public ResponseEntity<String> delete(@RequestHeader("UserInfo") String userInfo, @RequestParam Long id) {
         return ResponseEntity.ok(shipperService.deleteById(userInfo, id));
     }

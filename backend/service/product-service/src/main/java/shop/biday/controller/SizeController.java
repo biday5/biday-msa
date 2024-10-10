@@ -40,7 +40,7 @@ public class SizeController {
             @ApiResponse(responseCode = "200", description = "사이즈 목록 불러오기 성공"),
             @ApiResponse(responseCode = "404", description = "사이즈 찾을 수 없음")
     })
-    @Parameter(name = "id", description = "상품 id", example = "1")
+    @Parameter(name = "productId", description = "상품 id", example = "1")
     public ResponseEntity<List<SizeModel>> findAllByProductId(@RequestParam("productId") Long productId) {
         return ResponseEntity.ok(sizeService.findAllByProductId(productId));
     }
@@ -79,6 +79,7 @@ public class SizeController {
             @Parameter(examples = {
                     @ExampleObject(name = "exampleSizeModel", value = """ 
                         { 
+                            "id" : "사이즈 id",
                             "product" : "브랜드 이름",
                             "name" : "사이즈 이름(enum : XS~XXL)", 
                             "createdAt" : "등록 시간"
@@ -103,7 +104,7 @@ public class SizeController {
     })
     public ResponseEntity<String> delete(
             @RequestHeader("UserInfo") String userInfoHeader,
-            @RequestParam Long id) {
+            @RequestParam("sizeId") Long id) {
         return ResponseEntity.ok(sizeService.deleteById(userInfoHeader, id));
     }
 }

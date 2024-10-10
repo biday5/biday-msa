@@ -79,11 +79,13 @@ public class AddressServiceImpl implements AddressService {
         return addressRepository.deleteById(id).hasElement();
     }
 
+    @Override
     public Mono<Long> countByUserId(String userInfoHeader) {
         UserInfoModel userInfoModel = userInfoUtils.extractUserInfo(userInfoHeader);
         return addressRepository.countByUserId(userInfoModel.getUserId());
     }
 
+    @Override
     public Mono<String> pick(String id) {
         return addressRepository.findById(id)
                 .flatMap(selectedAddress -> {
@@ -104,6 +106,7 @@ public class AddressServiceImpl implements AddressService {
                 .switchIfEmpty(Mono.error(new RuntimeException("주소를 찾지 못했습니다.")));
     }
 
+    @Override
     public Flux<AddressDocument> findAllByUserId(String userInfoHeader) {
         UserInfoModel userInfoModel = userInfoUtils.extractUserInfo(userInfoHeader);
         return addressRepository.findAllByUserId(userInfoModel.getUserId());

@@ -14,6 +14,7 @@ import shop.biday.utils.UserInfoUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -43,29 +44,18 @@ public class ShipperServiceImpl implements ShipperService {
     @Override
     public ShipperEntity save(String userInfo, ShipperModel shipper) {
         log.info("Save shipper started");
-        getUserInfoModel(userInfo);
-
-        PaymentEntity payment = paymentService.findById(shipper.getPaymentId());
-
-        return shipperRepository.save(ShipperEntity.builder()
-                .payment(payment)
-                .carrier(shipper.getCarrier())
-                .trackingNumber(shipper.getTrackingNumber())
-                .shipmentDate(shipper.getShipmentDate())
-                .estimatedDeliveryDate(shipper.getEstimatedDeliveryDate())
-                .deliveryAddress(shipper.getDeliveryAddress())
-                .status("준비중")
-                .deliveryAddress(shipper.getDeliveryAddress())
-                .createdAt(LocalDateTime.now())
-                .build());
+        return validateUser(userInfo)
+                .map(t-> {
+                    ShipperEntity savedShipper = createShipperEntity(shipper);
+                    log.debug("Shipper saved successfully: {}", savedShipper.getId());
+                    return shipperRepository.save(savedShipper);
+        })
     }
 
     @Override
     public ShipperEntity update(String userInfo, ShipperModel shipper) {
         log.info("Update shipper started");
-        getUserInfoModel(userInfo);
-
-        PaymentEntity payment = paymentService.findById(shipper.getPaymentId());
+        validateUser(userInfo);
 
         if (!shipperRepository.existsById(shipper.getId())) {
             log.error("Not found shipper: {}", shipper.getId());
@@ -74,7 +64,7 @@ public class ShipperServiceImpl implements ShipperService {
 
         return shipperRepository.save(ShipperEntity.builder()
                 .id(shipper.getId())
-                .payment(payment)
+                .payment(paymentService.findById(shipper.getPaymentId()))
                 .carrier(shipper.getCarrier())
                 .trackingNumber(shipper.getTrackingNumber())
                 .shipmentDate(shipper.getShipmentDate())
@@ -90,7 +80,7 @@ public class ShipperServiceImpl implements ShipperService {
     @Override
     public String deleteById(String userInfo, Long id) {
         log.info("Delete shipper started for id: {}", id);
-        getUserInfoModel(userInfo);
+        validateUser(userInfo);
 
         if (!shipperRepository.existsById(id)) {
             log.error("배송 정보를 찾을수 없습니다: {}", id);
@@ -101,10 +91,26 @@ public class ShipperServiceImpl implements ShipperService {
         return "배송지 삭제 성공";
     }
 
-    private void getUserInfoModel(String userInfo) {
-        UserInfoModel userInfoModel = userInfoUtils.extractUserInfo(userInfo);
-        if (!userInfoModel.getUserRole().equalsIgnoreCase("ROLE_SELLER")) {
-            throw new IllegalArgumentException("사용자 정보가 올바르지 않습니다.");
-        }
+    private Optional<String> validateUser(String userInfoHeader) {
+        log.info("Validating user: {}", userInfoHeader);
+        UserInfoModel userInfoModel = userInfoUtils.extractUserInfo(userInfoHeader);
+        return Optional.ofNullable(userInfoModel.getUserRole())
+                .filter(role -> role.equalsIgnoreCase("ROLE_SELLER"))
+                .or(() -> {
+                    log.error("User does not have role SELLER: {}", userInfoModel.getUserRole());
+                    return Optional.empty();
+                });
     }
+
+    private ShipperEntity ShipperEntity.builder()
+                .payment(paymentService.findById(shipper.getPaymentId()))
+            .carrier(shipper.getCarrier())
+            .trackingNumber(shipper.getTrackingNumber())
+            .shipmentDate(shipper.getShipmentDate())
+            .estimatedDeliveryDate(shipper.getEstimatedDeliveryDate())
+            .deliveryAddress(shipper.getDeliveryAddress())
+            .status("준비중")
+                .deliveryAddress(shipper.getDeliveryAddress())
+            .createdAt(LocalDateTime.now())
+            .build()
 }

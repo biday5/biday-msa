@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -37,7 +38,7 @@ public class AccountController {
             @ApiResponse(responseCode = "4011", description = "조회에 실패하였습니다.", content = @Content(mediaType = "application/json"))
     })
     @Parameters({
-            @Parameter(name = "userId", description = "유저번호", example = "66f3601fd3d86243cceb4718")
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 token", example = "")
     })
     public ResponseEntity<Mono<AccountDocument>> findById(@RequestHeader("UserInfo") String userInfoHeader) {
         return new ResponseEntity<>(accountService.findByUserId(userInfoHeader), HttpStatus.OK);

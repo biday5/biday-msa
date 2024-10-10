@@ -3,6 +3,7 @@ package shop.biday.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -99,6 +100,17 @@ public class BidController {
     @Operation(summary = "입찰 저장", description = "입찰 데이터를 저장합니다.")
     @ApiResponse(responseCode = "200", description = "성공")
     @PostMapping
+    @Parameters({
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
+                    example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}"),
+            @Parameter(examples = {
+                    @ExampleObject(name = "exampleBidModel", value = """ 
+                                { 
+                                    "auctionId" : "참여한 경매 id",
+                                    "currentBid" : "입찰 가격"
+                                } 
+                            """)})
+    })
     public Mono<BidResponse> save(@RequestHeader("UserInfo") String userInfo,
                                   @RequestBody @Validated BidModel bidModel) {
         log.info("save bidModel: {}, userInfo: {}", bidModel, userInfo);

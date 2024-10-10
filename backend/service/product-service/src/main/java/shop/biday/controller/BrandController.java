@@ -51,15 +51,12 @@ public class BrandController {
             @ApiResponse(responseCode = "200", description = "브랜드 등록 성공"),
             @ApiResponse(responseCode = "404", description = "브랜드 등록 할 수 없음")
     })
-
     @Parameters({
             @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 token", example = ""),
             @Parameter(examples = {
                     @ExampleObject(name = "exampleBrandModel", value = """ 
                         { 
-                            "name" : "브랜드 이름", 
-                            "createdAt" : "등록 시간", 
-                            "updatedAt" : "시간 시간"
+                            "name" : "브랜드 이름"
                         } 
                     """)})
     })
@@ -81,8 +78,7 @@ public class BrandController {
                     @ExampleObject(name = "exampleBrandModel", value = """ 
                         { 
                             "id" : "변경할 브랜드 id",
-                            "name" : "브랜드 이름", 
-                            "createdAt" : "등록 시간", 
+                            "name" : "브랜드 이름",
                             "updatedAt" : "시간 시간"
                         } 
                     """)})
