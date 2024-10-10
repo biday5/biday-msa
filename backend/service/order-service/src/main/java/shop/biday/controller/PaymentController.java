@@ -89,11 +89,11 @@ public class PaymentController {
 
     @Operation(summary = "사용자 기준 결제 내역 조회", description = "userId로 결제 조회합니다.")
     @ApiResponse(responseCode = "200", description = "성공")
-    @GetMapping("/findByUser")
     @Parameters({
             @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
                     example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}"),
     })
+    @GetMapping("/findByUser")
     public ResponseEntity<List<PaymentRequest>> findByUser(@RequestHeader("UserInfo") String userInfo) {
         log.info("findByUser: {}", userInfo);
         return new ResponseEntity<>(paymentService.findByUser(userInfo), HttpStatus.OK);
