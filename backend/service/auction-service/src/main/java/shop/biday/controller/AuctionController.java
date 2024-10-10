@@ -85,7 +85,8 @@ public class AuctionController {
             @ApiResponse(responseCode = "404", description = "경매 목록 찾을 수 없음")
     })
     @Parameters({
-            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 token", example = ""),
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
+                    example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}"),
             @Parameter(name = "period", description = "기간별 정렬", example = "3개월"),
             @Parameter(name = "cursor", description = "현재 페이지에서 가장 마지막 경매의 id", example = "1"),
             @Parameter(name = "page", description = "페이지 번호", example = "1"),
@@ -108,7 +109,8 @@ public class AuctionController {
             @ApiResponse(responseCode = "404", description = "경매 등록 할 수 없음")
     })
     @Parameters({
-            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 token", example = ""),
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
+                    example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}"),
             @Parameter(examples = {
                     @ExampleObject(name = "exampleProductModel", value = """ 
                         { 
@@ -135,7 +137,8 @@ public class AuctionController {
             @ApiResponse(responseCode = "404", description = "경매 수정 할 수 없음")
     })
     @Parameters({
-            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 token", example = ""),
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
+                    example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}"),
             @Parameter(examples = {
                     @ExampleObject(name = "exampleProductModel", value = """ 
                         { 
@@ -163,7 +166,8 @@ public class AuctionController {
             @ApiResponse(responseCode = "404", description = "경매 찾을 수 없음")
     })
     @Parameters({
-            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 token", example = ""),
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
+                    example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}"),
             @Parameter(name = "userId", description = "현재 로그인한 사용자 token에서 추출한 userId", example = "66f1442a7415bc47b04b3477"),
             @Parameter(name = "brandId", description = "브랜드 id", example = "1")
     })

@@ -43,7 +43,8 @@ public class ImageController {
             @ApiResponse(responseCode = "404", description = "사진 등록 실패")
     })
     @Parameters(value = {
-            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 token", example = ""),
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
+                    example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}"),
             @Parameter(name = "files", description = "업로드할 이미지 파일", example = "단일 사진 파일"),
             @Parameter(name = "filePath", description = "NCloud storage 업로드 폴더 경로 지정", example = "brand 혹은 product 혹은 rate 혹은 error"),
             @Parameter(name = "type", description = "이미지 타입", example = "브랜드 or 상품 or 평점 or 에러"),
@@ -68,7 +69,8 @@ public class ImageController {
             @ApiResponse(responseCode = "404", description = "사진 등록 실패")
     })
     @Parameters(value = {
-            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 token", example = ""),
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
+                    example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}"),
             @Parameter(name = "files", description = "업로드할 이미지 파일 목록", example = "여러 사진 파일"),
             @Parameter(name = "filePath", description = "NCloud storage 업로드 폴더 경로 지정", example = "auctions 혹은 refunds"),
             @Parameter(name = "type", description = "이미지 타입", example = "경매 or 환불"),
@@ -92,7 +94,8 @@ public class ImageController {
             @ApiResponse(responseCode = "404", description = "사진 수정 실패")
     })
     @Parameters(value = {
-            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 token", example = ""),
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
+                    example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}"),
             @Parameter(description = "업데이트할 이미지 파일"),
             @Parameter(description = "업데이트할 이미지의 ID")
     })
@@ -111,7 +114,8 @@ public class ImageController {
             @ApiResponse(responseCode = "404", description = "사진 삭제 실패")
     })
     @Parameters({
-            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 token", example = ""),
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
+                    example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}"),
             @Parameter(name = "imageId", description = "삭제할 이미지의 id", example = "1")
     })
     public String deleteImages(

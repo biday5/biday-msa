@@ -52,7 +52,8 @@ public class BrandController {
             @ApiResponse(responseCode = "404", description = "브랜드 등록 할 수 없음")
     })
     @Parameters({
-            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 token", example = ""),
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
+                    example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}"),
             @Parameter(examples = {
                     @ExampleObject(name = "exampleBrandModel", value = """ 
                         { 
@@ -73,7 +74,8 @@ public class BrandController {
             @ApiResponse(responseCode = "404", description = "브랜드 수정 할 수 없음")
     })
     @Parameters({
-            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 token", example = ""),
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
+                    example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}"),
             @Parameter(examples = {
                     @ExampleObject(name = "exampleBrandModel", value = """ 
                         { 
@@ -96,7 +98,8 @@ public class BrandController {
             @ApiResponse(responseCode = "404", description = "브랜드 삭제 할 수 없음")
     })
     @Parameters({
-            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 token", example = ""),
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
+                    example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}"),
             @Parameter(name = "brandId", description = "브랜드 id", example = "1")
     })
     public ResponseEntity<String> delete(

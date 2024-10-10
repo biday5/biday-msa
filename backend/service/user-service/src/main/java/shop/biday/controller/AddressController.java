@@ -33,7 +33,8 @@ public class AddressController {
             @ApiResponse(responseCode = "200", description = "주소 목록을 성공적으로 불러왔습니다."),
             @ApiResponse(responseCode = "404", description = "주소를 찾을 수 없습니다.")
     })
-    @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 token", example = "")
+    @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
+            example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}")
     public ResponseEntity<Flux<AddressDocument>> findAllByUserId(@RequestHeader("UserInfo") String userInfoHeader) {
         return ResponseEntity.ok(addressService.findAllByUserId(userInfoHeader));
     }
@@ -61,11 +62,13 @@ public class AddressController {
             @ApiResponse(responseCode = "200", description = "이메일과 연관된 주소의 수."),
             @ApiResponse(responseCode = "400", description = "잘못된 요청입니다.", content = @Content)
     })
-    @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 token", example = "")
+    @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
+            example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}")
     public ResponseEntity<Mono<Long>> count(@RequestHeader("UserInfo") String userInfoHeader) {
         return ResponseEntity.ok(addressService.countByUserId(userInfoHeader));
     }
 
+    // TODO UserInfo 넣기!
     @DeleteMapping("/deleteById")
     @Operation(
             summary = "주소 삭제",
@@ -96,7 +99,8 @@ public class AddressController {
             @ApiResponse(responseCode = "500", description = "서버 오류가 발생했습니다.", content = @Content(mediaType = "application/json"))
     })
     @Parameters({
-            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 token", example = ""),
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
+                    example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}"),
             @Parameter(examples = {
                     @ExampleObject(name = "exampleAddressModel", value = """ 
                         { 

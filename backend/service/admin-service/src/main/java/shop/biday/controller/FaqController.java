@@ -56,7 +56,8 @@ public class FaqController {
             @ApiResponse(responseCode = "400", description = "잘못된 요청으로 질문 추가 실패")
     })
     @Parameters({
-            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 token", example = ""),
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
+                    example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}"),
             @Parameter(examples = {
                     @ExampleObject(name = "exampleFaqModel", value = """ 
                         { 
@@ -80,7 +81,8 @@ public class FaqController {
     })
     @Parameters({
             @Parameter(name = "id", description = "삭제할 질문의 ID", example = "1"),
-            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 token", example = ""),
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
+                    example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}")
     })
     public ResponseEntity<Boolean> deleteById(
             @PathVariable Long id,
