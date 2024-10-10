@@ -98,6 +98,10 @@ public class BidController {
 
     @Operation(summary = "입찰 저장", description = "입찰 데이터를 저장합니다.")
     @ApiResponse(responseCode = "200", description = "성공")
+    @Parameters({
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
+                    example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}"),
+    })
     @PostMapping
     public Mono<BidResponse> save(@RequestHeader("UserInfo") String userInfo,
                                   @RequestBody @Validated BidModel bidModel) {
