@@ -100,11 +100,11 @@ public class CategoryController {
     @Parameters({
             @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
                     example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}"),
-            @Parameter(name = "brandId", description = "브랜드 id", example = "1")
+            @Parameter(name = "categoryId", description = "카테고리 id", example = "1")
     })
     public ResponseEntity<String> delete(
             @RequestHeader("UserInfo") String userInfoHeader,
-            @RequestParam Long id) {
+            @RequestParam("categoryId") Long id) {
         return ResponseEntity.ok(categoryService.deleteById(userInfoHeader, id));
     }
 }

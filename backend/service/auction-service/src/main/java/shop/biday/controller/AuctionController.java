@@ -112,11 +112,11 @@ public class AuctionController {
             @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
                     example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}"),
             @Parameter(examples = {
-                    @ExampleObject(name = "exampleProductModel", value = """ 
+                    @ExampleObject(name = "exampleAuctionModel", value = """ 
                         { 
                             "userId" : "변경 불가, 판매자 userId",
-                            "product" : "변경 불가, 경매로 등록할 상품, product의 findById 사용해서 선택!", 
-                            "description" : "변경 불가, 경매로 등록할 판매자 상품의 사진", 
+                            "sizeId" : "변경 불가, 경매로 등록할 상품의 sizeId, size의 findById 사용해서 선택!", 
+                            "description" : "변경 불가, 경매로 등록할 판매자 상품의 설명", 
                             "startingBid" : "변경 불가, 경매 시작가, 상품 가격의 반값or40%로 시작",
                             "currentBid" : "변경 불가, 현재 경매가",
                             "startedAt" : "만약 이미 시작되었다면 변경 불가, 시작 날짜",
@@ -126,7 +126,7 @@ public class AuctionController {
     })
     public ResponseEntity<AuctionEntity> save(
             @RequestHeader("UserInfo") String userInfoHeader,
-            @RequestBody AuctionModel auctionModel) {
+            @RequestBody AuctionDto auctionModel) {
         return ResponseEntity.ok(auctionService.save(userInfoHeader, auctionModel));
     }
 
@@ -144,7 +144,7 @@ public class AuctionController {
                         { 
                             "id" : "경매 id"
                             "userId" : "변경 불가, 판매자 userId",
-                            "product" : "변경 불가, 경매로 등록할 상품, product의 findById 사용해서 선택!", 
+                            "sizeId" : "변경 불가, 경매로 등록할 상품의 sizeId, size의 findById 사용해서 선택!", 
                             "description" : "변경 불가, 경매로 등록할 판매자 상품의 사진", 
                             "startingBid" : "변경 불가, 경매 시작가, 상품 가격의 반값 or 40%로 시작",
                             "currentBid" : "변경 불가, 현재 경매가",
@@ -155,7 +155,7 @@ public class AuctionController {
     })
     public ResponseEntity<AuctionEntity> update(
             @RequestHeader("UserInfo") String userInfoHeader,
-            @RequestBody AuctionModel auctionModel) {
+            @RequestBody AuctionDto auctionModel) {
         return ResponseEntity.ok(auctionService.update(userInfoHeader, auctionModel));
     }
 
