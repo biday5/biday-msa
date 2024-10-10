@@ -105,9 +105,9 @@ public class ProductController {
                     """)})
     })
     public ResponseEntity<ProductEntity> saveProduct(
-            @RequestHeader String role,
+            @RequestHeader("UserInfo") String userInfoHeader,
             @RequestBody ProductModel product) {
-        return ResponseEntity.ok(productService.save(role, product));
+        return ResponseEntity.ok(productService.save(userInfoHeader, product));
     }
 
     @PatchMapping

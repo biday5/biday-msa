@@ -57,7 +57,8 @@ public class ImageController {
             @RequestParam("referenceId") Long referenceId
     ) {
         log.info("이미지 업로드 중");
-        return imageService.uploadFileByAdmin(userInfoHeader, files, filePath, type, referenceId).toString();
+//        return imageService.uploadFileByAdmin(files, filePath, type, referenceId).toString();
+        return imageService.uploadFileByAdmin(userInfoHeader, files, filePath, type, referenceId);
     }
 
     @PostMapping("/uploadByUser")

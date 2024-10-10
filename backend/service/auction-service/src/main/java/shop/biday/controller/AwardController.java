@@ -32,7 +32,7 @@ public class AwardController {
             @ApiResponse(responseCode = "404", description = "낙찰 목록 찾을 수 없음")
     })
     @Parameters({
-            @Parameter(name = "userId", description = "현재 로그인한 사용자 token에서 추출한 userId", example = "66f1442a7415bc47b04b3477"),
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 token", example = ""),
             @Parameter(name = "period", description = "기간별 정렬", example = "3개월"),
             @Parameter(name = "cursor", description = "현재 페이지에서 가장 마지막 낙찰의 id", example = "1"),
             @Parameter(name = "page", description = "페이지 번호", example = "1"),
@@ -55,8 +55,8 @@ public class AwardController {
             @ApiResponse(responseCode = "404", description = "낙찰 찾을 수 없음")
     })
     @Parameters({
-            @Parameter(name = "userId", description = "현재 로그인한 사용자 token에서 추출한 userId", example = "66f1442a7415bc47b04b3477"),
-            @Parameter(name = "id", description = "상세보기할 낙찰의 id", example = "1")
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 token", example = ""),
+            @Parameter(name = "awardId", description = "상세보기할 낙찰의 id", example = "1")
     })
     public ResponseEntity<AwardModel> findById(
             @RequestHeader("UserInfo") String userInfoHeader,
