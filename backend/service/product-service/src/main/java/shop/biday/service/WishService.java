@@ -1,12 +1,20 @@
 package shop.biday.service;
 
+import org.springframework.http.ResponseEntity;
+
+import java.util.List;
+
 public interface WishService {
-    boolean toggleWish(String email, Long productId);
+    List<?> findByUserId(String userInfoHeader);
 
-    void deleteWish(String email, Long productId);
+    boolean toggleWish(String userInfoHeader, Long productId);
 
-    void insertWish(String email, Long productId);
+    void deleteWish(String userInfoHeader, Long productId);
 
-    boolean isWish(String email, Long productId);
+    void insertWish(String userInfoHeader, Long productId);
+
+    boolean isWish(String userInfoHeader, Long productId);
+
+    ResponseEntity<String> deleteByWishId(String userInfoHeader, Long wishId);
 
 }

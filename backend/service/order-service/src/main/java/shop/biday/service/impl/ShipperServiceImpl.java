@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import shop.biday.model.domain.ShipperModel;
 import shop.biday.model.domain.UserInfoModel;
-import shop.biday.model.entity.PaymentEntity;
 import shop.biday.model.entity.ShipperEntity;
 import shop.biday.model.repository.ShipperRepository;
 import shop.biday.service.PaymentService;
@@ -36,59 +35,65 @@ public class ShipperServiceImpl implements ShipperService {
 
     @Override
     public ShipperModel findById(Long id) {
-        log.info("Find shipper by id: {}", id);
-        return ShipperModel.of(shipperRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("잘못된 요청입니다.")));
+        log.info("Finding shipper by id: {}", id);
+        return shipperRepository.findById(id)
+                .map(ShipperModel::of)
+                .orElseThrow(() -> {
+                    log.error("Shipper not found for id: {}", id);
+                    return new IllegalArgumentException("잘못된 요청입니다.");
+                });
     }
 
     @Override
     public ShipperEntity save(String userInfo, ShipperModel shipper) {
-        log.info("Save shipper started");
+        log.info("Saving shipper started");
         return validateUser(userInfo)
-                .map(t-> {
+                .map(user -> {
                     ShipperEntity savedShipper = createShipperEntity(shipper);
                     log.debug("Shipper saved successfully: {}", savedShipper.getId());
                     return shipperRepository.save(savedShipper);
-        })
+                })
+                .orElseThrow(() -> {
+                    log.error("Save Shipper failed: User does not have permission");
+                    return new RuntimeException("Save Shipper failed: User does not have permission");
+                });
     }
 
     @Override
     public ShipperEntity update(String userInfo, ShipperModel shipper) {
         log.info("Update shipper started");
-        validateUser(userInfo);
-
-        if (!shipperRepository.existsById(shipper.getId())) {
-            log.error("Not found shipper: {}", shipper.getId());
-            throw new IllegalArgumentException("잘못된 요청입니다.");
-        }
-
-        return shipperRepository.save(ShipperEntity.builder()
-                .id(shipper.getId())
-                .payment(paymentService.findById(shipper.getPaymentId()))
-                .carrier(shipper.getCarrier())
-                .trackingNumber(shipper.getTrackingNumber())
-                .shipmentDate(shipper.getShipmentDate())
-                .estimatedDeliveryDate(shipper.getEstimatedDeliveryDate())
-                .deliveryAddress(shipper.getDeliveryAddress())
-                .status(shipper.getStatus())
-                .deliveryAddress(shipper.getDeliveryAddress())
-                .createdAt(shipper.getCreatedAt())
-                .updatedAt(LocalDateTime.now())
-                .build());
+        return validateUser(userInfo)
+                .filter(t->{
+                    boolean exists = shipperRepository.existsById(shipper.getId());
+                    if(!exists) {
+                        log.error("Not found shipper: {}", shipper.getId());
+                        throw new IllegalArgumentException("Not found shipper");
+                    }
+                    return exists;
+                })
+                .map(t->{
+                    ShipperEntity updatedShipper = createShipperEntity(shipper);
+                    updatedShipper.setId(shipper.getId());
+                    log.debug("Shipper updated successfully: {}", updatedShipper.getId());
+                    return shipperRepository.save(updatedShipper);
+                })
+                .orElseThrow(()-> new RuntimeException("Update Shipper failed: Shipper not found or user does not have permission"));
     }
 
     @Override
     public String deleteById(String userInfo, Long id) {
-        log.info("Delete shipper started for id: {}", id);
-        validateUser(userInfo);
-
-        if (!shipperRepository.existsById(id)) {
-            log.error("배송 정보를 찾을수 없습니다: {}", id);
-            return "배송지 삭제 실패";
-        }
-
-        shipperRepository.deleteById(id);
-        return "배송지 삭제 성공";
+        log.info("Deleting shipper started for id: {}", id);
+        return validateUser(userInfo)
+                .filter(user -> shipperRepository.existsById(id))
+                .map(user -> {
+                    shipperRepository.deleteById(id);
+                    log.debug("Shipper deleted successfully: {}", id);
+                    return "배송지 삭제 성공";
+                })
+                .orElseGet(() -> {
+                    log.error("Delete Shipper failed: User does not have permission or shipper not found");
+                    return "유효하지 않은 사용자: 판매자 권한이 필요합니다";
+                });
     }
 
     private Optional<String> validateUser(String userInfoHeader) {
@@ -102,15 +107,16 @@ public class ShipperServiceImpl implements ShipperService {
                 });
     }
 
-    private ShipperEntity ShipperEntity.builder()
+    private ShipperEntity createShipperEntity(ShipperModel shipper) {
+        return ShipperEntity.builder()
                 .payment(paymentService.findById(shipper.getPaymentId()))
-            .carrier(shipper.getCarrier())
-            .trackingNumber(shipper.getTrackingNumber())
-            .shipmentDate(shipper.getShipmentDate())
-            .estimatedDeliveryDate(shipper.getEstimatedDeliveryDate())
-            .deliveryAddress(shipper.getDeliveryAddress())
-            .status("준비중")
+                .carrier(shipper.getCarrier())
+                .trackingNumber(shipper.getTrackingNumber())
+                .shipmentDate(shipper.getShipmentDate())
+                .estimatedDeliveryDate(shipper.getEstimatedDeliveryDate())
                 .deliveryAddress(shipper.getDeliveryAddress())
-            .createdAt(LocalDateTime.now())
-            .build()
+                .status(shipper.getStatus())
+                .deliveryAddress(shipper.getDeliveryAddress())
+                .build();
+    }
 }

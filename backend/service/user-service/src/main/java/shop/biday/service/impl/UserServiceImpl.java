@@ -7,10 +7,12 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import shop.biday.model.document.UserDocument;
+import shop.biday.model.domain.UserInfoModel;
 import shop.biday.model.domain.UserModel;
 import shop.biday.model.enums.Role;
 import shop.biday.model.repository.MUserRepository;
 import shop.biday.service.UserService;
+import shop.biday.utils.UserInfoUtils;
 
 import java.util.Collections;
 
@@ -20,6 +22,7 @@ import java.util.Collections;
 public class UserServiceImpl implements UserService {
     private final MUserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserInfoUtils userInfoUtils;
 
     @Override
     public Flux<UserDocument> findAll() {
@@ -57,8 +60,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Mono<Void> deleteById(String id) {
-        return userRepository.deleteById(id);
+    public Mono<Void> deleteById(String userInfoHeader) {
+        UserInfoModel userInfo = userInfoUtils.extractUserInfo(userInfoHeader);
+        return userRepository.deleteById(userInfo.getUserId());
     }
 
     public Mono<UserDocument> findByEmail(String email) {
@@ -78,8 +82,10 @@ public class UserServiceImpl implements UserService {
         return userRepository.existsByPhone(userModel.getPhoneNum());
     }
 
-    public Mono<Boolean> existsByPasswordAndEmail(UserModel userModel) {
-        return userRepository.findByEmail(userModel.getEmail())
+    public Mono<Boolean> existsByPasswordAndEmail(String userInfoHeader, UserModel userModel) {
+        UserInfoModel userInfo = userInfoUtils.extractUserInfo(userInfoHeader);
+
+        return userRepository.findById(userInfo.getUserId())
                 .flatMap(user -> Mono.just(passwordEncoder.matches(userModel.getPassword(), user.getPassword()))) // 비밀번호 비교
                 .defaultIfEmpty(false);
     }
@@ -89,8 +95,10 @@ public class UserServiceImpl implements UserService {
                 .switchIfEmpty(Mono.error(new RuntimeException("해당 전화번호로 사용자를 찾을 수 없습니다.: " + userModel.getPhoneNum())));
     }
 
-    public Mono<String> changePassword(UserModel userModel) {
-        return userRepository.findByEmail(userModel.getEmail())
+    public Mono<String> changePassword(String userInfoHeader,UserModel userModel) {
+        UserInfoModel userInfo = userInfoUtils.extractUserInfo(userInfoHeader);
+
+        return  userRepository.findById(userInfo.getUserId())
                 .flatMap(user -> {
                     if (passwordEncoder.matches(userModel.getPassword(), user.getPassword())) { // 비밀번호 비교
                         String encodedNewPassword = passwordEncoder.encode(userModel.getNewPassword()); // 새 비밀번호 해시
@@ -101,7 +109,7 @@ public class UserServiceImpl implements UserService {
                         return Mono.just("예전 비밀번호가 틀렸습니다.");
                     }
                 })
-                .switchIfEmpty(Mono.just("이메일 대상이 없습니다."));
+                .switchIfEmpty(Mono.just("유저 대상이 없습니다."));
     }
 
     public Mono<UserDocument> register(UserModel userModel) {

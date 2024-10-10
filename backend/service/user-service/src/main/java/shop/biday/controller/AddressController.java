@@ -78,10 +78,15 @@ public class AddressController {
             @ApiResponse(responseCode = "204", description = "주소가 성공적으로 삭제되었습니다."),
             @ApiResponse(responseCode = "404", description = "주소를 찾을 수 없습니다.", content = @Content)
     })
-    @Parameter(name = "id", description = "삭제 할 주소를 선택 id", example = "1L")
-    public ResponseEntity<Mono<Boolean>> deleteById(@RequestParam @Parameter(description = "삭제할 주소의 ID") String id) {
+    @Parameters({
+        @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
+                example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}"),
+        @Parameter(name = "id", description = "삭제 할 주소를 선택 id", example = "1L")
+    })
+    public ResponseEntity<Mono<Boolean>> deleteById(@RequestHeader("UserInfo") String userInfoHeader,
+                                                    @RequestParam @Parameter(description = "삭제할 주소의 ID") String id) {
         try {
-            addressService.deleteById(id);
+            addressService.deleteById(userInfoHeader,id);
             return ResponseEntity.noContent().build();
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();

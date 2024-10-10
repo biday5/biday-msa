@@ -11,10 +11,10 @@ public interface AddressService {
     Mono<String> pick(String id);
     Mono<Long> countByUserId(String userInfoHeader);
     Mono<AddressDocument> save(String userInfoHeader , AddressModel addressModel);
-    Mono<Boolean> deleteById(String id);
+    Mono<Boolean> deleteById(String userInfoHeader, String id);
 
-    Flux<AddressDocument> findAll();
-    Mono<AddressDocument> findById(String id);
-    Mono<Boolean> existsById(String id);
-    Mono<Long> count();
+//    Flux<AddressDocument> findAll();
+//    Mono<AddressDocument> findById(String id);
+//    Mono<Boolean> existsById(String id);
+//    Mono<Long> count();
 }

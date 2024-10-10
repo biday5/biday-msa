@@ -27,7 +27,7 @@ public class QWishRepositoryImpl implements QWishRepository {
     }
 
     @Override
-    public WishEntity findByEmailAndProductId(String userId, Long productId) {
+    public WishEntity findByUserIdAndProductId(String userId, Long productId) {
         queryFactory.select(wishEntity)
                 .where(wishEntity.userId.eq(userId)
                         .and(wishEntity.product.id.eq(productId)));

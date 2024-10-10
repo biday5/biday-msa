@@ -8,7 +8,7 @@ public interface QWishRepository {
 
     void deleteWish(String userId, Long productId);
 
-    WishEntity findByEmailAndProductId(String userId, Long productId);
+    WishEntity findByUserIdAndProductId(String userId, Long productId);
 
     List<?> findByUserId(String userId);
 

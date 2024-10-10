@@ -23,7 +23,6 @@ import java.util.List;
 @Tag(name = "wishes", description = "Wish Controller")
 public class WishController {
     private final WishService wishService;
-    private final WishRepository wishRepository;
 
 
     @GetMapping("/user")
@@ -32,9 +31,10 @@ public class WishController {
             @ApiResponse(responseCode = "200", description = "위시 목록 불러오기 성공"),
             @ApiResponse(responseCode = "404", description = "위시 찾을 수 없음")
     })
-    @Parameter(name = "userId", description = "유저 id", example = "sdfksdfsdfoijekf")
+    @Parameter(name = "UserInfo", description = "현재 로그인한 사용자",
+            example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}")
     public ResponseEntity<List<?>> findByUser(@RequestHeader("UserInfo") String userInfoHeader) {
-        List<?> wishList = wishRepository.findByUserId(userInfoHeader);
+        List<?> wishList = wishService.findByUserId(userInfoHeader);
 
         return (wishList == null || wishList.isEmpty())
                 ? ResponseEntity.noContent().build()
@@ -43,61 +43,40 @@ public class WishController {
     }
 
     @GetMapping
-    @Operation(summary = "사이즈 수정", description = "사이즈 수정하기")
+    @Operation(summary = "위시 수정", description = "위시 수정하기")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "사이즈 수정 성공"),
-            @ApiResponse(responseCode = "404", description = "사이즈 수정 할 수 없음")
+            @ApiResponse(responseCode = "200", description = "위시 수정 성공"),
+            @ApiResponse(responseCode = "404", description = "위시 수정 할 수 없음")
     })
     @Parameters({
-            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자",
                     example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}"),
-            @Parameter(examples = {
-                    @ExampleObject(name = "exampleSizeModel", value = """ 
-                        { 
-                            "id" : "사이즈 id",
-                            "product" : "브랜드 이름",
-                            "name" : "사이즈 이름(enum : XS~XXL)", 
-                            "createdAt" : "등록 시간"
-                        } 
-                    """)})
+            @Parameter(name = "productId", description = "상품 id", example = "1")
     })
     public ResponseEntity<?> toggleWish(
             @RequestHeader("UserInfo") String userInfoHeader,
             @RequestParam("productId") Long productId) {
-        return wishService.toggleWish(userId, productId)
+        return wishService.toggleWish(userInfoHeader, productId)
                 ? ResponseEntity.status(HttpStatus.CREATED).body("위시 생성 성공")
                 : ResponseEntity.ok("위시 삭제 성공");
 
     }
 
     @DeleteMapping
-    @Operation(summary = "사이즈 수정", description = "사이즈 수정하기")
+    @Operation(summary = "위시 삭제", description = "위시 삭제하기")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "사이즈 수정 성공"),
-            @ApiResponse(responseCode = "404", description = "사이즈 수정 할 수 없음")
+            @ApiResponse(responseCode = "200", description = "위시 삭제 성공"),
+            @ApiResponse(responseCode = "404", description = "위시 삭제 할 수 없음")
     })
     @Parameters({
             @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
                     example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}"),
-            @Parameter(examples = {
-                    @ExampleObject(name = "exampleSizeModel", value = """ 
-                        { 
-                            "id" : "사이즈 id",
-                            "product" : "브랜드 이름",
-                            "name" : "사이즈 이름(enum : XS~XXL)", 
-                            "createdAt" : "등록 시간"
-                        } 
-                    """)})
+            @Parameter(name = "wishId", description = "위시 id", example = "1")
     })
     public ResponseEntity<?> delete(
             @RequestHeader("UserInfo") String userInfoHeader,
-            @RequestParam("wishId") Long id) {
-        return wishRepository.findById(id)
-                .filter(wish -> wish.getUserId().equals(userId))
-                .map(wish -> {
-                    wishRepository.deleteById(id);
-                    return ResponseEntity.ok("위시 삭제 성공");
-                }).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("존재하지 않는 wishId: " + id));
+            @RequestParam("wishId") Long wishId) {
+        return wishService.deleteByWishId(userInfoHeader, wishId);
 
     }
 }

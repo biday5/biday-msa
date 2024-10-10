@@ -107,20 +107,23 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public String deleteById(String userInfoHeader, Long id) {
         log.info("Deleting product started for id: {}", id);
-
-        return validateUser(userInfoHeader).map(t -> {
-            if (!productRepository.existsById(id)) {
-                log.error("Product not found with id: {}", id);
-                return "상품 삭제 실패: 상품을 찾을 수 없습니다";
-            }
-
-            productRepository.deleteById(id);
-            log.debug("Product deleted successfully: {}", id);
-            return "상품 삭제 성공";
-        }).orElseGet(() -> {
-            log.error("User does not have role ADMIN or does not exist");
-            return "유효하지 않은 사용자: 관리자 권한이 필요합니다";
-        });
+        return validateUser(userInfoHeader)
+                .filter(t -> {
+                    boolean exists = productRepository.existsById(id);
+                    if (!exists) {
+                        log.error("Product not found with id: {}", id);
+                    }
+                    return exists;
+                })
+                .map(t -> {
+                    productRepository.deleteById(id);
+                    log.debug("Product deleted successfully: {}", id);
+                    return "상품 삭제 성공";
+                })
+                .orElseGet(() -> {
+                    log.error("User does not have role ADMIN or does not exist");
+                    return "유효하지 않은 사용자: 관리자 권한이 필요합니다";
+                });
     }
 
     @Override
