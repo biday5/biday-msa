@@ -10,7 +10,7 @@ import java.nio.charset.StandardCharsets;
 
 @Component
 public class UserInfoUtils {
-    private  final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public UserInfoModel extractUserInfo(String userInfoHeader) {
         if (userInfoHeader == null || userInfoHeader.isEmpty()) {
