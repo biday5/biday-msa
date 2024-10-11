@@ -55,6 +55,7 @@ public class Oauth2SuccessHandler implements ServerAuthenticationSuccessHandler 
                 .then(Mono.defer(() -> {
                     var response = webFilterExchange.getExchange().getResponse();
                     response.getHeaders().set("Authorization", "Bearer " + access);
+                    response.addCookie(createCookie("Authorization", access));
                     response.addCookie(createCookie("refresh", refresh));
                     response.setStatusCode(HttpStatus.FOUND);
                     response.getHeaders().setLocation(URI.create(REDIRECT_URL));
