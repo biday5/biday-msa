@@ -5,9 +5,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;
 import shop.biday.model.domain.UserInfoModel;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+
 @Component
 public class UserInfoUtils {
-    private  final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public UserInfoModel extractUserInfo(String userInfoHeader) {
         if (userInfoHeader == null || userInfoHeader.isEmpty()) {
@@ -15,7 +18,9 @@ public class UserInfoUtils {
         }
 
         try {
-            return objectMapper.readValue(userInfoHeader, UserInfoModel.class);
+            return objectMapper.readValue(URLDecoder.decode(
+                            userInfoHeader, StandardCharsets.UTF_8),
+                    UserInfoModel.class);
         } catch (JsonProcessingException e) {
             throw new RuntimeException("유효하지 않은 UserInfo 형식", e);
         }
