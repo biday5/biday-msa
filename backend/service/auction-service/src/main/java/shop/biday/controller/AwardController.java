@@ -17,7 +17,6 @@ import shop.biday.service.AwardService;
 
 import java.time.LocalDateTime;
 
-@CrossOrigin
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/awards")

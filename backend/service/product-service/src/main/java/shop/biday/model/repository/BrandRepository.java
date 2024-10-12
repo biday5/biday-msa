@@ -7,5 +7,5 @@ import shop.biday.model.entity.BrandEntity;
 @Repository
 public interface BrandRepository extends JpaRepository<BrandEntity, Long>, QBrandRepository {
 
-    BrandEntity findByName(String name);
+    BrandEntity findByNameIgnoreCase(String name);
 }

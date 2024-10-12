@@ -1,5 +1,6 @@
 package shop.biday.service;
 
+import org.springframework.http.ResponseEntity;
 import shop.biday.model.domain.ShipperModel;
 import shop.biday.model.entity.ShipperEntity;
 
@@ -7,13 +8,13 @@ import java.util.List;
 
 public interface ShipperService {
 
-    List<ShipperModel> findAll();
+    ResponseEntity<List<ShipperModel>> findAll();
 
-    ShipperModel findById(Long id);
+    ResponseEntity<ShipperModel> findById(Long id);
 
-    ShipperEntity save(String token, ShipperModel brand);
+    ResponseEntity<ShipperEntity> save(String token, ShipperModel brand);
 
-    ShipperEntity update(String token, ShipperModel brand);
+    ResponseEntity<ShipperEntity> update(String token, ShipperModel brand);
 
-    String deleteById(String token, Long id);
+    ResponseEntity<String> deleteById(String token, Long id);
 }

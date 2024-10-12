@@ -14,7 +14,6 @@ import shop.biday.service.WishService;
 
 import java.util.List;
 
-@CrossOrigin
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/wishes")

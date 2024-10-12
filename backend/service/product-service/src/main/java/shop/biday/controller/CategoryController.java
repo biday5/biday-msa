@@ -16,7 +16,6 @@ import shop.biday.service.CategoryService;
 
 import java.util.List;
 
-@CrossOrigin
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/categories")

@@ -16,7 +16,6 @@ import shop.biday.service.SizeService;
 
 import java.util.List;
 
-@CrossOrigin
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/sizes")

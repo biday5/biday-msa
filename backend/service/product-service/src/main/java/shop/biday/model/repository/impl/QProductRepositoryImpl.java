@@ -64,8 +64,8 @@ public class QProductRepositoryImpl implements QProductRepository {
     }
 
     @Override
-    public List<ProductDto> findProducts(Long categoryId, Long brandId, String keyword, String color, String order, Long lastItemValue) {
-        return createBaseQuery(queryFactory, categoryId, brandId, keyword, color, order, lastItemValue)
+    public List<ProductDto> findProducts(Long categoryId, Long brandId, String keyword, String color, String order) {
+        return createBaseQuery(queryFactory, categoryId, brandId, keyword, color, order)
                 .fetch();
     }
 
@@ -126,7 +126,7 @@ public class QProductRepositoryImpl implements QProductRepository {
     }
 
     private JPQLQuery<ProductDto> createBaseQuery(JPAQueryFactory queryFactory, Long categoryId, Long brandId, String keyword,
-                                                  String color, String order, Long lastItemId) {
+                                                  String color, String order) {
         JPQLQuery<ProductDto> query = queryFactory
                 .select(createProductDtoProjection())
                 .from(qProduct)
@@ -141,7 +141,7 @@ public class QProductRepositoryImpl implements QProductRepository {
                         findByKeyword(keyword)
                 );
 
-        findByOrdering(query, order, lastItemId);
+        findByOrdering(query, order);
 
         return query
                 .groupBy(qProduct.id, qBrand.name, qCategory.name, qProduct.name, qProduct.subName, qProduct.productCode, qProduct.price, qProduct.color.stringValue());
@@ -168,38 +168,13 @@ public class QProductRepositoryImpl implements QProductRepository {
                 .or(qBrand.name.containsIgnoreCase(keyword)) : null;
     }
 
-    private void findByOrdering(JPQLQuery<ProductDto> query, String order, Long lastItemId) {
+    private void findByOrdering(JPQLQuery<ProductDto> query, String order) {
         switch (order) {
-            case "가격 낮은 순":
-                if (lastItemId != null) {
-                    query.where(qProduct.price.gt(fetchProductByPrice(lastItemId)));
-                }
-                query.orderBy(qProduct.price.asc());
-                break;
-            case "가격 높은 순":
-                if (lastItemId != null) {
-                    query.where(qProduct.price.lt(fetchProductByPrice(lastItemId)));
-                }
-                query.orderBy(qProduct.price.desc());
-                break;
-            case "위시 적은 순":
-                if (lastItemId != null) {
-                    query.where(qWish.count().gt(fetchWishByCount(lastItemId)));
-                }
-                query.orderBy(qWish.count().asc());
-                break;
-            case "위시 많은 순":
-                if (lastItemId != null) {
-                    query.where(qWish.count().lt(fetchWishByCount(lastItemId)));
-                }
-                query.orderBy(qWish.count().desc());
-                break;
-            default:
-                if (lastItemId != null) {
-                    query.where(qProduct.id.gt(lastItemId));
-                }
-                query.orderBy(qProduct.id.asc());
-                break;
+            case "가격 낮은 순" -> query.orderBy(qProduct.price.asc());
+            case "가격 높은 순" -> query.orderBy(qProduct.price.desc());
+            case "위시 적은 순" -> query.orderBy(qWish.count().asc());
+            case "위시 많은 순" -> query.orderBy(qWish.count().desc());
+            default -> query.orderBy(qProduct.id.asc());
         }
     }
 

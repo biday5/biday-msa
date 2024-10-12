@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import shop.biday.model.domain.ProductModel;
 import shop.biday.model.domain.UserInfoModel;
 import shop.biday.model.dto.ProductDto;
+import shop.biday.model.entity.BrandEntity;
+import shop.biday.model.entity.CategoryEntity;
 import shop.biday.model.entity.ProductEntity;
 import shop.biday.model.entity.enums.Color;
 import shop.biday.model.repository.BrandRepository;
@@ -17,10 +19,7 @@ import shop.biday.service.ProductService;
 import shop.biday.utils.UserInfoUtils;
 
 import java.net.http.HttpResponse;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -78,6 +77,42 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public ResponseEntity<List<ProductDto>> findByFilter(String category, String brand, String keyword, String color, String order) {
+        log.info("Finding products by filter started");
+        log.info("Filter parameters - category: {}, brand: {}, keyword: {}, color: {}, order: {}",
+                category, brand, keyword, color, order);
+
+        List<ProductDto> products = Optional.ofNullable(category)
+                .map(cat -> categoryRepository.findByNameIgnoreCase(cat))
+                .map(catEntity -> {
+                    Long categoryId = catEntity.getId();
+                    log.info("Category found with ID: {}", categoryId);
+
+                    return Optional.ofNullable(brand)
+                            .map(br -> brandRepository.findByNameIgnoreCase(br))
+                            .map(brEntity -> {
+                                Long brandId = brEntity.getId();
+                                log.info("Brand found with ID: {}", brandId);
+                                return productRepository.findProducts(categoryId, brandId, keyword, color, order);
+                            })
+                            .orElseGet(() -> {
+                                log.warn("Brand not found: {}", brand);
+                                return productRepository.findProducts(categoryId, null, keyword, color, order);
+                            });
+                })
+                .orElseGet(() -> {
+                    log.warn("Category not found: {}", category);
+                    return brand != null ?
+                            productRepository.findProducts(null, brandRepository.findByNameIgnoreCase(brand).getId(), keyword, color, order) :
+                            Collections.emptyList();
+                });
+
+        return products.isEmpty() ?
+                new ResponseEntity<>(HttpStatus.NOT_FOUND) :
+                new ResponseEntity<>(products, HttpStatus.OK);
+    }
+
+    @Override
     public ResponseEntity<ProductEntity> save(String userInfoHeader, ProductModel product) {
         log.info("Saving product started with user: {}", userInfoHeader);
         return validateUser(userInfoHeader)
@@ -125,17 +160,6 @@ public class ProductServiceImpl implements ProductService {
                 });
     }
 
-    @Override
-    public ResponseEntity<List<ProductDto>> findByFilter(Long categoryId, Long brandId, String keyword, String color, String order, Long lastItemId) {
-        log.info("Finding products by filter started");
-        log.info("Filter parameters - categoryId: {}, brandId: {}, keyword: {}, color: {}, order: {}, lastItemId: {}",
-                categoryId, brandId, keyword, color, order, lastItemId);
-        List<ProductDto> products = productRepository.findProducts(categoryId, brandId, keyword, color, order, lastItemId);
-        return products.isEmpty() ?
-                new ResponseEntity<>(HttpStatus.NOT_FOUND) :
-                new ResponseEntity<>(products, HttpStatus.OK);
-    }
-
     private Optional<String> validateUser(String userInfoHeader) {
         log.info("Validating user: {}", userInfoHeader);
         UserInfoModel userInfoModel = userInfoUtils.extractUserInfo(userInfoHeader);
@@ -150,8 +174,8 @@ public class ProductServiceImpl implements ProductService {
     private ProductEntity createProductEntity(ProductModel product) {
         log.info("Creating product entity for product: {}", product.getName());
         return ProductEntity.builder()
-                .brand(brandRepository.findByName(product.getBrand()))
-                .category(categoryRepository.findByName(product.getCategory()))
+                .brand(brandRepository.findByNameIgnoreCase(product.getBrand()))
+                .category(categoryRepository.findByNameIgnoreCase(product.getCategory()))
                 .name(product.getName())
                 .subName(product.getSubName())
                 .productCode(product.getProductCode())

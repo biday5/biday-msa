@@ -2,6 +2,8 @@ package shop.biday.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import shop.biday.model.domain.ShipperModel;
 import shop.biday.model.domain.UserInfoModel;
@@ -24,74 +26,85 @@ public class ShipperServiceImpl implements ShipperService {
     private final UserInfoUtils userInfoUtils;
 
     @Override
-    public List<ShipperModel> findAll() {
+    public ResponseEntity<List<ShipperModel>> findAll() {
         log.info("Find all shippers");
-        return shipperRepository.findAll()
+        List<ShipperModel> shippers = shipperRepository.findAll()
                 .stream()
                 .map(ShipperModel::of)
                 .toList();
+
+        return shippers.isEmpty() ?
+                ResponseEntity.status(HttpStatus.NOT_FOUND).build() :
+                ResponseEntity.ok(shippers);
     }
 
     @Override
-    public ShipperModel findById(Long id) {
+    public ResponseEntity<ShipperModel> findById(Long id) {
         log.info("Finding shipper by id: {}", id);
         return shipperRepository.findById(id)
-                .map(ShipperModel::of)
-                .orElseThrow(() -> {
+                .map(shipper -> ResponseEntity.ok(ShipperModel.of(shipper)))
+                .orElseGet(() -> {
                     log.error("Shipper not found for id: {}", id);
-                    return new IllegalArgumentException("잘못된 요청입니다.");
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
                 });
     }
 
     @Override
-    public ShipperEntity save(String userInfo, ShipperModel shipper) {
+    public ResponseEntity<ShipperEntity> save(String userInfo, ShipperModel shipper) {
         log.info("Saving shipper started");
         return validateUser(userInfo)
                 .map(user -> {
                     ShipperEntity savedShipper = createShipperEntity(shipper);
                     log.debug("Shipper saved successfully: {}", savedShipper.getId());
-                    return shipperRepository.save(savedShipper);
+                    return ResponseEntity.ok(shipperRepository.save(savedShipper));
                 })
-                .orElseThrow(() -> {
+                .orElseGet(() -> {
                     log.error("Save Shipper failed: User does not have permission");
-                    return new RuntimeException("Save Shipper failed: User does not have permission");
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                            .body(null);
                 });
     }
 
     @Override
-    public ShipperEntity update(String userInfo, ShipperModel shipper) {
+    public ResponseEntity<ShipperEntity> update(String userInfo, ShipperModel shipper) {
         log.info("Update shipper started");
+
         return validateUser(userInfo)
-                .filter(t->{
+                .map(user -> {
                     boolean exists = shipperRepository.existsById(shipper.getId());
-                    if(!exists) {
+                    if (!exists) {
                         log.error("Not found shipper: {}", shipper.getId());
-                        throw new IllegalArgumentException("Not found shipper");
+                        return ResponseEntity.status(HttpStatus.NOT_FOUND).<ShipperEntity>body(null);
                     }
-                    return exists;
-                })
-                .map(t->{
+
                     ShipperEntity updatedShipper = createShipperEntity(shipper);
                     updatedShipper.setId(shipper.getId());
                     log.debug("Shipper updated successfully: {}", updatedShipper.getId());
-                    return shipperRepository.save(updatedShipper);
+                    return ResponseEntity.ok(updatedShipper);
                 })
-                .orElseThrow(()-> new RuntimeException("Update Shipper failed: Shipper not found or user does not have permission"));
+                .orElseGet(() -> {
+                    log.error("Update Shipper failed: User does not have permission");
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN).<ShipperEntity>body(null);
+                });
     }
 
     @Override
-    public String deleteById(String userInfo, Long id) {
+    public ResponseEntity<String> deleteById(String userInfo, Long id) {
         log.info("Deleting shipper started for id: {}", id);
         return validateUser(userInfo)
                 .filter(user -> shipperRepository.existsById(id))
                 .map(user -> {
                     shipperRepository.deleteById(id);
                     log.debug("Shipper deleted successfully: {}", id);
-                    return "배송지 삭제 성공";
+                    return ResponseEntity.ok("배송지 삭제 성공"); // 200 반환
                 })
                 .orElseGet(() -> {
-                    log.error("Delete Shipper failed: User does not have permission or shipper not found");
-                    return "유효하지 않은 사용자: 판매자 권한이 필요합니다";
+                    if (!shipperRepository.existsById(id)) {
+                        log.error("Delete Shipper failed: Shipper not found for id: {}", id);
+                        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("배송을 찾을 수 없습니다."); // 404 반환
+                    }
+                    log.error("Delete Shipper failed: User does not have permission");
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN).body("유효하지 않은 사용자: 판매자 권한이 필요합니다"); // 403 반환
                 });
     }
 

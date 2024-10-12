@@ -13,5 +13,5 @@ public interface QProductRepository {
 
     Map<Long, ProductModel> findByProductId(Long id);
 
-    List<ProductDto> findProducts(Long categoryId, Long brandId, String keyword, String color, String order, Long lastItemId);
+    List<ProductDto> findProducts(Long categoryId, Long brandId, String keyword, String color, String order);
 }

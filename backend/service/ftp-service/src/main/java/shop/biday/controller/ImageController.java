@@ -15,7 +15,6 @@ import shop.biday.service.ImageService;
 
 import java.util.List;
 
-@CrossOrigin
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/images")

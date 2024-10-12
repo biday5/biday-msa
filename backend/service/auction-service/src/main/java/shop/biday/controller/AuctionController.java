@@ -20,7 +20,6 @@ import shop.biday.service.AuctionService;
 
 import java.util.List;
 
-@CrossOrigin
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/auctions")
