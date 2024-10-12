@@ -42,27 +42,48 @@ public class ImageServiceImpl implements ImageService {
     private String bucketName;
 
     @Override
-//    public String uploadFileByAdmin(List<MultipartFile> multipartFiles, String filePath, String type, Long referencedId) {
-        public String uploadFileByAdmin(String userInfoHeader, List<MultipartFile> multipartFiles, String filePath, String type, Long referencedId) {
+    public ResponseEntity<?> getImage(String id) {
+        log.info("Get Image: {}", id);
+        return imageRepository.findById(id)
+                .map(image -> {
+                    try {
+                        return fetchImageFromS3(image, "Image Name: {}");
+                    } catch (IOException e) {
+                        log.error("Error fetching image: {}", e.getMessage());
+                        return ResponseEntity.status(500).body(null); // Internal Server Error
+                    }
+                })
+                .orElseGet(() -> {
+                    log.error("Image not found: {}", id);
+                    try {
+                        return fetchErrorImage();
+                    } catch (IOException e) {
+                        log.error("Error fetching error image: {}", e.getMessage());
+                        return ResponseEntity.status(500).body(null); // Internal Server Error
+                    }
+                });
+    }
+
+    @Override
+    public ResponseEntity<String> uploadFileByAdmin(String userInfoHeader, List<MultipartFile> multipartFiles, String filePath, String type, Long referencedId) {
         log.info("Image upload By Admin started");
-//        return uploadFiles(multipartFiles, filePath, type, referencedId);
         return validateRole(userInfoHeader, "ROLE_ADMIN")
                 .map(validRole -> uploadFiles(multipartFiles, filePath, type, referencedId))
                 .orElseThrow(() -> new IllegalArgumentException("User does not have the necessary permissions or the role is invalid."));
     }
 
     @Override
-    public String uploadFilesByUser(String role, List<MultipartFile> multipartFiles, String filePath, String type, Long referencedId) {
+    public ResponseEntity<String> uploadFilesByUser(String role, List<MultipartFile> multipartFiles, String filePath, String type, Long referencedId) {
         log.info("Images upload By User started");
         return validateRole(role, "ROLE_SELLER", "ROLE_USER")
                 .map(validRole -> uploadFiles(multipartFiles, filePath, type, referencedId))
                 .orElseThrow(() -> new IllegalArgumentException("User does not have the necessary permissions or the role is invalid."));
     }
 
-    private String uploadFiles(List<MultipartFile> multipartFiles, String filePath, String type, Long referencedId) {
+    private ResponseEntity<String> uploadFiles(List<MultipartFile> multipartFiles, String filePath, String type, Long referencedId) {
         if (multipartFiles.isEmpty()) {
             log.error("File list is empty");
-            return "파일이 비어있습니다.";
+            return ResponseEntity.badRequest().body("파일이 비어있습니다.");
         }
 
         StringBuilder resultMessage = new StringBuilder();
@@ -74,7 +95,7 @@ public class ImageServiceImpl implements ImageService {
             }
         });
 
-        return resultMessage.toString();
+        return ResponseEntity.ok(resultMessage.toString());
     }
 
     private void handleFileUpload(MultipartFile multipartFile, String filePath, String type, Long referencedId, StringBuilder resultMessage) {
@@ -136,13 +157,16 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public String update(String role, List<MultipartFile> multipartFiles, String id) {
+    public ResponseEntity<String> update(String role, List<MultipartFile> multipartFiles, String id) {
         log.info("Image update started for ID: {}", id);
         return imageRepository.findById(id)
-                .map(image -> updateImage(image, multipartFiles))
+                .map(image -> {
+                    String updateResult = updateImage(image, multipartFiles);
+                    return ResponseEntity.ok(updateResult);
+                })
                 .orElseGet(() -> {
                     log.error("Image not found: {}", id);
-                    return "이미지 찾을 수 없습니다.";
+                    return ResponseEntity.status(404).body("이미지 찾을 수 없습니다.");
                 });
     }
 
@@ -171,27 +195,6 @@ public class ImageServiceImpl implements ImageService {
         });
 
         return resultMessage.toString();
-    }
-
-    @Override
-    public ResponseEntity<byte[]> getImage(String id) {
-        log.info("Get Image: {}", id);
-        return imageRepository.findById(id)
-                .map(image -> {
-                    try {
-                        return fetchImageFromS3(image, "Image Name: {}");
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
-                .orElseGet(() -> {
-                    log.error("Image not found: {}", id);
-                    try {
-                        return fetchErrorImage();
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
     }
 
     private ResponseEntity<byte[]> fetchImageFromS3(ImageDocument image, String logMessage) throws IOException {
@@ -224,16 +227,16 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public String deleteById(String role, String id) {
+    public ResponseEntity<String> deleteById(String role, String id) {
         log.info("Image delete start.");
         return Optional.of(id)
                 .filter(imageRepository::existsById)
                 .map(existingId -> {
                     imageRepository.deleteById(existingId);
                     log.debug("Image deleted from Mongo: {}", existingId);
-                    return "이미지 삭제 성공";
+                    return ResponseEntity.ok("이미지 삭제 성공");
                 })
-                .orElse("이미지 삭제 실패");
+                .orElse(ResponseEntity.status(404).body("이미지 삭제 실패"));
     }
 
     private Optional<String> validateRole(String userInfoHeader, String... validRoles) {
@@ -247,7 +250,6 @@ public class ImageServiceImpl implements ImageService {
                 });
     }
 }
-
 
 
 //    @Override

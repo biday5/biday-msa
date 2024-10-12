@@ -15,7 +15,6 @@ import shop.biday.service.ImageService;
 
 import java.util.List;
 
-@Slf4j
 @CrossOrigin
 @RestController
 @RequiredArgsConstructor
@@ -31,8 +30,7 @@ public class ImageController {
             @ApiResponse(responseCode = "404", description = "사진 불러오기 실패")
     })
     @Parameter(name = "imageId", description = "이미지의 id", example = "1L")
-    public ResponseEntity<byte[]> getImageById(@RequestParam("imageId") String id) {
-        log.info("이미지 불러오는 중");
+    public ResponseEntity<?> getImageById(@RequestParam("imageId") String id) {
         return imageService.getImage(id);
     }
 
@@ -50,14 +48,13 @@ public class ImageController {
             @Parameter(name = "type", description = "이미지 타입", example = "브랜드 or 상품 or 평점 or 에러"),
             @Parameter(name = "referencedId", description = "이미지의 참조 ID, 평점이나 에러는 아무 값이나 줘도 상관 x")
     })
-    public String uploadImage(
+    public ResponseEntity<String> uploadImage(
             @RequestHeader("UserInfo") String userInfoHeader,
             @RequestPart("files") List<MultipartFile> files,
             @RequestParam("filePath") String filePath,
             @RequestParam("type") String type,
             @RequestParam("referenceId") Long referenceId
     ) {
-        log.info("이미지 업로드 중");
 //        return imageService.uploadFileByAdmin(files, filePath, type, referenceId).toString();
         return imageService.uploadFileByAdmin(userInfoHeader, files, filePath, type, referenceId);
     }
@@ -76,15 +73,14 @@ public class ImageController {
             @Parameter(name = "type", description = "이미지 타입", example = "경매 or 환불"),
             @Parameter(name = "referencedId", description = "이미지의 참조 ID")
     })
-    public String uploadImages(
+    public ResponseEntity<String> uploadImages(
             @RequestHeader("UserInfo") String userInfoHeader,
             @RequestPart("files") List<MultipartFile> files,
             @RequestParam("filePath") String filePath,
             @RequestParam("type") String type,
             @RequestParam("referenceId") Long referenceId
     ) {
-        log.info("이미지 업로드 중");
-        return imageService.uploadFilesByUser(userInfoHeader, files, filePath, type, referenceId).toString();
+        return imageService.uploadFilesByUser(userInfoHeader, files, filePath, type, referenceId);
     }
 
     @PatchMapping
@@ -99,11 +95,10 @@ public class ImageController {
             @Parameter(description = "업데이트할 이미지 파일"),
             @Parameter(description = "업데이트할 이미지의 ID")
     })
-    public String updateImages(
+    public ResponseEntity<String> updateImages(
             @RequestHeader("UserInfo") String userInfoHeader,
             @RequestParam("files") List<MultipartFile> files,
             @RequestParam("id") String id) {
-        log.info("이미지 업데이트 중");
         return imageService.update(userInfoHeader, files, id);
     }
 
@@ -118,10 +113,9 @@ public class ImageController {
                     example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}"),
             @Parameter(name = "imageId", description = "삭제할 이미지의 id", example = "1")
     })
-    public String deleteImages(
+    public ResponseEntity<String> deleteImages(
             @RequestHeader("UserInfo") String userInfoHeader,
             @RequestParam("id") String id) {
-        log.info("이미지 삭제 중");
         return imageService.deleteById(userInfoHeader, id);
     }
 

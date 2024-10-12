@@ -32,18 +32,22 @@ public class AuctionController {
     @Operation(summary = "경매 상세보기", description = "경매 상세보기, 여기서는 경매와 해당 상품에 관한 정보만 가져옴")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "상품 불러오기 성공"),
-            @ApiResponse(responseCode = "404", description = "상품 찾을 수 없음")
+            @ApiResponse(responseCode = "403", description = "권한 없음"),
+            @ApiResponse(responseCode = "404", description = "상품 찾을 수 없음"),
+            @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     @Parameter(name = "id", description = "상세보기할 경매의 id", example = "1")
     public ResponseEntity<AuctionModel> findById(@RequestParam(value = "id", required = true) Long id) {
-        return ResponseEntity.ok(auctionService.findById(id));
+        return auctionService.findById(id);
     }
 
     @GetMapping("/findBySize")
     @Operation(summary = "헤더 경매 목록", description = "종료 날짜에 따른 경매 목록")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "경매 목록 가져오기 성공"),
-            @ApiResponse(responseCode = "404", description = "경매 목록 찾을 수 없음")
+            @ApiResponse(responseCode = "403", description = "권한 없음"),
+            @ApiResponse(responseCode = "404", description = "경매 목록 찾을 수 없음"),
+            @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     @Parameters({
             @Parameter(name = "sizeId", description = "경매에 등록된 상품의 사이즈 id", example = "1"),
@@ -59,14 +63,16 @@ public class AuctionController {
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "20") int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return ResponseEntity.ok(auctionService.findBySize(sizeId, order, cursor, pageable));
+        return auctionService.findBySize(sizeId, order, cursor, pageable);
     }
 
     @GetMapping("/findAllBySize")
     @Operation(summary = "상품 상세 경매 목록", description = "상품 상세에서 size 기준으로 보여질 전체 경매 목록")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "경매 목록 가져오기 성공"),
-            @ApiResponse(responseCode = "404", description = "경매 목록 찾을 수 없음")
+            @ApiResponse(responseCode = "403", description = "권한 없음"),
+            @ApiResponse(responseCode = "404", description = "경매 목록 찾을 수 없음"),
+            @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     @Parameters({
             @Parameter(name = "sizeId", description = "경매에 등록된 상품의 사이즈 id", example = "1"),
@@ -75,14 +81,16 @@ public class AuctionController {
     public ResponseEntity<List<AuctionDto>> findAllBySize(
             @RequestParam(value = "sizeId", required = true) Long sizeId,
             @RequestParam(value = "order", required = false, defaultValue = "") String order) {
-        return ResponseEntity.ok(auctionService.findAllBySize(sizeId, order));
+        return auctionService.findAllBySize(sizeId, order);
     }
 
     @GetMapping
     @Operation(summary = "마이페이지 경매 목록", description = "마이 페이지에서 불러올 수 있는 경매 목록")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "경매 목록 가져오기 성공"),
-            @ApiResponse(responseCode = "404", description = "경매 목록 찾을 수 없음")
+            @ApiResponse(responseCode = "403", description = "권한 없음"),
+            @ApiResponse(responseCode = "404", description = "경매 목록 찾을 수 없음"),
+            @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     @Parameters({
             @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
@@ -99,14 +107,15 @@ public class AuctionController {
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "5") int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return ResponseEntity.ok(auctionService.findByUser(userInfoHeader, period, cursor, pageable));
+        return auctionService.findByUser(userInfoHeader, period, cursor, pageable);
     }
 
     @PostMapping
     @Operation(summary = "경매 등록", description = "새로운 경매 등록")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "경매 등록 성공"),
-            @ApiResponse(responseCode = "404", description = "경매 등록 할 수 없음")
+            @ApiResponse(responseCode = "403", description = "권한 없음"),
+            @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     @Parameters({
             @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
@@ -127,14 +136,16 @@ public class AuctionController {
     public ResponseEntity<AuctionEntity> save(
             @RequestHeader("UserInfo") String userInfoHeader,
             @RequestBody AuctionDto auctionModel) {
-        return ResponseEntity.ok(auctionService.save(userInfoHeader, auctionModel));
+        return auctionService.save(userInfoHeader, auctionModel);
     }
 
     @PatchMapping
     @Operation(summary = "경매 수정", description = "진행 예정 경매 수정, 기존 시작 날짜 전에만 시작 날짜+끝나는 날짜만 변경 가능")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "경매 수정 성공"),
-            @ApiResponse(responseCode = "404", description = "경매 수정 할 수 없음")
+            @ApiResponse(responseCode = "403", description = "권한 없음"),
+            @ApiResponse(responseCode = "404", description = "경매 찾을 수 없음"),
+            @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     @Parameters({
             @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
@@ -156,14 +167,16 @@ public class AuctionController {
     public ResponseEntity<AuctionEntity> update(
             @RequestHeader("UserInfo") String userInfoHeader,
             @RequestBody AuctionDto auctionModel) {
-        return ResponseEntity.ok(auctionService.update(userInfoHeader, auctionModel));
+        return auctionService.update(userInfoHeader, auctionModel);
     }
 
     @DeleteMapping
     @Operation(summary = "경매 삭제", description = "경매 삭제")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "경매 삭제 성공"),
-            @ApiResponse(responseCode = "404", description = "경매 찾을 수 없음")
+            @ApiResponse(responseCode = "403", description = "권한 없음"),
+            @ApiResponse(responseCode = "404", description = "경매 찾을 수 없음"),
+            @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     @Parameters({
             @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
@@ -174,6 +187,6 @@ public class AuctionController {
     public ResponseEntity<String> delete(
             @RequestHeader("UserInfo") String userInfoHeader,
             @RequestParam Long id) {
-        return ResponseEntity.ok(auctionService.deleteById(userInfoHeader, id));
+        return auctionService.deleteById(userInfoHeader, id);
     }
 }

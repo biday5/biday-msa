@@ -86,7 +86,8 @@ public class ProductController {
     @Operation(summary = "상품 등록", description = "새로운 상품 등록")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "상품 등록 성공"),
-            @ApiResponse(responseCode = "404", description = "상품 등록 할 수 없음")
+            @ApiResponse(responseCode = "403", description = "사용자 권한 부족"),
+            @ApiResponse(responseCode = "400", description = "상품 등록 실패")
     })
     @Parameters({
             @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
@@ -115,7 +116,8 @@ public class ProductController {
     @Operation(summary = "상품 수정", description = "기존 상품 수정")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "상품 수정 성공"),
-            @ApiResponse(responseCode = "404", description = "상품 수정 할 수 없음")
+            @ApiResponse(responseCode = "404", description = "상품 수정 할 수 없음"),
+            @ApiResponse(responseCode = "403", description = "사용자 권한 부족")
     })
     @Parameters({
             @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
@@ -145,7 +147,8 @@ public class ProductController {
     @Operation(summary = "상품 삭제", description = "상품 삭제")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "상품 삭제 성공"),
-            @ApiResponse(responseCode = "404", description = "상품 찾을 수 없음")
+            @ApiResponse(responseCode = "404", description = "상품 찾을 수 없음"),
+            @ApiResponse(responseCode = "403", description = "사용자 권한 부족")
     })
     @Parameters({
             @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",

@@ -6,16 +6,16 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface ImageService {
-    String uploadFileByAdmin(String userInfoHeader, List<MultipartFile> multipartFiles, String filePath, String type, Long referencedId);
+    ResponseEntity<?> getImage(String id);
+
+    ResponseEntity<String> uploadFileByAdmin(String userInfoHeader, List<MultipartFile> multipartFiles, String filePath, String type, Long referencedId);
 //    String uploadFileByAdmin(List<MultipartFile> multipartFiles, String filePath, String type, Long referencedId);
 
-    String uploadFilesByUser(String userInfoHeader, List<MultipartFile> multipartFiles, String filePath, String type, Long referencedId);
+    ResponseEntity<String> uploadFilesByUser(String userInfoHeader, List<MultipartFile> multipartFiles, String filePath, String type, Long referencedId);
 
-    String update(String userInfoHeader, List<MultipartFile> multipartFiles, String id);
+    ResponseEntity<String> update(String userInfoHeader, List<MultipartFile> multipartFiles, String id);
 
-    String deleteById(String userInfoHeader, String id);
-
-    ResponseEntity<byte[]> getImage(String id);
+    ResponseEntity<String> deleteById(String userInfoHeader, String id);
 
 //    Optional<ImageDocument> findById(String id);
 //

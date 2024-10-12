@@ -27,7 +27,8 @@ public class WishController {
     @Operation(summary = "사용자 기준 위시 목록", description = "마이페이지 등에서 보여질 때 불러질 특정 사용자의 wish 리스트")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "위시 목록 불러오기 성공"),
-            @ApiResponse(responseCode = "404", description = "위시 찾을 수 없음")
+            @ApiResponse(responseCode = "204", description = "위시 목록이 없음"),
+            @ApiResponse(responseCode = "404", description = "위시를 찾을 수 없음")
     })
     @Parameter(name = "UserInfo", description = "현재 로그인한 사용자",
             example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}")
@@ -44,6 +45,7 @@ public class WishController {
     @Operation(summary = "위시 수정", description = "위시 수정하기")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "위시 수정 성공"),
+            @ApiResponse(responseCode = "201", description = "위시 생성 성공"),
             @ApiResponse(responseCode = "404", description = "위시 수정 할 수 없음")
     })
     @Parameters({
@@ -64,7 +66,8 @@ public class WishController {
     @Operation(summary = "위시 삭제", description = "위시 삭제하기")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "위시 삭제 성공"),
-            @ApiResponse(responseCode = "404", description = "위시 삭제 할 수 없음")
+            @ApiResponse(responseCode = "404", description = "위시 삭제 할 수 없음"),
+            @ApiResponse(responseCode = "403", description = "삭제 권한 없음")
     })
     @Parameters({
             @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",

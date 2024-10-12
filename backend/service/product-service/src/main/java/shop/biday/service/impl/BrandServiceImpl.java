@@ -2,6 +2,8 @@ package shop.biday.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import shop.biday.model.domain.BrandModel;
 import shop.biday.model.domain.UserInfoModel;
@@ -21,22 +23,19 @@ public class BrandServiceImpl implements BrandService {
     private final UserInfoUtils userInfoUtils;
 
     @Override
-    public List<BrandModel> findAll() {
+    public ResponseEntity<List<BrandModel>> findAll() {
         log.info("Find all brands");
-        return brandRepository.findAllBrand();
+        List<BrandModel> brands = brandRepository.findAllBrand();
+        return brands.isEmpty() ?
+                new ResponseEntity<>(HttpStatus.NOT_FOUND) :
+                new ResponseEntity<>(brands, HttpStatus.OK);
     }
 
     @Override
-    public BrandModel findById(Long id) {
+    public ResponseEntity<BrandModel> findById(Long id) {
         log.info("Find brand by id: {}", id);
         return Optional.ofNullable(id)
-                .filter(t -> {
-                    boolean exists = brandRepository.existsById(id);
-                    if (!exists) {
-                        log.error("Not found brand with id: {}", id);
-                    }
-                    return exists;
-                })
+                .filter(t -> brandRepository.existsById(id))
                 .flatMap(brandRepository::findById)
                 .map(brandEntity -> BrandModel.builder()
                         .id(brandEntity.getId())
@@ -44,11 +43,15 @@ public class BrandServiceImpl implements BrandService {
                         .createdAt(brandEntity.getCreatedAt())
                         .updatedAt(brandEntity.getUpdatedAt())
                         .build())
-                .orElse(null);
+                .map(brandModel -> new ResponseEntity<>(brandModel, HttpStatus.OK))
+                .orElseGet(() -> {
+                    log.error("Not found brand with id: {}", id);
+                    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                });
     }
 
     @Override
-    public BrandEntity save(String userInfoHeader, BrandModel brand) {
+    public ResponseEntity<BrandEntity> save(String userInfoHeader, BrandModel brand) {
         log.info("Save Brand started with user: {}", userInfoHeader);
         return isAdmin(userInfoHeader)
                 .map(t -> {
@@ -56,50 +59,51 @@ public class BrandServiceImpl implements BrandService {
                             .name(brand.getName())
                             .build());
                     log.info("Brand saved successfully: {}", savedBrand.getId());
-                    return savedBrand;
+                    return new ResponseEntity<>(savedBrand, HttpStatus.OK);
                 })
-                .orElseThrow(() -> new RuntimeException("Save Brand failed: User does not have permission"));
+                .orElseGet(() -> {
+                    log.error("Save brand failed : User does not have permission");
+                    return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+                });
     }
 
     @Override
-    public BrandEntity update(String userInfoHeader, BrandModel brand) {
+    public ResponseEntity<BrandEntity> update(String userInfoHeader, BrandModel brand) {
         log.info("Update Brand started for id: {}", brand.getId());
         return isAdmin(userInfoHeader)
-                .filter(t -> {
-                    boolean exists = brandRepository.existsById(brand.getId());
-                    if (!exists) {
-                        log.error("Not found brand with id: {}", brand.getId());
-                    }
-                    return exists;
-                })
+                .filter(t -> brandRepository.existsById(brand.getId()))
                 .map(t -> {
                     BrandEntity updatedBrand = brandRepository.save(BrandEntity.builder()
                             .id(brand.getId())
                             .name(brand.getName())
                             .build());
                     log.info("Brand updated successfully: {}", updatedBrand.getId());
-                    return updatedBrand;
+                    return new ResponseEntity<>(updatedBrand, HttpStatus.OK);
                 })
-                .orElseThrow(() -> new RuntimeException("Update Brand failed: Brand not found or user does not have permission"));
+                .orElseGet(() -> {
+                    log.error("Update Brand failed: Brand not found or user does not have permission");
+                    return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+                });
     }
 
     @Override
-    public String deleteById(String userInfoHeader, Long id) {
+    public ResponseEntity<String> deleteById(String userInfoHeader, Long id) {
         log.info("Delete Brand started for id: {}", id);
+        return isAdmin(userInfoHeader)
+                .map(t -> {
+                    if (!brandRepository.existsById(id)) {
+                        log.error("Not found brand with id: {}", id);
+                        return new ResponseEntity<>("브랜드를 찾을 수 없습니다", HttpStatus.NOT_FOUND);
+                    }
 
-        return isAdmin(userInfoHeader).map(t -> {
-            if (!brandRepository.existsById(id)) {
-                log.error("Not found brand with id: {}", id);
-                return "브랜드 삭제 실패: 브랜드를 찾을 수 없습니다";
-            }
-
-            brandRepository.deleteById(id);
-            log.info("Brand deleted successfully: {}", id);
-            return "브랜드 삭제 성공";
-        }).orElseGet(() -> {
-            log.error("User does not have role ADMIN or does not exist");
-            return "유효하지 않은 사용자: 관리자 권한이 필요합니다";
-        });
+                    brandRepository.deleteById(id);
+                    log.info("Brand deleted successfully: {}", id);
+                    return new ResponseEntity<>("브랜드 삭제 성공", HttpStatus.OK);
+                })
+                .orElseGet(() -> {
+                    log.error("User does not have role ADMIN or Brand does not exist");
+                    return new ResponseEntity<>("유효하지 않은 사용자: 관리자 권한이 필요합니다", HttpStatus.FORBIDDEN);
+                });
     }
 
     private Optional<String> isAdmin(String userInfoHeader) {
