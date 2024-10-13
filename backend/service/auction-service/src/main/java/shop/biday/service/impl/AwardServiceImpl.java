@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import shop.biday.model.domain.AwardModel;
 import shop.biday.model.domain.UserInfoModel;
@@ -49,7 +51,7 @@ public class AwardServiceImpl implements AwardService {
     }
 
     @Override
-    public AwardModel findByAwardId(String userInfoHeader, Long awardId) {
+    public ResponseEntity<AwardModel> findByAwardId(String userInfoHeader, Long awardId) {
         log.info("Find User {} Award by Id: {}", userInfoHeader, awardId);
         return validateUser(userInfoHeader)
                 .flatMap(uid -> awardRepository.findById(awardId)
@@ -64,25 +66,39 @@ public class AwardServiceImpl implements AwardService {
                         })
                         .map(award -> {
                             log.info("Award found for User {}: {}", uid, awardId);
-                            return awardRepository.findByAwardId(awardId);
+                            return ResponseEntity.ok(awardRepository.findByAwardId(awardId));
                         }))
+                .map(ResponseEntity::ok)
                 .orElseGet(() -> {
-                    log.error("User {} not found or not authorized for award id {}", userInfoUtils.extractUserInfo(userInfoHeader).getUserId(), awardId);
-                    return null;
-                });
+                    String userId = userInfoUtils.extractUserInfo(userInfoHeader).getUserId();
+                    if (awardRepository.findById(awardId).isPresent()) {
+                        log.error("User {} is not authorized for award id {}", userId, awardId);
+                        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+                    } else {
+                        log.error("Award not found for award id {}", awardId);
+                        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+                    }
+                }).getBody();
     }
 
     @Override
-    public Slice<AwardModel> findByUser(String userInfoHeader, String period, LocalDateTime cursor, Pageable pageable) {
+    public ResponseEntity<Slice<AwardModel>> findByUser(String userInfoHeader, String period, LocalDateTime cursor, Pageable pageable) {
         log.info("Finding awards for User: {}", userInfoHeader);
         return validateUser(userInfoHeader)
                 .map(uid -> {
                     log.info("Valid user {} found, fetching awards.", uid);
-                    return awardRepository.findByUser(uid, period, cursor, pageable);
+                    Slice<AwardModel> awards = awardRepository.findByUser(uid, period, cursor, pageable);
+
+                    if (awards.isEmpty()) {
+                        log.warn("No awards found for user {} with period {}", uid, period);
+                        return ResponseEntity.status(HttpStatus.NOT_FOUND).body((Slice<AwardModel>) null);
+                    }
+
+                    return ResponseEntity.ok(awards);
                 })
                 .orElseGet(() -> {
                     log.error("Invalid user ID: {}", userInfoUtils.extractUserInfo(userInfoHeader).getUserId());
-                    return null;
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN).body((Slice<AwardModel>) null);
                 });
     }
 

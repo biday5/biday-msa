@@ -5,7 +5,6 @@ import shop.biday.model.domain.SizeModel;
 import shop.biday.model.entity.SizeEntity;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface SizeService {
     ResponseEntity<List<SizeEntity>> findAll();

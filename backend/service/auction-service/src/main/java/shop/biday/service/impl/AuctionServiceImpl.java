@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -36,7 +37,7 @@ public class AuctionServiceImpl implements AuctionService {
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> {
                     log.warn("Auction not found for id: {}", id);
-                    return ResponseEntity.status(404).body(null);
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
                 });
     }
 
@@ -62,21 +63,46 @@ public class AuctionServiceImpl implements AuctionService {
     @Override
     public ResponseEntity<Slice<AuctionDto>> findBySize(Long sizeId, String order, Long cursor, Pageable pageable) {
         log.info("Find All Auctions By Time: {} SizeId: {}", order, sizeId);
-        return ResponseEntity.ok(auctionRepository.findBySize(sizeId, order, cursor, pageable));
+        return Optional.of(auctionRepository.findBySize(sizeId, order, cursor, pageable))
+                .filter(auctions -> !auctions.isEmpty())
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> {
+                    log.warn("No auctions found for SizeId: {}", sizeId);
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+                });
     }
 
     @Override
     public ResponseEntity<List<AuctionDto>> findAllBySize(Long sizeId, String order) {
         log.info("Find All by Size: {} Order: {}", sizeId, order);
-        return ResponseEntity.ok(auctionRepository.findAllBySize(sizeId, order));
+        return Optional.of(auctionRepository.findAllBySize(sizeId, order))
+                .filter(auctions -> !auctions.isEmpty())
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> {
+                    log.warn("No auctions found for SizeId: {}", sizeId);
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); // 404 반환
+                });
     }
 
     @Override
     public ResponseEntity<Slice<AuctionDto>> findByUser(String userInfoHeader, String period, Long cursor, Pageable pageable) {
         log.info("Find All Auctions By User: {}", userInfoHeader);
         return validateUser(userInfoHeader)
-                .map(t -> ResponseEntity.ok(auctionRepository.findByUser(userInfoUtils.extractUserInfo(userInfoHeader).getUserId(), period, cursor, pageable)))
-                .orElseGet(() -> ResponseEntity.status(403).body(null));
+                .map(user -> {
+                    Slice<AuctionDto> auctions = auctionRepository.findByUser(
+                            userInfoUtils.extractUserInfo(userInfoHeader).getUserId(),
+                            period,
+                            cursor,
+                            pageable
+                    );
+                    return auctions.isEmpty() ?
+                            ResponseEntity.status(HttpStatus.NOT_FOUND).body((Slice<AuctionDto>) null) : // 404 반환
+                            ResponseEntity.ok(auctions); // 200 반환
+                })
+                .orElseGet(() -> {
+                    log.warn("User not authorized: {}", userInfoHeader);
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN).body((Slice<AuctionDto>) null); // 403 반환
+                });
     }
 
     @Override
@@ -88,7 +114,10 @@ public class AuctionServiceImpl implements AuctionService {
                     auctionRepository.save(auction);
                     return ResponseEntity.ok(auction);
                 })
-                .orElseThrow(() -> new NoSuchElementException("Auction not found with id: " + id));
+                .orElseGet(() -> {
+                    log.error("Auction not found with id: {}", id);
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+                });
     }
 
     @Override
@@ -108,9 +137,12 @@ public class AuctionServiceImpl implements AuctionService {
                             .build());
 
                     quartzService.createJob(auctionEntity.getId(), auctionEntity.getEndedAt());
-                    return ResponseEntity.ok(auctionEntity);
+                    return ResponseEntity.ok(auctionEntity); // 200 반환
                 })
-                .orElseThrow(() -> new IllegalArgumentException("Invalid role or not a seller"));
+                .orElseGet(() -> {
+                    log.error("Invalid role or not a seller");
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null); // 403 반환
+                });
     }
 
     @Override
@@ -119,16 +151,20 @@ public class AuctionServiceImpl implements AuctionService {
         return validateUser(userInfoHeader)
                 .map(t -> {
                     Long auctionId = auction.getId();
-                    String auctionUserId = auctionRepository.findById(auctionId)
-                            .orElseThrow(() -> new IllegalArgumentException("Auction not found"))
-                            .getUserId();
+                    AuctionEntity existingAuction = auctionRepository.findById(auctionId)
+                            .orElseThrow(() -> {
+                                log.error("Auction not found for id: {}", auctionId);
+                                return new IllegalArgumentException("Auction not found"); // 404 반환
+                            });
 
+                    String auctionUserId = existingAuction.getUserId();
                     if (!auctionUserId.equals(userInfoUtils.extractUserInfo(userInfoHeader).getUserId())) {
                         log.error("User with ID {} does not have Update Authority for auction id: {}", userInfoUtils.extractUserInfo(userInfoHeader).getUserId(), auctionId);
-                        throw new SecurityException("User does not have permission to update this auction.");
+                        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(AuctionEntity.builder().build());
                     }
 
                     AuctionEntity auctionEntity = auctionRepository.save(AuctionEntity.builder()
+                            .id(auctionId)
                             .userId(auction.getUserId())
                             .sizeId(auction.getSizeId())
                             .description(auction.getDescription())
@@ -138,12 +174,13 @@ public class AuctionServiceImpl implements AuctionService {
                             .endedAt(auction.getEndedAt())
                             .status(false)
                             .build());
+
                     log.debug("Update Auction By User for id: {}", auctionId);
-                    return ResponseEntity.ok(auctionEntity);
+                    return ResponseEntity.ok(auctionEntity); // 200 반환
                 })
-                .orElseThrow(() -> {
+                .orElseGet(() -> {
                     log.error("User does not have role SELLER or does not exist");
-                    return new IllegalArgumentException("Invalid role or user does not exist.");
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN).body(AuctionEntity.builder().build());
                 });
     }
 
@@ -153,20 +190,23 @@ public class AuctionServiceImpl implements AuctionService {
         return validateUser(userInfoHeader)
                 .map(t -> {
                     AuctionEntity auction = auctionRepository.findById(id)
-                            .orElseThrow(() -> new NoSuchElementException("Auction not found"));
+                            .orElseThrow(() -> {
+                                log.error("Auction not found for id: {}", id);
+                                return new NoSuchElementException("Auction not found"); // 404 반환
+                            });
 
                     if (!auction.getUserId().equals(userInfoUtils.extractUserInfo(userInfoHeader).getUserId())) {
                         log.error("User with ID {} does not have Delete Authority for auction id: {}", userInfoUtils.extractUserInfo(userInfoHeader).getUserId(), id);
-                        return ResponseEntity.status(403).body("삭제 권한이 없습니다");
+                        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("삭제 권한이 없습니다"); // 403 반환
                     }
 
                     auctionRepository.deleteById(id);
                     log.debug("Delete Auction By User for id: {}", id);
-                    return ResponseEntity.ok("경매 삭제 성공");
+                    return ResponseEntity.ok("경매 삭제 성공"); // 200 반환
                 })
                 .orElseGet(() -> {
                     log.error("User does not have role SELLER or does not exist");
-                    return ResponseEntity.status(403).body("유효하지 않은 사용자");
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN).body("유효하지 않은 사용자"); // 403 반환
                 });
     }
 

@@ -47,7 +47,6 @@ public class ProductController {
             @Parameter(name = "keyword", description = "상품 키워드", example = "바지"),
             @Parameter(name = "color", description = "검색 이후 선택 가능한 색깔 필터", example = "red"),
             @Parameter(name = "order", description = "상품 목록 정렬 방식", example = "최신 등록순"),
-//            @Parameter(name = "lastItemId", description = "현재 페이지에서 가장 마지막 상품의 id", example = "1L")
     })
     public ResponseEntity<List<ProductDto>> searchByFilter(
             @RequestParam(value = "brand", required = false) String brand,
@@ -55,10 +54,8 @@ public class ProductController {
             @RequestParam(value = "keyword", required = false, defaultValue = "") String keyword,
             @RequestParam(value = "color", required = false, defaultValue = "") String color,
             @RequestParam(value = "order", required = false, defaultValue = "") String order
-            /*@RequestParam(value = "lastItemId", required = false) Long lastItemId*/
             ) {
         return productService.findByFilter(category, brand, keyword, color, order);
-//        return productService.findByFilter(categoryId, brandId, keyword, color, order, lastItemId);
     }
 
     @GetMapping

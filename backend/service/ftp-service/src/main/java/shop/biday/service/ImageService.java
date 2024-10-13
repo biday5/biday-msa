@@ -8,8 +8,8 @@ import java.util.List;
 public interface ImageService {
     ResponseEntity<?> getImage(String id);
 
-    ResponseEntity<String> uploadFileByAdmin(String userInfoHeader, List<MultipartFile> multipartFiles, String filePath, String type, Long referencedId);
-//    String uploadFileByAdmin(List<MultipartFile> multipartFiles, String filePath, String type, Long referencedId);
+//    ResponseEntity<String> uploadFileByAdmin(String userInfoHeader, List<MultipartFile> multipartFiles, String filePath, String type, Long referencedId);
+    ResponseEntity<String> uploadFileByAdmin(List<MultipartFile> multipartFiles, String filePath, String type, Long referencedId);
 
     ResponseEntity<String> uploadFilesByUser(String userInfoHeader, List<MultipartFile> multipartFiles, String filePath, String type, Long referencedId);
 

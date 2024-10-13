@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -40,22 +39,22 @@ public class ImageController {
             @ApiResponse(responseCode = "404", description = "사진 등록 실패")
     })
     @Parameters(value = {
-            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
-                    example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}"),
+//            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
+//                    example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}"),
             @Parameter(name = "files", description = "업로드할 이미지 파일", example = "단일 사진 파일"),
             @Parameter(name = "filePath", description = "NCloud storage 업로드 폴더 경로 지정", example = "brand 혹은 product 혹은 rate 혹은 error"),
             @Parameter(name = "type", description = "이미지 타입", example = "브랜드 or 상품 or 평점 or 에러"),
             @Parameter(name = "referencedId", description = "이미지의 참조 ID, 평점이나 에러는 아무 값이나 줘도 상관 x")
     })
     public ResponseEntity<String> uploadImage(
-            @RequestHeader("UserInfo") String userInfoHeader,
+//            @RequestHeader("UserInfo") String userInfoHeader,
             @RequestPart("files") List<MultipartFile> files,
             @RequestParam("filePath") String filePath,
             @RequestParam("type") String type,
             @RequestParam("referenceId") Long referenceId
     ) {
-//        return imageService.uploadFileByAdmin(files, filePath, type, referenceId).toString();
-        return imageService.uploadFileByAdmin(userInfoHeader, files, filePath, type, referenceId);
+        return imageService.uploadFileByAdmin(files, filePath, type, referenceId);
+//        return imageService.uploadFileByAdmin(userInfoHeader, files, filePath, type, referenceId);
     }
 
     @PostMapping("/uploadByUser")

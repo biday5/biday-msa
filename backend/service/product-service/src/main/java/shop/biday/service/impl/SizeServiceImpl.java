@@ -96,7 +96,6 @@ public class SizeServiceImpl implements SizeService {
                         log.error("Size not found with id: {}", id);
                         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("사이즈 삭제 실패: 사이즈를 찾을 수 없습니다.");
                     }
-
                     sizeRepository.deleteById(id);
                     log.info("Size deleted successfully: {}", id);
                     return ResponseEntity.ok("사이즈 삭제 성공");
