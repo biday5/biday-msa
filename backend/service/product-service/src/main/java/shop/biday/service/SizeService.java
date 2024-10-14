@@ -7,7 +7,7 @@ import shop.biday.model.entity.SizeEntity;
 import java.util.List;
 
 public interface SizeService {
-    ResponseEntity<List<SizeEntity>> findAll();
+    ResponseEntity<List<SizeModel>> findAll();
 
     ResponseEntity<SizeEntity> findById(Long id);
 

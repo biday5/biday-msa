@@ -27,9 +27,9 @@ public class SizeServiceImpl implements SizeService {
     private final UserInfoUtils userInfoUtils;
 
     @Override
-    public ResponseEntity<List<SizeEntity>> findAll() {
+    public ResponseEntity<List<SizeModel>> findAll() {
         log.info("Finding all sizes");
-        List<SizeEntity> sizes = sizeRepository.findAll();
+        List<SizeModel> sizes = sizeRepository.findAllSize();
         return sizes.isEmpty() ?
                 ResponseEntity.status(HttpStatus.NOT_FOUND).build() :
                 ResponseEntity.ok(sizes);

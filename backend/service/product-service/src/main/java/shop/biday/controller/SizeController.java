@@ -29,7 +29,7 @@ public class SizeController {
             @ApiResponse(responseCode = "200", description = "사이즈 목록 불러오기 성공"),
             @ApiResponse(responseCode = "404", description = "사이즈 찾을 수 없음")
     })
-    public ResponseEntity<List<SizeEntity>> findAll() {
+    public ResponseEntity<List<SizeModel>> findAll() {
         return sizeService.findAll();
     }
 

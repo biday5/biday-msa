@@ -5,5 +5,7 @@ import shop.biday.model.domain.SizeModel;
 import java.util.List;
 
 public interface QSizeRepository {
+    List<SizeModel> findAllSize();
+
     List<SizeModel> findAllByProductId(Long productId);
 }

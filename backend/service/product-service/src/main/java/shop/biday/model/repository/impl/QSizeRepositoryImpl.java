@@ -22,6 +22,21 @@ public class QSizeRepositoryImpl implements QSizeRepository {
     private final QProductEntity qProduct = QProductEntity.productEntity;
 
     @Override
+    public List<SizeModel> findAllSize() {
+        return queryFactory
+                .select(Projections.constructor(SizeModel.class,
+                        qSize.id,
+                        qProduct.name.as("product"),
+                        qSize.size.stringValue(),
+                        qSize.createdAt,
+                        qSize.updatedAt
+                ))
+                .from(qSize)
+                .leftJoin(qSize.product, qProduct)
+                .fetch();
+    }
+
+    @Override
     public List<SizeModel> findAllByProductId(Long productId) {
         return queryFactory
                 .select(Projections.constructor(SizeModel.class,
