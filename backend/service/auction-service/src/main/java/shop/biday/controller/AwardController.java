@@ -17,7 +17,6 @@ import shop.biday.service.AwardService;
 
 import java.time.LocalDateTime;
 
-@CrossOrigin
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/awards")
@@ -29,7 +28,8 @@ public class AwardController {
     @Operation(summary = "낙찰 목록", description = "마이 페이지에서 불러올 수 있는 낙찰 목록")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "낙찰 목록 가져오기 성공"),
-            @ApiResponse(responseCode = "404", description = "낙찰 목록 찾을 수 없음")
+            @ApiResponse(responseCode = "404", description = "낙찰 목록 찾을 수 없음"),
+            @ApiResponse(responseCode = "403", description = "권한 없음")
     })
     @Parameters({
             @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
@@ -46,14 +46,15 @@ public class AwardController {
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "5") int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return ResponseEntity.ok(awardService.findByUser(userInfoHeader, period, cursor, pageable));
+        return awardService.findByUser(userInfoHeader, period, cursor, pageable);
     }
 
     @GetMapping("/findById")
     @Operation(summary = "낙찰 상세보기", description = "마이페이지에서 낙찰 리스트 통해 이동 가능")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "낙찰 불러오기 성공"),
-            @ApiResponse(responseCode = "404", description = "낙찰 찾을 수 없음")
+            @ApiResponse(responseCode = "404", description = "낙찰 찾을 수 없음"),
+            @ApiResponse(responseCode = "403", description = "권한 없음")
     })
     @Parameters({
             @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
@@ -63,6 +64,6 @@ public class AwardController {
     public ResponseEntity<AwardModel> findById(
             @RequestHeader("UserInfo") String userInfoHeader,
             @RequestParam(value = "awardId", required = true) Long awardId) {
-        return ResponseEntity.ok(awardService.findByAwardId(userInfoHeader, awardId));
+        return awardService.findByAwardId(userInfoHeader, awardId);
     }
 }

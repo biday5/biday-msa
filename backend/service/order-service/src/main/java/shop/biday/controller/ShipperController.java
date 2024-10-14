@@ -27,32 +27,38 @@ public class ShipperController {
     private final ShipperService shipperService;
 
     @GetMapping
-    @Operation(summary = "배송 목록", description = "상품 등록하거나, 메인/검색 페이지에서 배송 목록 띄울 때 사용")
+    @Operation(summary = "배송 목록", description = "메인/검색 페이지에서 배송 목록 띄울 때 사용")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "배송 목록 불러오기 성공"),
-            @ApiResponse(responseCode = "404", description = "배송 찾을 수 없음")
+            @ApiResponse(responseCode = "403", description = "접근 권한 없음"),
+            @ApiResponse(responseCode = "404", description = "배송 목록을 찾을 수 없음"),
+            @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     public ResponseEntity<List<ShipperModel>> findAll() {
         log.info("Shipper Controller findAll");
-        return ResponseEntity.ok(shipperService.findAll());
+        return shipperService.findAll();
     }
 
     @GetMapping("/findById")
     @Operation(summary = "배송 상세보기", description = "배송 상세보기")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "배송 불러오기 성공"),
-            @ApiResponse(responseCode = "404", description = "배송 찾을 수 없음")
+            @ApiResponse(responseCode = "403", description = "접근 권한 없음"),
+            @ApiResponse(responseCode = "404", description = "배송을 찾을 수 없음"),
+            @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     @Parameter(name = "id", description = "상세보기할 배송 id", example = "1")
     public ResponseEntity<ShipperModel> findById(@RequestParam Long id) {
-        return ResponseEntity.ok(shipperService.findById(id));
+        return shipperService.findById(id);
     }
 
     @PostMapping
     @Operation(summary = "배송 등록", description = "배송 새로 등록하기")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "배송 등록 성공"),
-            @ApiResponse(responseCode = "404", description = "배송 등록 할 수 없음")
+            @ApiResponse(responseCode = "403", description = "접근 권한 없음"),
+            @ApiResponse(responseCode = "404", description = "배송 등록 할 수 없음"),
+            @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     @Parameters({
             @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
@@ -74,14 +80,16 @@ public class ShipperController {
     public ResponseEntity<ShipperEntity> create(@RequestHeader("UserInfo") String userInfo,
                                                 @RequestBody ShipperModel shipper) {
         log.info("Shipper Controller create userInfo: {}, shipperModel: {}", userInfo, shipper);
-        return ResponseEntity.ok(shipperService.save(userInfo, shipper));
+        return shipperService.save(userInfo, shipper);
     }
 
     @PatchMapping
     @Operation(summary = "배송 수정", description = "배송 수정하기")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "배송 수정 성공"),
-            @ApiResponse(responseCode = "404", description = "배송 수정 할 수 없음")
+            @ApiResponse(responseCode = "403", description = "접근 권한 없음"),
+            @ApiResponse(responseCode = "404", description = "배송 수정 할 수 없음"),
+            @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     @Parameters({
             @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
@@ -103,14 +111,16 @@ public class ShipperController {
     })
     public ResponseEntity<ShipperEntity> update(@RequestHeader("UserInfo") String userInfo,
                                                 @RequestBody ShipperModel shipper) {
-        return ResponseEntity.ok(shipperService.update(userInfo, shipper));
+        return shipperService.update(userInfo, shipper);
     }
 
     @DeleteMapping
     @Operation(summary = "배송 삭제", description = "배송 삭제하기")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "배송 삭제 성공"),
-            @ApiResponse(responseCode = "404", description = "배송 삭제 할 수 없음")
+            @ApiResponse(responseCode = "403", description = "접근 권한 없음"),
+            @ApiResponse(responseCode = "404", description = "배송 삭제 할 수 없음"),
+            @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     @Parameters({
             @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
@@ -118,6 +128,6 @@ public class ShipperController {
             @Parameter(name = "id", description = "삭제할 배송 id", example = "1")
     })
     public ResponseEntity<String> delete(@RequestHeader("UserInfo") String userInfo, @RequestParam Long id) {
-        return ResponseEntity.ok(shipperService.deleteById(userInfo, id));
+        return shipperService.deleteById(userInfo, id);
     }
 }

@@ -18,7 +18,6 @@ import shop.biday.service.ProductService;
 import java.util.List;
 import java.util.Map;
 
-@CrossOrigin
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/products")
@@ -33,7 +32,7 @@ public class ProductController {
             @ApiResponse(responseCode = "404", description = "상품 전체 목록 찾을 수 없음")
     })
     public ResponseEntity<Map<Long, ProductModel>> findAll() {
-        return ResponseEntity.ok(productService.findAll());
+        return productService.findAll();
     }
 
     @GetMapping("/findByFilter")
@@ -43,21 +42,20 @@ public class ProductController {
             @ApiResponse(responseCode = "404", description = "상품 목록 찾을 수 없음")
     })
     @Parameters({
-            @Parameter(name = "brandId", description = "브랜드 id", example = "1L"),
-            @Parameter(name = "categoryId", description = "카테고리 id", example = "1L"),
+            @Parameter(name = "brand", description = "브랜드 이름", example = "esfai"),
+            @Parameter(name = "category", description = "카테고리 이름", example = "top"),
             @Parameter(name = "keyword", description = "상품 키워드", example = "바지"),
             @Parameter(name = "color", description = "검색 이후 선택 가능한 색깔 필터", example = "red"),
             @Parameter(name = "order", description = "상품 목록 정렬 방식", example = "최신 등록순"),
-            @Parameter(name = "lastItemId", description = "현재 페이지에서 가장 마지막 상품의 id", example = "1L")
     })
     public ResponseEntity<List<ProductDto>> searchByFilter(
-            @RequestParam(value = "brandId", required = false) Long brandId,
-            @RequestParam(value = "categoryId", required = false) Long categoryId,
+            @RequestParam(value = "brand", required = false) String brand,
+            @RequestParam(value = "category", required = false) String category,
             @RequestParam(value = "keyword", required = false, defaultValue = "") String keyword,
             @RequestParam(value = "color", required = false, defaultValue = "") String color,
-            @RequestParam(value = "order", required = false, defaultValue = "") String order,
-            @RequestParam(value = "lastItemId", required = false) Long lastItemId) {
-        return ResponseEntity.ok(productService.findByFilter(categoryId, brandId, keyword, color, order, lastItemId));
+            @RequestParam(value = "order", required = false, defaultValue = "") String order
+            ) {
+        return productService.findByFilter(category, brand, keyword, color, order);
     }
 
     @GetMapping
@@ -68,7 +66,7 @@ public class ProductController {
     })
     @Parameter(name = "id", description = "선택된 상품의 id", example = "1L")
     public ResponseEntity<List<Map.Entry<Long, ProductModel>>> findByName(@RequestParam(value = "id", required = true) Long id) {
-        return ResponseEntity.ok(productService.findAllByProductName(id));
+        return productService.findAllByProductName(id);
     }
 
     @GetMapping("/findOne")
@@ -79,14 +77,15 @@ public class ProductController {
     })
     @Parameter(name = "id", description = "선택된 상품의 id", example = "1L")
     public ResponseEntity<Map<Long, ProductModel>> findById(@RequestParam(value = "id", required = true) Long id) {
-        return ResponseEntity.ok(productService.findByProductId(id));
+        return productService.findByProductId(id);
     }
 
     @PostMapping
     @Operation(summary = "상품 등록", description = "새로운 상품 등록")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "상품 등록 성공"),
-            @ApiResponse(responseCode = "404", description = "상품 등록 할 수 없음")
+            @ApiResponse(responseCode = "403", description = "사용자 권한 부족"),
+            @ApiResponse(responseCode = "400", description = "상품 등록 실패")
     })
     @Parameters({
             @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
@@ -108,14 +107,15 @@ public class ProductController {
     public ResponseEntity<ProductEntity> saveProduct(
             @RequestHeader("UserInfo") String userInfoHeader,
             @RequestBody ProductModel product) {
-        return ResponseEntity.ok(productService.save(userInfoHeader, product));
+        return productService.save(userInfoHeader, product);
     }
 
     @PatchMapping
     @Operation(summary = "상품 수정", description = "기존 상품 수정")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "상품 수정 성공"),
-            @ApiResponse(responseCode = "404", description = "상품 수정 할 수 없음")
+            @ApiResponse(responseCode = "404", description = "상품 수정 할 수 없음"),
+            @ApiResponse(responseCode = "403", description = "사용자 권한 부족")
     })
     @Parameters({
             @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
@@ -138,14 +138,15 @@ public class ProductController {
     public ResponseEntity<ProductEntity> updateProduct(
             @RequestHeader("UserInfo") String userInfoHeader,
             @RequestBody ProductModel product) {
-        return ResponseEntity.ok(productService.update(userInfoHeader, product));
+        return productService.update(userInfoHeader, product);
     }
 
     @DeleteMapping
     @Operation(summary = "상품 삭제", description = "상품 삭제")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "상품 삭제 성공"),
-            @ApiResponse(responseCode = "404", description = "상품 찾을 수 없음")
+            @ApiResponse(responseCode = "404", description = "상품 찾을 수 없음"),
+            @ApiResponse(responseCode = "403", description = "사용자 권한 부족")
     })
     @Parameters({
             @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
@@ -155,6 +156,6 @@ public class ProductController {
     public ResponseEntity<String> deleteProduct(
             @RequestHeader("UserInfo") String userInfoHeader,
             @RequestParam(value = "productId", required = true) Long productId) {
-        return ResponseEntity.ok(productService.deleteById(userInfoHeader, productId));
+        return productService.deleteById(userInfoHeader, productId);
     }
 }

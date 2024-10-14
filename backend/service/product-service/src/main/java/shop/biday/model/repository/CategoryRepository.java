@@ -7,5 +7,5 @@ import shop.biday.model.entity.CategoryEntity;
 @Repository
 public interface CategoryRepository extends JpaRepository<CategoryEntity, Long>, QCategoryRepository {
 
-    CategoryEntity findByName(String name);
+    CategoryEntity findByNameIgnoreCase(String name);
 }

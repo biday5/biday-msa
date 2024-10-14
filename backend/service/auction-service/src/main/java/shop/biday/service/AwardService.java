@@ -2,6 +2,7 @@ package shop.biday.service;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.http.ResponseEntity;
 import shop.biday.model.domain.AwardModel;
 import shop.biday.model.entity.AwardEntity;
 
@@ -16,7 +17,7 @@ public interface AwardService {
 
     AwardEntity save(AwardEntity award);
 
-    AwardModel findByAwardId(String userInfoHeader, Long awardId);
+    ResponseEntity<AwardModel> findByAwardId(String userInfoHeader, Long awardId);
 
-    Slice<AwardModel> findByUser(String userInfoHeader, String period, LocalDateTime cursor, Pageable pageable);
+    ResponseEntity<Slice<AwardModel>> findByUser(String userInfoHeader, String period, LocalDateTime cursor, Pageable pageable);
 }

@@ -1,18 +1,19 @@
 package shop.biday.service;
 
+import org.springframework.http.ResponseEntity;
 import shop.biday.model.domain.BrandModel;
 import shop.biday.model.entity.BrandEntity;
 
 import java.util.List;
 
 public interface BrandService {
-    List<BrandModel> findAll();
+    ResponseEntity<List<BrandModel>> findAll();
 
-    BrandModel findById(Long id);
+    ResponseEntity<BrandModel> findById(Long id);
 
-    BrandEntity save(String userInfoHeader, BrandModel brand);
+    ResponseEntity<BrandEntity> save(String userInfoHeader, BrandModel brand);
 
-    BrandEntity update(String userInfoHeader, BrandModel brand);
+    ResponseEntity<BrandEntity> update(String userInfoHeader, BrandModel brand);
 
-    String deleteById(String userInfoHeader, Long id);
+    ResponseEntity<String> deleteById(String userInfoHeader, Long id);
 }

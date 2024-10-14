@@ -2,6 +2,8 @@ package shop.biday.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import shop.biday.model.domain.SizeModel;
 import shop.biday.model.domain.UserInfoModel;
@@ -25,71 +27,82 @@ public class SizeServiceImpl implements SizeService {
     private final UserInfoUtils userInfoUtils;
 
     @Override
-    public List<SizeEntity> findAll() {
+    public ResponseEntity<List<SizeEntity>> findAll() {
         log.info("Finding all sizes");
-        return sizeRepository.findAll();
+        List<SizeEntity> sizes = sizeRepository.findAll();
+        return sizes.isEmpty() ?
+                ResponseEntity.status(HttpStatus.NOT_FOUND).build() :
+                ResponseEntity.ok(sizes);
     }
 
     @Override
-    public Optional<SizeEntity> findById(Long id) {
+    public ResponseEntity<SizeEntity> findById(Long id) {
         log.info("Finding size by id: {}", id);
-        return sizeRepository.findById(id);
+        return sizeRepository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> {
+                    log.error("Size not found with id: {}", id);
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+                });
     }
 
     @Override
-    public List<SizeModel> findAllByProductId(Long productId) {
+    public ResponseEntity<List<SizeModel>> findAllByProductId(Long productId) {
         log.info("Finding sizes by Product id: {}", productId);
-        return sizeRepository.findAllByProductId(productId);
+        List<SizeModel> sizes = sizeRepository.findAllByProductId(productId);
+        return sizes.isEmpty() ?
+                ResponseEntity.status(HttpStatus.NOT_FOUND).build() :
+                ResponseEntity.ok(sizes);
     }
 
     @Override
-    public SizeEntity save(String userInfoHeader, SizeModel size) {
+    public ResponseEntity<SizeEntity> save(String userInfoHeader, SizeModel size) {
         log.info("Saving size started with user: {}", userInfoHeader);
         return validateUser(userInfoHeader)
                 .map(t -> {
                     SizeEntity newSize = createSizeEntity(size);
                     log.info("Size saved successfully: {}", newSize);
-                    return sizeRepository.save(newSize);
+                    return ResponseEntity.status(HttpStatus.CREATED).body(sizeRepository.save(newSize));
                 })
-                .orElseThrow(() -> new RuntimeException("Save Size failed: User does not have permission"));
+                .orElseGet(() -> {
+                    log.error("Save Size failed: User does not have permission");
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+                });
     }
 
     @Override
-    public SizeEntity update(String userInfoHeader, SizeModel size) {
+    public ResponseEntity<SizeEntity> update(String userInfoHeader, SizeModel size) {
         log.info("Updating size started for id: {}", size.getId());
         return validateUser(userInfoHeader)
-                .filter(t -> {
-                    boolean exists = sizeRepository.existsById(size.getId());
-                    if (!exists) {
-                        log.error("Size not found with id: {}", size.getId());
-                    }
-                    return exists;
-                })
+                .filter(t -> sizeRepository.existsById(size.getId()))
                 .map(t -> {
                     SizeEntity updatedSize = createSizeEntity(size);
                     updatedSize.setId(size.getId());
                     log.info("Size updated successfully: {}", updatedSize);
-                    return sizeRepository.save(updatedSize);
+                    return ResponseEntity.ok(sizeRepository.save(updatedSize));
                 })
-                .orElseThrow(() -> new RuntimeException("Update Size failed: Size not found or user does not have permission"));
+                .orElseGet(() -> {
+                    log.error("Update Size failed: Size not found or user does not have permission");
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+                });
     }
 
     @Override
-    public String deleteById(String userInfoHeader, Long id) {
+    public ResponseEntity<String> deleteById(String userInfoHeader, Long id) {
         log.info("Deleting size started for id: {}", id);
-        return validateUser(userInfoHeader).map(t -> {
-            if (!sizeRepository.existsById(id)) {
-                log.error("Size not found with id: {}", id);
-                return "사이즈 삭제 실패: 사이즈를 찾을 수 없습니다.";
-            }
-
-            sizeRepository.deleteById(id);
-            log.info("Size deleted successfully: {}", id);
-            return "사이즈 삭제 성공";
-        }).orElseGet(() -> {
-            log.error("User does not have role ADMIN or does not exist");
-            return "유효하지 않은 사용자: 관리자 권한이 필요합니다.";
-        });
+        return validateUser(userInfoHeader)
+                .map(t -> {
+                    if (!sizeRepository.existsById(id)) {
+                        log.error("Size not found with id: {}", id);
+                        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("사이즈 삭제 실패: 사이즈를 찾을 수 없습니다.");
+                    }
+                    sizeRepository.deleteById(id);
+                    log.info("Size deleted successfully: {}", id);
+                    return ResponseEntity.ok("사이즈 삭제 성공");
+                }).orElseGet(() -> {
+                    log.error("User does not have role ADMIN or does not exist");
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN).body("유효하지 않은 사용자: 관리자 권한이 필요합니다.");
+                });
     }
 
     private Optional<String> validateUser(String userInfoHeader) {

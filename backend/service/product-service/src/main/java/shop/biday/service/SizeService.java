@@ -1,21 +1,21 @@
 package shop.biday.service;
 
+import org.springframework.http.ResponseEntity;
 import shop.biday.model.domain.SizeModel;
 import shop.biday.model.entity.SizeEntity;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface SizeService {
-    List<SizeEntity> findAll();
+    ResponseEntity<List<SizeEntity>> findAll();
 
-    Optional<SizeEntity> findById(Long id);
+    ResponseEntity<SizeEntity> findById(Long id);
 
-    List<SizeModel> findAllByProductId(Long productId);
+    ResponseEntity<List<SizeModel>> findAllByProductId(Long productId);
 
-    SizeEntity save(String userInfoHeader, SizeModel size);
+    ResponseEntity<SizeEntity> save(String userInfoHeader, SizeModel size);
 
-    SizeEntity update(String userInfoHeader, SizeModel size);
+    ResponseEntity<SizeEntity> update(String userInfoHeader, SizeModel size);
 
-    String deleteById(String userInfoHeader, Long id);
+    ResponseEntity<String> deleteById(String userInfoHeader, Long id);
 }

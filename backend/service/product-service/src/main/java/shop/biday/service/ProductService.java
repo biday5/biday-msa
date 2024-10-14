@@ -1,5 +1,6 @@
 package shop.biday.service;
 
+import org.springframework.http.ResponseEntity;
 import shop.biday.model.domain.ProductModel;
 import shop.biday.model.dto.ProductDto;
 import shop.biday.model.entity.ProductEntity;
@@ -9,17 +10,17 @@ import java.util.Map;
 
 public interface ProductService {
 
-    Map<Long, ProductModel> findAll();
+    ResponseEntity<Map<Long, ProductModel>> findAll();
 
-    List<Map.Entry<Long, ProductModel>> findAllByProductName(Long id);
+    ResponseEntity<List<Map.Entry<Long, ProductModel>>> findAllByProductName(Long id);
 
-    Map<Long, ProductModel> findByProductId(Long id);
+    ResponseEntity<Map<Long, ProductModel>> findByProductId(Long id);
 
-    List<ProductDto> findByFilter(Long categoryId, Long brandId, String keyword, String color, String order, Long lastItemId);
+    ResponseEntity<List<ProductDto>> findByFilter(String category, String brand, String keyword, String color, String order);
 
-    ProductEntity save(String userInfoHeader, ProductModel product);
+    ResponseEntity<ProductEntity> save(String userInfoHeader, ProductModel product);
 
-    ProductEntity update(String userInfoHeader, ProductModel product);
+    ResponseEntity<ProductEntity> update(String userInfoHeader, ProductModel product);
 
-    String deleteById(String userInfoHeader, Long id);
+    ResponseEntity<String> deleteById(String userInfoHeader, Long id);
 }

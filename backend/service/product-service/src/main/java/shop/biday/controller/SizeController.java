@@ -16,7 +16,6 @@ import shop.biday.service.SizeService;
 
 import java.util.List;
 
-@CrossOrigin
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/sizes")
@@ -31,7 +30,7 @@ public class SizeController {
             @ApiResponse(responseCode = "404", description = "사이즈 찾을 수 없음")
     })
     public ResponseEntity<List<SizeEntity>> findAll() {
-        return ResponseEntity.ok(sizeService.findAll());
+        return sizeService.findAll();
     }
 
     @GetMapping("/findByProduct")
@@ -42,14 +41,15 @@ public class SizeController {
     })
     @Parameter(name = "productId", description = "상품 id", example = "1")
     public ResponseEntity<List<SizeModel>> findAllByProductId(@RequestParam("productId") Long productId) {
-        return ResponseEntity.ok(sizeService.findAllByProductId(productId));
+        return sizeService.findAllByProductId(productId);
     }
 
     @PostMapping
     @Operation(summary = "사이즈 등록", description = "사이즈 새로 등록하기")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "사이즈 등록 성공"),
-            @ApiResponse(responseCode = "404", description = "사이즈 등록 할 수 없음")
+            @ApiResponse(responseCode = "201", description = "사이즈 등록 성공"),
+            @ApiResponse(responseCode = "400", description = "유효하지 않은 요청"),
+            @ApiResponse(responseCode = "403", description = "권한이 없음")
     })
     @Parameters({
             @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
@@ -66,14 +66,15 @@ public class SizeController {
     public ResponseEntity<SizeEntity> create(
             @RequestHeader("UserInfo") String userInfoHeader,
             @RequestBody SizeModel size) {
-        return ResponseEntity.ok(sizeService.save(userInfoHeader, size));
+        return sizeService.save(userInfoHeader, size);
     }
 
     @PatchMapping
     @Operation(summary = "사이즈 수정", description = "사이즈 수정하기")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "사이즈 수정 성공"),
-            @ApiResponse(responseCode = "404", description = "사이즈 수정 할 수 없음")
+            @ApiResponse(responseCode = "404", description = "사이즈를 찾을 수 없음"),
+            @ApiResponse(responseCode = "403", description = "권한이 없음")
     })
     @Parameters({
             @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
@@ -91,14 +92,15 @@ public class SizeController {
     public ResponseEntity<SizeEntity> update(
             @RequestHeader("UserInfo") String userInfoHeader,
             @RequestBody SizeModel size) {
-        return ResponseEntity.ok(sizeService.update(userInfoHeader, size));
+        return sizeService.update(userInfoHeader, size);
     }
 
     @DeleteMapping
     @Operation(summary = "사이즈 삭제", description = "사이즈 삭제하기")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "사이즈 삭제 성공"),
-            @ApiResponse(responseCode = "404", description = "사이즈 삭제 할 수 없음")
+            @ApiResponse(responseCode = "404", description = "사이즈를 찾을 수 없음"),
+            @ApiResponse(responseCode = "403", description = "권한이 없음")
     })
     @Parameters({
             @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
@@ -108,6 +110,6 @@ public class SizeController {
     public ResponseEntity<String> delete(
             @RequestHeader("UserInfo") String userInfoHeader,
             @RequestParam("sizeId") Long id) {
-        return ResponseEntity.ok(sizeService.deleteById(userInfoHeader, id));
+        return sizeService.deleteById(userInfoHeader, id);
     }
 }
