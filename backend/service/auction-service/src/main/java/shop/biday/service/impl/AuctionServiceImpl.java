@@ -106,18 +106,13 @@ public class AuctionServiceImpl implements AuctionService {
     }
 
     @Override
-    public ResponseEntity<AuctionEntity> updateState(Long id) {
+    public AuctionEntity updateState(Long id) {
         log.info("Update Auction Status by id: {}", id);
         return auctionRepository.findById(id)
                 .map(auction -> {
                     auction.setStatus(true);
-                    auctionRepository.save(auction);
-                    return ResponseEntity.ok(auction);
-                })
-                .orElseGet(() -> {
-                    log.error("Auction not found with id: {}", id);
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-                });
+                    return auctionRepository.save(auction);
+                }).orElseThrow(() -> new NoSuchElementException("Auction not found with id: " + id));
     }
 
     @Override

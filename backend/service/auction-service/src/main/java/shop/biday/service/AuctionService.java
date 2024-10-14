@@ -21,7 +21,7 @@ public interface AuctionService {
 
     ResponseEntity<Slice<AuctionDto>> findByUser(String userInfoHeader, String period, Long cursor, Pageable pageable);
 
-    ResponseEntity<AuctionEntity> updateState(Long id);
+    AuctionEntity updateState(Long id);
 
     boolean existsById(Long id);
 
