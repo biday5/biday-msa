@@ -123,8 +123,7 @@ public class AddressController {
     public ResponseEntity<Mono<AddressDocument>> insert(
             @RequestHeader("UserInfo") String userInfo,
             @RequestBody @Validated @Parameter(description = "주소 세부 사항을 포함하는 모델") AddressRequest addressRequest) {
-        log.info("addressRequest : {}",addressRequest);
-        return ResponseEntity.ok(addressService.save(userInfo,addressRequest));
+        log.info("addressRequest : {}", addressRequest);
+        return ResponseEntity.ok(addressService.save(userInfo, addressRequest));
     }
-
 }
