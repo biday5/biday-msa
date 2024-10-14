@@ -11,11 +11,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import shop.biday.model.document.AddressDocument;
 import shop.biday.model.domain.AddressModel;
+import shop.biday.model.domain.AddressRequest;
 import shop.biday.service.AddressService;
 
 
@@ -114,16 +116,14 @@ public class AddressController {
                             "detailAddress" : "상세 주소",
                             "zipcode" : "우편번호",
                             "type" : "",
-                            "pick" : "기본 주소 선택 여부",
-                            "email" : "??"
+                            "pick" : "기본 주소 선택 여부"
                         } 
                     """)})
     })
     public ResponseEntity<Mono<AddressDocument>> insert(
             @RequestHeader("UserInfo") String userInfo,
-            @RequestBody @Parameter(description = "주소 세부 사항을 포함하는 모델") AddressModel addressModel) {
-        log.info("addressModel : {}",addressModel);
-        return ResponseEntity.ok(addressService.save(userInfo,addressModel));
+            @RequestBody @Validated @Parameter(description = "주소 세부 사항을 포함하는 모델") AddressRequest addressRequest) {
+        log.info("addressRequest : {}", addressRequest);
+        return ResponseEntity.ok(addressService.save(userInfo, addressRequest));
     }
-
 }

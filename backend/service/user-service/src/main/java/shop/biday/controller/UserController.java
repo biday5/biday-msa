@@ -11,11 +11,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import shop.biday.model.document.UserDocument;
 import shop.biday.model.domain.UserModel;
+import shop.biday.model.domain.UserRequest;
 import shop.biday.service.impl.UserServiceImpl;
 
 
@@ -110,13 +112,9 @@ public class UserController {
             @Parameter(name = "password", description = "8자~12자 이내", example = "abcd1234!@"),
             @Parameter(name = "name", description = "이름", example = "비트춘자"),
             @Parameter(name = "phoneNum", description = "번호", example = "000-0000-0000"),
-            @Parameter(name = "streetaddress", description = "주소", example = "경기 성남시 중원구 성남동 2325"),
-            @Parameter(name = "detailaddress", description = "상세주소", example = "102호"),
-            @Parameter(name = "zipcode", description = "우편번호", example = "13363"),
-            @Parameter(name = "type", description = "주소유형", example = "HOME")
     })
-    public ResponseEntity<Mono<UserDocument>> join(@RequestBody UserModel model) {
-        return new ResponseEntity<>(userService.save(model), HttpStatus.OK);
+    public ResponseEntity<Mono<UserDocument>> join(@RequestBody @Validated UserRequest userRequest) {
+        return new ResponseEntity<>(userService.save(userRequest), HttpStatus.OK);
     }
 
     @PostMapping("/validate")
