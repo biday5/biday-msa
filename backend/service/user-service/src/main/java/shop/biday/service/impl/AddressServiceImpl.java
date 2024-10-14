@@ -7,6 +7,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import shop.biday.model.document.AddressDocument;
 import shop.biday.model.domain.AddressModel;
+import shop.biday.model.domain.AddressRequest;
 import shop.biday.model.domain.UserInfoModel;
 import shop.biday.model.enums.AddressType;
 import shop.biday.model.repository.MAddressRepository;
@@ -22,36 +23,37 @@ public class AddressServiceImpl implements AddressService {
     private final UserInfoUtils userInfoUtils;
 
     @Override
-    public Mono<AddressDocument> save(String userId, AddressModel addressModel) {
+    public Mono<AddressDocument> save(String userInfoHeader, AddressRequest addressRequest) {
+        UserInfoModel userInfo = userInfoUtils.extractUserInfo(userInfoHeader);
 
         AddressType addressType;
         try {
-            addressType = AddressType.fromString(addressModel.getType());
+            addressType = AddressType.fromString(addressRequest.type());
         } catch (IllegalArgumentException e) {
             addressType = AddressType.OTHER;
         }
 
         AddressType finalAddressType = addressType;
-        return countByUserId(userId)
+        return countByUserId(userInfoHeader)
                 .flatMap(count -> {
                     if (count >= 3) {
                         return Mono.error(new IllegalStateException("최대 주소 가능 갯수는 3개 입니다."));
                     }
-                    return addressRepository.findByUserId(userId)
-                            .defaultIfEmpty(null)
-                            .flatMap(existingAddress -> {
-                                AddressDocument addressEntity = AddressDocument.builder()
-                                        .userId(userId)
-                                        .streetAddress(addressModel.getStreetAddress())
-                                        .detailAddress(addressModel.getDetailAddress())
-                                        .zipcode(addressModel.getZipcode())
-                                        .type(finalAddressType)
-                                        .pick(existingAddress == null)
-                                        .build();
-                                return addressRepository.save(addressEntity);
-                            });
+                    boolean isPick = (count == 0);
+
+                    AddressDocument addressEntity = AddressDocument.builder()
+                            .userId(userInfo.getUserId())
+                            .streetAddress(addressRequest.streetAddress())
+                            .detailAddress(addressRequest.detailAddress())
+                            .zipcode(addressRequest.zipcode())
+                            .type(finalAddressType)
+                            .pick(isPick)
+                            .build();
+
+                    return addressRepository.save(addressEntity);
                 });
     }
+
 
     @Override
     public Mono<Boolean> deleteById(String userInfoHeader, String id) {
@@ -97,24 +99,4 @@ public class AddressServiceImpl implements AddressService {
         return addressRepository.findAllByUserId(userInfoModel.getUserId());
     }
 
-//    @Override
-//    public Flux<AddressDocument> findAll() {
-//        return addressRepository.findAll();
-//    }
-//
-//    @Override
-//    public Mono<AddressDocument> findById(String id) {
-//        return addressRepository.findById(id)
-//                .switchIfEmpty(Mono.error(new RuntimeException("주소를 찾지 못했습니다.")));
-//    }
-//
-//    @Override
-//    public Mono<Boolean> existsById(String id) {
-//        return addressRepository.existsById(id);
-//    }
-//
-//    @Override
-//    public Mono<Long> count() {
-//        return addressRepository.count();
-//    }
 }

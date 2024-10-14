@@ -9,6 +9,7 @@ import reactor.core.publisher.Mono;
 import shop.biday.model.document.UserDocument;
 import shop.biday.model.domain.UserInfoModel;
 import shop.biday.model.domain.UserModel;
+import shop.biday.model.domain.UserRequest;
 import shop.biday.model.enums.Role;
 import shop.biday.model.repository.MUserRepository;
 import shop.biday.service.UserService;
@@ -35,19 +36,21 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Mono<UserDocument> save(UserModel userModel) {
-        UserDocument userDocument = UserDocument.builder()
-                .name(userModel.getName())
-                .email(userModel.getEmail())
-                .password(passwordEncoder.encode(userModel.getPassword()))
-                .phone(userModel.getPhoneNum())
-                .role(Collections.singletonList(Role.ROLE_USER))
-                .status(true)
-                .totalRating(2.0)
-                .build();
-
-        return userRepository.save(userDocument);
+    public Mono<UserDocument> save(UserRequest userRequest) {
+        return Mono.just(userRequest)
+                .map(req -> UserDocument.builder()
+                        .name(req.name())
+                        .email(req.email())
+                        .password(passwordEncoder.encode(req.password()))
+                        .phone(req.phoneNum())
+                        .role(Collections.singletonList(Role.ROLE_USER))
+                        .status(true)
+                        .totalRating(2.0)
+                        .build())
+                .flatMap(userRepository::save)
+                .onErrorResume(e -> Mono.error(new RuntimeException("사용자 등록 중 오류 발생: " + e.getMessage())));
     }
+
 
     @Override
     public Mono<Boolean> existsById(String id) {

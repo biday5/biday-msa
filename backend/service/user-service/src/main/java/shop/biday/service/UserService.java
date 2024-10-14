@@ -4,7 +4,7 @@ package shop.biday.service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import shop.biday.model.document.UserDocument;
-import shop.biday.model.domain.UserModel;
+import shop.biday.model.domain.UserRequest;
 
 
 public interface UserService {
@@ -12,7 +12,7 @@ public interface UserService {
 
     Mono<UserDocument> findById(String id);
 
-    Mono<UserDocument> save(UserModel userModel);
+    Mono<UserDocument> save(UserRequest userRequest);
 
     Mono<Boolean> existsById(String id);
 
