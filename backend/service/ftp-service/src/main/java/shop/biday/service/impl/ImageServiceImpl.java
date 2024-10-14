@@ -65,13 +65,11 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-//    public ResponseEntity<String> uploadFileByAdmin(String userInfoHeader, List<MultipartFile> multipartFiles, String filePath, String type, Long referencedId) {
-        public ResponseEntity<String> uploadFileByAdmin(List<MultipartFile> multipartFiles, String filePath, String type, Long referencedId) {
+    public ResponseEntity<String> uploadFileByAdmin(String userInfoHeader, List<MultipartFile> multipartFiles, String filePath, String type, Long referencedId) {
         log.info("Image upload By Admin started");
-        return uploadFiles(multipartFiles, filePath, type, referencedId);
-//        return validateRole(userInfoHeader, "ROLE_ADMIN")
-//                .map(validRole -> uploadFiles(multipartFiles, filePath, type, referencedId))
-//                .orElseThrow(() -> new IllegalArgumentException("User does not have the necessary permissions or the role is invalid."));
+        return validateRole(userInfoHeader, "ROLE_ADMIN")
+                .map(validRole -> uploadFiles(multipartFiles, filePath, type, referencedId))
+                .orElseThrow(() -> new IllegalArgumentException("User does not have the necessary permissions or the role is invalid."));
     }
 
     @Override
