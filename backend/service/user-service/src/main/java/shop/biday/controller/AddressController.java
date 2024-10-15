@@ -10,13 +10,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import shop.biday.model.document.AddressDocument;
-import shop.biday.model.domain.AddressModel;
 import shop.biday.model.domain.AddressRequest;
 import shop.biday.service.AddressService;
 
@@ -55,22 +56,6 @@ public class AddressController {
         return ResponseEntity.ok(addressService.pick(id));
     }
 
-    @GetMapping("/count")
-    @Operation(
-            summary = "주소 수 카운트",
-            description = "주어진 이메일과 연관된 주소의 수를 카운트합니다."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "이메일과 연관된 주소의 수."),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다.", content = @Content)
-    })
-    @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
-            example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}")
-    public ResponseEntity<Mono<Long>> count(@RequestHeader("UserInfo") String userInfoHeader) {
-        return ResponseEntity.ok(addressService.countByUserId(userInfoHeader));
-    }
-
-    // TODO UserInfo 넣기!
     @DeleteMapping("/deleteById")
     @Operation(
             summary = "주소 삭제",
@@ -81,18 +66,23 @@ public class AddressController {
             @ApiResponse(responseCode = "404", description = "주소를 찾을 수 없습니다.", content = @Content)
     })
     @Parameters({
-        @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
-                example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}"),
-        @Parameter(name = "id", description = "삭제 할 주소를 선택 id", example = "1L")
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
+                    example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}"),
+            @Parameter(name = "id", description = "삭제 할 주소의 ID", example = "1L")
     })
-    public ResponseEntity<Mono<Boolean>> deleteById(@RequestHeader("UserInfo") String userInfoHeader,
-                                                    @RequestParam @Parameter(description = "삭제할 주소의 ID") String id) {
-        try {
-            addressService.deleteById(userInfoHeader,id);
-            return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+    public Mono<Boolean> deleteById(@RequestHeader("UserInfo") String userInfoHeader,
+                                    @RequestParam @Parameter(description = "삭제할 주소의 ID") String id) {
+        return addressService.deleteById(userInfoHeader, id)
+                .flatMap(result -> {
+                    if (result) {
+                        return Mono.just(true);
+                    } else {
+                        return Mono.just(false);
+                    }
+                })
+                .onErrorResume(e -> {
+                    return Mono.just(false);
+                });
     }
 
     @PostMapping("/insert")

@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import shop.biday.model.document.AddressDocument;
-import shop.biday.model.domain.AddressModel;
 import shop.biday.model.domain.AddressRequest;
 import shop.biday.model.domain.UserInfoModel;
 import shop.biday.model.enums.AddressType;
@@ -60,10 +59,14 @@ public class AddressServiceImpl implements AddressService {
         UserInfoModel userInfo = userInfoUtils.extractUserInfo(userInfoHeader);
 
         if (userInfo.getUserId() == null) {
-            return Mono.error(new IllegalArgumentException("유저 ID는 없습니다."));
+            return Mono.error(new IllegalArgumentException("유저 ID가 없습니다."));
         }
 
-        return addressRepository.deleteById(id).hasElement();
+        return addressRepository.findById(id)
+                .flatMap(address -> addressRepository.deleteById(id)
+                        .then(Mono.just(true))
+                )
+                .defaultIfEmpty(false);
     }
 
     @Override
