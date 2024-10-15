@@ -16,4 +16,5 @@ public interface MAddressRepository extends ReactiveMongoRepository<AddressDocum
     Mono<AddressDocument> findByUserId(String id);
 
     Flux<AddressDocument> findAllByUserId(String id);
+
 }
