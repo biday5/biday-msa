@@ -71,6 +71,8 @@ public class BidController {
                         )
                 );
 
+        log.info("streamBid bidSinks: {}", bidSinks.keySet());
+
         return findBid.doOnNext(bidSink::tryEmitNext)
                 .thenMany(bidSink.asFlux())
                 .onErrorResume(IOException.class, e -> {
@@ -90,8 +92,10 @@ public class BidController {
                 })
                 .doOnCancel(() -> {
                     log.warn("클라이언트가 연결을 끊었습니다. auctionId: {}", auctionId);
+                    log.info("doOnCancel bidSink.currentSubscriberCount: {}", bidSink.currentSubscriberCount());
                     if (bidSink.currentSubscriberCount() == 1) {
                         bidSinks.remove(auctionId);
+                        log.info("streamBid doOnCancel bindSinks remove: {}", bidSinks.keySet());
                     }
                 }).log();
     }
