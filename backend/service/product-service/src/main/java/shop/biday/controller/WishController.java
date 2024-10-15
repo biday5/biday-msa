@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,13 +15,14 @@ import shop.biday.service.WishService;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/wishes")
 @Tag(name = "wishes", description = "Wish Controller")
 public class WishController {
-    private final WishService wishService;
 
+    private final WishService wishService;
 
     @GetMapping("/user")
     @Operation(summary = "사용자 기준 위시 목록", description = "마이페이지 등에서 보여질 때 불러질 특정 사용자의 wish 리스트")
@@ -32,12 +34,7 @@ public class WishController {
     @Parameter(name = "UserInfo", description = "현재 로그인한 사용자",
             example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}")
     public ResponseEntity<List<?>> findByUser(@RequestHeader("UserInfo") String userInfoHeader) {
-        List<?> wishList = wishService.findByUserId(userInfoHeader);
-
-        return (wishList == null || wishList.isEmpty())
-                ? ResponseEntity.noContent().build()
-                : ResponseEntity.ok(wishList);
-
+        return ResponseEntity.ok(wishService.findByUserId(userInfoHeader));
     }
 
     @GetMapping
@@ -58,7 +55,6 @@ public class WishController {
         return wishService.toggleWish(userInfoHeader, productId)
                 ? ResponseEntity.status(HttpStatus.CREATED).body("위시 생성 성공")
                 : ResponseEntity.ok("위시 삭제 성공");
-
     }
 
     @DeleteMapping

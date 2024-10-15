@@ -12,7 +12,8 @@ import org.springframework.stereotype.Component;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AddressModel {
-    private Long id;
+
+    private String id;
     private String userId;
     private String streetAddress;
     private String detailAddress;
