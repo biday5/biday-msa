@@ -70,6 +70,5 @@ public class WishController {
 	public ResponseEntity<?> delete(@RequestHeader("UserInfo") String userInfoHeader,
 			@RequestParam("id") Long id) {
 		return ResponseEntity.ok(wishService.deleteByWishId(userInfoHeader, id));
-
 	}
 }
