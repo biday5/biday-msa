@@ -64,7 +64,7 @@ public class ProductServiceImpl implements ProductService {
                     log.warn("Category not found: {}", category);
                     return brand != null ?
                             productRepository.findProducts(null, brandRepository.findByNameIgnoreCase(brand).getId(), keyword, color, order) :
-                            Collections.emptyList();
+                            productRepository.findProducts(null, null, keyword, color, order);
                 });
 
         return products.isEmpty() ?
