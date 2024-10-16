@@ -49,6 +49,8 @@ out/
 # 환경 파일
 .env
 
+database/**
+
 # Ignore MySQL socket files
 backend/mysql/**
 backend/mongodb/**

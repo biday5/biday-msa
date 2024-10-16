@@ -1,19 +1,18 @@
 package shop.biday.service.impl;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import shop.biday.model.domain.UserInfoModel;
 import shop.biday.model.entity.ProductEntity;
 import shop.biday.model.entity.WishEntity;
 import shop.biday.model.repository.WishRepository;
 import shop.biday.service.WishService;
 import shop.biday.utils.UserInfoUtils;
-
-import java.util.List;
 
 @Slf4j
 @Service
@@ -25,9 +24,7 @@ public class WishServiceImpl implements WishService {
 
     @Override
     public List<?> findByUserId(String userInfoHeader) {
-        return wishRepository.findByUserId(
-                getUserInfoModel(userInfoHeader).getUserId()
-        );
+        return wishRepository.findByUserId(getUserInfoModel(userInfoHeader).getUserId());
     }
 
     @Override
@@ -50,23 +47,25 @@ public class WishServiceImpl implements WishService {
 
     private boolean insertWishAndReturnTrue(String userId, Long productId) {
         log.info("Adding wish for userId: {} and productId: {}", userId, productId);
-        wishRepository.save(WishEntity.builder()
-                .userId(userId)
-                .product(ProductEntity.builder()
-                        .id(productId)
-                        .build())
-                .build());
+        wishRepository.save(WishEntity.builder().userId(userId)
+                .product(ProductEntity.builder().id(productId).build()).build());
         return true;
     }
 
     @Override
-    public ResponseEntity<String> deleteByWishId(String userInfoHeader, Long wishId) {
-        return wishRepository.findById(wishId)
-                .filter(wish -> wish.getUserId().equals(getUserInfoModel(userInfoHeader).getUserId()))
-                .map(wish -> {
-                    wishRepository.deleteById(wishId);
-                    return ResponseEntity.ok("위시 삭제 성공");
-                }).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("존재하지 않는 wishId: " + wishId));
+    public boolean deleteByWishId(String userInfoHeader, Long id) {
+        if (!wishRepository.existsById(id)) {
+            return false;
+        }
+
+        WishEntity wish = wishRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("잘못된 요청입니다."));
+        if (!getUserInfoModel(userInfoHeader).getUserId().equals(wish.getUserId())) {
+            return false;
+        }
+
+        wishRepository.deleteById(id);
+        return true;
     }
 
     private boolean existsWish(String userId, Long productId) {
