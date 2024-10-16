@@ -140,7 +140,7 @@ public class UserController {
     }
 
     @GetMapping("/oauthLogin/{email}")
-    public Mono<ResponseEntity<UserDocument>> findByEmail(@PathVariable String email) {
+    public Mono<ResponseEntity<UserDocument>> findByEmail(@PathVariable("email") String email) {
         return userService.findByEmail(email)
                 .map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.notFound().build());
@@ -181,5 +181,4 @@ public class UserController {
             @RequestHeader("UserInfo") String userInfoHeader) {
         userService.deleteById(userInfoHeader);
     }
-
 }

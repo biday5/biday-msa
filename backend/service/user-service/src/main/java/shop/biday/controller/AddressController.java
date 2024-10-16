@@ -52,7 +52,7 @@ public class AddressController {
             @ApiResponse(responseCode = "404", description = "주소를 찾을 수 없습니다.", content = @Content)
     })
     @Parameter(name = "id", description = "기본주소로 선택할 id", example = "1L")
-    public ResponseEntity<Mono<String>> pick(@RequestParam @Parameter(description = "선택할 주소의 ID") String id) {
+    public ResponseEntity<Mono<String>> pick(@RequestParam ("id")  String id) {
         return ResponseEntity.ok(addressService.pick(id));
     }
 
@@ -71,7 +71,7 @@ public class AddressController {
             @Parameter(name = "id", description = "삭제 할 주소의 ID", example = "1L")
     })
     public Mono<Boolean> deleteById(@RequestHeader("UserInfo") String userInfoHeader,
-                                    @RequestParam @Parameter(description = "삭제할 주소의 ID") String id) {
+                                    @RequestParam ("id")  String id) {
         return addressService.deleteById(userInfoHeader, id)
                 .flatMap(result -> {
                     if (result) {

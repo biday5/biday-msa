@@ -35,8 +35,8 @@ public class AuctionController {
             @ApiResponse(responseCode = "404", description = "상품 찾을 수 없음"),
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
-    @Parameter(name = "id", description = "상세보기할 경매의 id", example = "1")
-    public ResponseEntity<AuctionModel> findById(@RequestParam(value = "id", required = true) Long id) {
+    @Parameter(name = "auctionId", description = "상세보기할 경매의 id", example = "1")
+    public ResponseEntity<AuctionModel> findById(@RequestParam(value = "auctionId", required = true) Long id) {
         return auctionService.findById(id);
     }
 
@@ -181,11 +181,11 @@ public class AuctionController {
             @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
                     example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}"),
             @Parameter(name = "userId", description = "현재 로그인한 사용자 token에서 추출한 userId", example = "66f1442a7415bc47b04b3477"),
-            @Parameter(name = "brandId", description = "브랜드 id", example = "1")
+            @Parameter(name = "auctionId", description = "경매 id", example = "1")
     })
     public ResponseEntity<String> delete(
             @RequestHeader("UserInfo") String userInfoHeader,
-            @RequestParam Long id) {
+            @RequestParam("auctionId") Long id) {
         return auctionService.deleteById(userInfoHeader, id);
     }
 }

@@ -64,8 +64,8 @@ public class ProductController {
             @ApiResponse(responseCode = "200", description = "상품 가져오기 성공"),
             @ApiResponse(responseCode = "404", description = "상품 찾을 수 없음")
     })
-    @Parameter(name = "id", description = "선택된 상품의 id", example = "1L")
-    public ResponseEntity<List<Map.Entry<Long, ProductModel>>> findByName(@RequestParam(value = "id", required = true) Long id) {
+    @Parameter(name = "productId", description = "선택된 상품의 id", example = "1L")
+    public ResponseEntity<List<Map.Entry<Long, ProductModel>>> findByName(@RequestParam(value = "productId", required = true) Long id) {
         return productService.findAllByProductName(id);
     }
 
@@ -75,8 +75,8 @@ public class ProductController {
             @ApiResponse(responseCode = "200", description = "상품 가져오기 성공"),
             @ApiResponse(responseCode = "404", description = "상품 찾을 수 없음")
     })
-    @Parameter(name = "id", description = "선택된 상품의 id", example = "1L")
-    public ResponseEntity<Map<Long, ProductModel>> findById(@RequestParam(value = "id", required = true) Long id) {
+    @Parameter(name = "productId", description = "선택된 상품의 id", example = "1L")
+    public ResponseEntity<Map<Long, ProductModel>> findById(@RequestParam(value = "productId", required = true) Long id) {
         return productService.findByProductId(id);
     }
 

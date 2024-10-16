@@ -41,8 +41,8 @@ public class CategoryController {
             @ApiResponse(responseCode = "404", description = "카테고리 찾을 수 없음"),
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
-    @Parameter(name = "id", description = "상세보기할 카테고리 ID", example = "1L")
-    public ResponseEntity<CategoryModel> findById(@RequestParam Long id) {
+    @Parameter(name = "categoryId", description = "상세보기할 카테고리 ID", example = "1L")
+    public ResponseEntity<CategoryModel> findById(@RequestParam("categoryId") Long id) {
         return categoryService.findById(id);
     }
 

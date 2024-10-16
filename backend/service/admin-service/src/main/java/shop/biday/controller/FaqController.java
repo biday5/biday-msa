@@ -45,7 +45,7 @@ public class FaqController {
             @ApiResponse(responseCode = "500", description = "서버 오류로 인한 질문 조회 실패")
     })
     @Parameter(name = "id", description = "조회할 질문의 ID", example = "1")
-    public ResponseEntity<FaqModel> findById(@PathVariable Long id) {
+    public ResponseEntity<FaqModel> findById(@PathVariable("id") Long id) {
         return ResponseEntity.ok(faqService.findById(id));
     }
 
@@ -84,9 +84,7 @@ public class FaqController {
             @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
                     example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}")
     })
-    public ResponseEntity<Boolean> deleteById(
-            @PathVariable Long id,
-            @RequestHeader("UserInfo") String userInfo) {
+    public ResponseEntity<Boolean> deleteById(@PathVariable("id") Long id, @RequestHeader("UserInfo") String userInfo) {
         return ResponseEntity.ok(faqService.deleteById(id, userInfo));
     }
 
@@ -98,7 +96,7 @@ public class FaqController {
             @ApiResponse(responseCode = "500", description = "서버 오류로 인한 질문 존재 여부 확인 실패", content = @Content(mediaType = "application/json"))
     })
     @Parameter(name = "id", description = "존재 여부를 확인할 질문의 ID", example = "1")
-    public ResponseEntity<Boolean> existsById(@PathVariable Long id) {
+    public ResponseEntity<Boolean> existsById(@PathVariable("id") Long id) {
         return ResponseEntity.ok(faqService.existsById(id));
     }
 }

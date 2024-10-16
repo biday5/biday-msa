@@ -37,7 +37,7 @@ public class LoginHistoryController {
     @Parameters({
             @Parameter(name = "userId", description = "유저번호", example = "66f3601fd3d86243cceb4718")
     })
-    public ResponseEntity<Mono<Boolean>> findById(@PathVariable String userId) {
+    public ResponseEntity<Mono<Boolean>> findById(@PathVariable("userId") String userId) {
         return new ResponseEntity<>(loginHistoryService.findByUserId(userId), HttpStatus.OK);
     }
 

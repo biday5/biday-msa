@@ -44,7 +44,7 @@ public class BidController {
     })
     @ApiResponse(responseCode = "200", description = "성공")
     @GetMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<BidResponse> streamBid(@RequestParam Long auctionId) {
+    public Flux<BidResponse> streamBid(@RequestParam("auctionId") Long auctionId) {
         log.info("stream auctionId: {}", auctionId);
         Sinks.Many<BidResponse> bidSink = bidSinks.computeIfAbsent(auctionId, id ->
                 Sinks.many().multicast().onBackpressureBuffer());

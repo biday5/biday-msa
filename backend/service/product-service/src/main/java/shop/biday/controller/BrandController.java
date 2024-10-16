@@ -40,8 +40,8 @@ public class BrandController {
             @ApiResponse(responseCode = "404", description = "브랜드 찾을 수 없음"),
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
-    @Parameter(name = "id", description = "상세보기할 브랜드 ID", example = "1")
-    public ResponseEntity<BrandModel> findById(@RequestParam Long id) {
+    @Parameter(name = "brandId", description = "상세보기할 브랜드 ID", example = "1")
+    public ResponseEntity<BrandModel> findById(@RequestParam("brandId") Long id) {
         return brandService.findById(id);
     }
 
