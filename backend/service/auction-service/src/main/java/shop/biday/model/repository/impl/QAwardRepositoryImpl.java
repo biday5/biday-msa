@@ -88,6 +88,7 @@ public class QAwardRepositoryImpl implements QAwardRepository {
                 qAuction.id,
                 qAuction.userId,
                 qAuction.sizeId,
+                qAuction.description,
                 qAuction.startingBid,
                 qAuction.currentBid,
                 qAuction.startedAt,

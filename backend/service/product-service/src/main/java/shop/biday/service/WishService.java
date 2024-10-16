@@ -1,7 +1,5 @@
 package shop.biday.service;
 
-import org.springframework.http.ResponseEntity;
-
 import java.util.List;
 
 public interface WishService {
@@ -10,6 +8,6 @@ public interface WishService {
 
     boolean toggleWish(String userInfoHeader, Long productId);
 
-    ResponseEntity<String> deleteByWishId(String userInfoHeader, Long wishId);
+    boolean deleteByWishId(String userInfoHeader, Long wishId);
 
 }
