@@ -43,7 +43,7 @@ public class AnnouncementController {
             @ApiResponse(responseCode = "500", description = "서버 오류로 인해 공지사항 조회 실패")
     })
     @Parameter(name = "id", description = "조회할 공지사항의 ID", example = "1")
-    public ResponseEntity<AnnouncementModel> findById(@PathVariable Long id) {
+    public ResponseEntity<AnnouncementModel> findById(@PathVariable("id") Long id) {
         return ResponseEntity.ok(announcementService.findById(id));
     }
 
@@ -58,12 +58,12 @@ public class AnnouncementController {
                     example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}"),
             @Parameter(examples = {
                     @ExampleObject(name = "exampleAnnouncemnetModel", value = """ 
-                        { 
-                            "userId" : "사용자 id",
-                            "title" : "공지사항 제목", 
-                            "content" : "공지사항 내용"
-                        } 
-                    """)})
+                                { 
+                                    "userId" : "사용자 id",
+                                    "title" : "공지사항 제목", 
+                                    "content" : "공지사항 내용"
+                                } 
+                            """)})
     })
     public ResponseEntity<AnnouncementModel> addAnnouncement(@RequestHeader("UserInfo") String userInfo,
                                                              @RequestBody AnnouncementModel announcementModel) {
@@ -82,7 +82,8 @@ public class AnnouncementController {
             @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
                     example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}")
     })
-    public ResponseEntity<Boolean> deleteById(@PathVariable Long id, @RequestHeader("UserInfo") String userInfo) {
+    public ResponseEntity<Boolean> deleteById(@PathVariable("id") Long id,
+                                              @RequestHeader("UserInfo") String userInfo) {
         return ResponseEntity.ok(announcementService.deleteById(id, userInfo));
     }
 }

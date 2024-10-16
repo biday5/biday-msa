@@ -48,7 +48,7 @@ public class ShipperController {
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     @Parameter(name = "id", description = "상세보기할 배송 id", example = "1")
-    public ResponseEntity<ShipperModel> findById(@RequestParam Long id) {
+    public ResponseEntity<ShipperModel> findById(@RequestParam("id") Long id) {
         return shipperService.findById(id);
     }
 
@@ -127,7 +127,7 @@ public class ShipperController {
                     example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}"),
             @Parameter(name = "id", description = "삭제할 배송 id", example = "1")
     })
-    public ResponseEntity<String> delete(@RequestHeader("UserInfo") String userInfo, @RequestParam Long id) {
+    public ResponseEntity<String> delete(@RequestHeader("UserInfo") String userInfo, @RequestParam("id") Long id) {
         return shipperService.deleteById(userInfo, id);
     }
 }

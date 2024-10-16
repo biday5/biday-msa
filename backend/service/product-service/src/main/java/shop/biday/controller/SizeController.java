@@ -57,7 +57,7 @@ public class SizeController {
             @Parameter(examples = {
                     @ExampleObject(name = "exampleSizeModel", value = """ 
                         { 
-                            "product" : "브랜드 이름",
+                            "product" : "상품 이름",
                             "name" : "사이즈 이름(enum : XS~XXL)", 
                             "createdAt" : "등록 시간"
                         } 

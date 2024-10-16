@@ -89,13 +89,13 @@ public class ImageController {
     @Parameters(value = {
             @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
                     example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}"),
-            @Parameter(description = "업데이트할 이미지 파일"),
-            @Parameter(description = "업데이트할 이미지의 ID")
+            @Parameter(name="files", description = "업데이트할 이미지 파일"),
+            @Parameter(name="imageId", description = "업데이트할 이미지의 ID")
     })
     public ResponseEntity<String> updateImages(
             @RequestHeader("UserInfo") String userInfoHeader,
             @RequestParam("files") List<MultipartFile> files,
-            @RequestParam("id") String id) {
+            @RequestParam("imageId") String id) {
         return imageService.update(userInfoHeader, files, id);
     }
 
@@ -112,7 +112,7 @@ public class ImageController {
     })
     public ResponseEntity<String> deleteImages(
             @RequestHeader("UserInfo") String userInfoHeader,
-            @RequestParam("id") String id) {
+            @RequestParam("imageId") String id) {
         return imageService.deleteById(userInfoHeader, id);
     }
 
