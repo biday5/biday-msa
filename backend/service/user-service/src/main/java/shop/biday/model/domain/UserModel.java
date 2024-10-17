@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
+import shop.biday.model.document.UserDocument;
 import shop.biday.model.enums.Role;
 
 import java.time.LocalDateTime;
@@ -25,8 +26,7 @@ public class UserModel {
     private String phoneNum;
     private LocalDateTime createAt;
     private LocalDateTime updateAt;
-   // private Role role;
-    private String status;
+    private boolean status;
     private Long totalRating;
 
     private String newPassword;
@@ -41,8 +41,20 @@ public class UserModel {
         this.role = Collections.singletonList(Role.valueOf(roleAsString));
     }
 
-//    public String getRoleAsString() {
-//        return role != null ? role.getAuthority() : "";
-//    }
+    public static UserModel fromDocument(UserDocument userDocument) {
+        return UserModel.builder()
+                .id(userDocument.getId())
+                .oauthName(userDocument.getOauthUser())
+                .name(userDocument.getName())
+                .email(userDocument.getEmail())
+                .password(userDocument.getPassword())
+                .phoneNum(userDocument.getPhone())
+                .createAt(userDocument.getCreatedAt())
+                .updateAt(userDocument.getUpdatedAt())
+                .status(userDocument.isStatus()) // boolean 값을 그대로 사용
+                .totalRating((long) userDocument.getTotalRating())
+                .role(userDocument.getRole())
+                .build();
+    }
 
 }

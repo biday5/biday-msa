@@ -174,7 +174,9 @@ public class QProductRepositoryImpl implements QProductRepository {
             case "가격 높은 순" -> query.orderBy(qProduct.price.desc());
             case "위시 적은 순" -> query.orderBy(qWish.count().asc());
             case "위시 많은 순" -> query.orderBy(qWish.count().desc());
-            default -> query.orderBy(qProduct.id.asc());
+            case "최신 등록 순" -> query.orderBy(qProduct.createdAt.desc());
+            case "오래된 등록 순" -> query.orderBy(qWish.createdAt.asc());
+            default -> query.orderBy(qProduct.createdAt.desc());
         }
     }
 

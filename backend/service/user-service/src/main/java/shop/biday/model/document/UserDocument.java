@@ -64,14 +64,4 @@ public class UserDocument {
     private double totalRating = 2.0; // 기본값 설정
 
 
-
-//     추가된 메서드
-//    public List<String> getRoles() {
-//        return Collections.singletonList(role.name()); // 단일 역할을 리스트로 반환
-//    }
-//    public List<String> getRoles() {
-//        List<String> roles = new ArrayList<>();
-//        roles.add(role.name()); // Add the single role
-//        return roles; // Return a mutable list
-//    }
 }

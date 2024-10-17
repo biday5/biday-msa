@@ -4,13 +4,14 @@ package shop.biday.service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import shop.biday.model.document.UserDocument;
+import shop.biday.model.domain.UserModel;
 import shop.biday.model.domain.UserRequest;
 
 
 public interface UserService {
-    Flux<UserDocument> findAll();
+    Flux<UserModel> findAll();
 
-    Mono<UserDocument> findById(String id);
+    Mono<UserModel> findById(String id);
 
     Mono<UserDocument> save(UserRequest userRequest);
 
