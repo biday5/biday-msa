@@ -148,12 +148,12 @@ public class UserController {
 
 
     @GetMapping("")
-    public Flux<UserDocument> findAll() {
+    public Flux<UserModel> findAll() {
         return userService.findAll();
     }
 
     @GetMapping("/findById/{id}")
-    public Mono<UserDocument> findById(@PathVariable String id) {
+    public Mono<UserModel> findById(@PathVariable String id) {
         return userService.findById(id);
     }
 

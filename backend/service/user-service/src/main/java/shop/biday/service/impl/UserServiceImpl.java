@@ -26,13 +26,15 @@ public class UserServiceImpl implements UserService {
     private final UserInfoUtils userInfoUtils;
 
     @Override
-    public Flux<UserDocument> findAll() {
-        return userRepository.findAll();
+    public Flux<UserModel> findAll() {
+        return userRepository.findAll()
+               .map(UserModel::fromDocument);
     }
 
     @Override
-    public Mono<UserDocument> findById(String id) {
-        return userRepository.findById(id);
+    public Mono<UserModel> findById(String id) {
+        return userRepository.findById(id)
+               .map(UserModel::fromDocument);
     }
 
     @Override
