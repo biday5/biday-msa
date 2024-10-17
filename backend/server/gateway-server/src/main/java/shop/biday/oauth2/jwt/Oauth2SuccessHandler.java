@@ -29,7 +29,7 @@ public class Oauth2SuccessHandler implements ServerAuthenticationSuccessHandler 
     private static final int COOKIE_MAX_AGE_SECONDS = 24 * 60 * 60; // 1 day
     private static final String ACCESS_TOKEN_TYPE = "access";
     private static final String REFRESH_TOKEN_TYPE = "refresh";
-    private static final String REDIRECT_URL = "http://localhost:3000/";
+    private static final String REDIRECT_URL = "http://localhost:3000/login";
 
     private final JWTUtil jwtUtil;
     private final WebClient webClient;
@@ -101,7 +101,7 @@ public class Oauth2SuccessHandler implements ServerAuthenticationSuccessHandler 
         return ResponseCookie.from(key, value)
                 .maxAge(COOKIE_MAX_AGE_SECONDS)
                 .path("/")
-                .httpOnly(true)
+                .httpOnly(false)
                 .build();
     }
 

@@ -63,6 +63,7 @@ public class QProductRepositoryImpl implements QProductRepository {
         );
     }
 
+    // TODO filter 프론트에서 전부 처리 가능하기 때문에, category랑 keyword만 보류 하고 나머지 다 지울 것
     @Override
     public List<ProductDto> findProducts(Long categoryId, Long brandId, String keyword, String color, String order) {
         return createBaseQuery(queryFactory, categoryId, brandId, keyword, color, order)
@@ -105,6 +106,8 @@ public class QProductRepositoryImpl implements QProductRepository {
                 qProduct.productCode,
                 qProduct.price,
                 qProduct.color.stringValue(),
+                qProduct.createdAt,
+                qProduct.updatedAt,
                 wishCount()
         );
     }
@@ -170,12 +173,12 @@ public class QProductRepositoryImpl implements QProductRepository {
 
     private void findByOrdering(JPQLQuery<ProductDto> query, String order) {
         switch (order) {
-            case "가격 낮은 순" -> query.orderBy(qProduct.price.asc());
-            case "가격 높은 순" -> query.orderBy(qProduct.price.desc());
-            case "위시 적은 순" -> query.orderBy(qWish.count().asc());
-            case "위시 많은 순" -> query.orderBy(qWish.count().desc());
-            case "최신 등록 순" -> query.orderBy(qProduct.createdAt.desc());
-            case "오래된 등록 순" -> query.orderBy(qWish.createdAt.asc());
+            case "price-low-to-high" -> query.orderBy(qProduct.price.asc());
+            case "price-high-to-low" -> query.orderBy(qProduct.price.desc());
+            case "wishlist-low-to-high" -> query.orderBy(qWish.count().asc());
+            case "wishlist-high-to-low" -> query.orderBy(qWish.count().desc());
+            case "newest" -> query.orderBy(qProduct.createdAt.desc());
+            case "oldest" -> query.orderBy(qProduct.createdAt.asc());
             default -> query.orderBy(qProduct.createdAt.desc());
         }
     }

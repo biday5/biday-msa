@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -18,5 +20,7 @@ public class ProductDto {
     private String productCode;
     private Long price;
     private String color;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
     private Long wishes;
 }
