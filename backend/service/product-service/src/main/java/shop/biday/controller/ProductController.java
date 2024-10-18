@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import shop.biday.model.domain.ProductModel;
+import shop.biday.model.domain.SizeModel;
 import shop.biday.model.dto.ProductDto;
 import shop.biday.model.entity.ProductEntity;
 import shop.biday.service.ProductService;
@@ -64,7 +65,7 @@ public class ProductController {
             @ApiResponse(responseCode = "200", description = "상품 가져오기 성공"),
             @ApiResponse(responseCode = "404", description = "상품 찾을 수 없음")
     })
-    @Parameter(name = "productId", description = "선택된 상품의 id", example = "1L")
+    @Parameter(name = "productId", description = "선택된 상품의 id", example = "1")
     public ResponseEntity<List<Map.Entry<Long, ProductModel>>> findByName(@RequestParam(value = "productId", required = true) Long id) {
         return productService.findAllByProductName(id);
     }
@@ -75,9 +76,22 @@ public class ProductController {
             @ApiResponse(responseCode = "200", description = "상품 가져오기 성공"),
             @ApiResponse(responseCode = "404", description = "상품 찾을 수 없음")
     })
-    @Parameter(name = "productId", description = "선택된 상품의 id", example = "1L")
+    @Parameter(name = "productId", description = "선택된 상품의 id", example = "1")
     public ResponseEntity<Map<Long, ProductModel>> findById(@RequestParam(value = "productId", required = true) Long id) {
         return productService.findByProductId(id);
+    }
+
+    @GetMapping("/findBySizeId")
+    @Operation(summary = "sizeId를 가지고 있는 상품 1개 반환", description = "마이페이지 내역보기 등 사이즈 id 기준으로 불러오는 상품 정보")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "상품 가져오기 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 파라미터"),
+            @ApiResponse(responseCode = "404", description = "상품 찾을 수 없음"),
+            @ApiResponse(responseCode = "500", description = "서버 오류")
+    })
+    @Parameter(name = "sizeId", description = "product의 사이즈 id", example = "1")
+    public ResponseEntity<SizeModel> findBySizeId(@RequestParam(value = "sizeId", required = true) Long sizeId) {
+        return productService.findBySizeId(sizeId);
     }
 
     @PostMapping

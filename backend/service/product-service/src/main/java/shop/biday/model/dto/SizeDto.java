@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class SizeDto {
     private Long id;
-    private ProductDto product;
+    private String productName;
     private String size;
 }
