@@ -11,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import shop.biday.model.domain.ProductModel;
 import shop.biday.model.domain.SizeModel;
-import shop.biday.model.dto.ProductDto;
+import shop.biday.model.dto.*;
 import shop.biday.model.entity.*;
 import shop.biday.model.repository.QProductRepository;
 
@@ -59,7 +59,7 @@ public class QProductRepositoryImpl implements QProductRepository {
                 qProduct.createdAt,
                 qProduct.updatedAt,
                 wishCount(),
-                set(createDefaultSizeProjection())
+                set(createDefaultSizeDtoProjection())
         );
     }
 
@@ -96,6 +96,25 @@ public class QProductRepositoryImpl implements QProductRepository {
                 .transform(groupBy(qProduct.id).as(createProductModelProjection()));
     }
 
+    @Override
+    public SizeModel findBySizeId(Long id) {
+        return queryFactory
+                .select(Projections.constructor(SizeModel.class,
+                        qSize.id,
+                        createProductDtoProjection(),
+                        qSize.size.stringValue(),
+                        qSize.createdAt,
+                        qSize.updatedAt
+                ))
+                .from(qSize)
+                .leftJoin(qSize.product, qProduct)
+                .leftJoin(qProduct.category, qCategory)
+                .leftJoin(qProduct.brand, qBrand)
+                .leftJoin(qWish).on(qProduct.id.eq(qWish.product.id))
+                .where(qSize.id.eq(id))
+                .fetchFirst();
+    }
+
     private ConstructorExpression<ProductDto> createProductDtoProjection() {
         return Projections.constructor(ProductDto.class,
                 qProduct.id,
@@ -118,13 +137,11 @@ public class QProductRepositoryImpl implements QProductRepository {
                 .where(qWish.product.id.eq(qProduct.id));
     }
 
-    private ConstructorExpression<SizeModel> createDefaultSizeProjection() {
-        return Projections.constructor(SizeModel.class,
+    private ConstructorExpression<SizeDto> createDefaultSizeDtoProjection() {
+        return Projections.constructor(SizeDto.class,
                 qSize.id,
-                qProduct.name.as("sizeProduct"),
-                qSize.size.stringValue(),
-                qSize.createdAt,
-                qSize.updatedAt
+                qProduct.name.as("productName"),
+                qSize.size.stringValue()
         );
     }
 

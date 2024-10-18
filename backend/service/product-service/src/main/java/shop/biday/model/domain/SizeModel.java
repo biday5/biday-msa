@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import shop.biday.model.dto.ProductDto;
 
 import java.time.LocalDateTime;
 
@@ -13,7 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class SizeModel {
     private Long id;
-    private String sizeProduct;
+    private ProductDto product;
     private String size;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

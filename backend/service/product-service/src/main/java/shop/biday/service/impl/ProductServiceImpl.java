@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import shop.biday.model.domain.ProductModel;
+import shop.biday.model.domain.SizeModel;
 import shop.biday.model.domain.UserInfoModel;
 import shop.biday.model.dto.ProductDto;
 import shop.biday.model.entity.ProductEntity;
@@ -13,10 +14,14 @@ import shop.biday.model.entity.enums.Color;
 import shop.biday.model.repository.BrandRepository;
 import shop.biday.model.repository.CategoryRepository;
 import shop.biday.model.repository.ProductRepository;
+import shop.biday.model.repository.SizeRepository;
 import shop.biday.service.ProductService;
 import shop.biday.utils.UserInfoUtils;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -25,6 +30,7 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final BrandRepository brandRepository;
     private final CategoryRepository categoryRepository;
+    private final SizeRepository sizeRepository;
     private final UserInfoUtils userInfoUtils;
 
     @Override
@@ -104,6 +110,28 @@ public class ProductServiceImpl implements ProductService {
                 });
     }
 
+    @Override
+    public ResponseEntity<SizeModel> findBySizeId(Long id) {
+        log.info("Find product by Size id: {}", id);
+
+        return Optional.ofNullable(id)
+                .filter(i -> i > 0)
+                .map(i -> {
+                    if (sizeRepository.existsById(i)) {
+                        SizeModel productDto = productRepository.findBySizeId(i);
+                        log.debug("Product found: {}", productDto.getId());
+                        return new ResponseEntity<SizeModel>(productDto, HttpStatus.OK);
+                    } else {
+                        log.warn("Size {} does not exist", i);
+                        return new ResponseEntity<SizeModel>(HttpStatus.NOT_FOUND);
+                    }
+                })
+                .orElseGet(() -> {
+                    log.error("Invalid sizeId: {}", id);
+                    return new ResponseEntity<SizeModel>(HttpStatus.BAD_REQUEST);
+                });
+    }
+
     public static String removeParentheses(String productName) {
         int index = productName.indexOf("(");
         return (index != -1) ? productName.substring(0, index) : productName;
@@ -116,7 +144,7 @@ public class ProductServiceImpl implements ProductService {
                 .map(t -> {
                     ProductEntity savedProduct = createProductEntity(product);
                     log.debug("Product saved successfully: {}", savedProduct.getId());
-                    return new ResponseEntity<>(productRepository.save(savedProduct),HttpStatus.OK);
+                    return new ResponseEntity<>(productRepository.save(savedProduct), HttpStatus.OK);
                 })
                 .orElseGet(() -> {
                     log.error("Save Product failed: User does not have permission");

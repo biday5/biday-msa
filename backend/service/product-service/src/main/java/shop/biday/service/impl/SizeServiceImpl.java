@@ -119,7 +119,7 @@ public class SizeServiceImpl implements SizeService {
     private SizeEntity createSizeEntity(SizeModel size) {
         return SizeEntity.builder()
                 .size(Size.valueOf(size.getSize()))
-                .product(productRepository.findByName(size.getSizeProduct()))
+                .product(productRepository.findByName(size.getProduct().getName()))
                 .updatedAt(LocalDateTime.now())
                 .build();
     }
