@@ -4,6 +4,7 @@ pipeline {
     environment {
         DOCKER_HUB_URL = "${docker_hub_url}"
         DOCKER_HUB_CREDENTIAL = credentials('dockerhub')
+        GIT_SSH_CREDENTIALS = credentials('github_ssh')
     }
 
     tools {
@@ -33,6 +34,17 @@ pipeline {
                         currentBuild.result = 'ABORTED'
                         error '변동 사항이 없으므로 파이프라인을 중단합니다.'
                     }
+                }
+            }
+        }
+
+        stage('Github') {
+            steps {
+                sshagent(['github_ssh']) {
+                    git branch: 'dev',
+                        url: 'git@github.com:biday5/biday-msa.git'
+
+                    sh 'git submodule update --init --recursive'
                 }
             }
         }
@@ -78,8 +90,8 @@ pipeline {
                     echo "docker_hub_url >>>>>>> ${docker_hub_url}"
                     echo "BUILD_TAG >>>>>> ${BUILD_TAG}"
                     def allModules = [
-                        "server:eureka-server",
                         "server:config-server",
+                        "server:eureka-server",
                         "server:gateway-server",
                         "service:admin-service",
                         "service:auction-service",
