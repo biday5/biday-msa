@@ -7,6 +7,7 @@ pipeline {
     }
 
     tools {
+        jdk 'openjdk_17'
         gradle 'gradle_8.10'
     }
 
@@ -39,7 +40,35 @@ pipeline {
         stage('Gradle Build') {
             steps {
                 echo '=== build modules shell script start ==='
-                sh './buildModule.sh'
+                dir('backend') {
+                    script {
+                        sh 'chmod +x gradlew'
+
+                        def allModules = [
+                            "server:config-server",
+                            "server:eureka-server",
+                            "server:gateway-server",
+                            "service:admin-service",
+                            "service:auction-service",
+                            "service:ftp-service",
+                            "service:order-service",
+                            "service:product-service",
+                            "service:sms-service",
+                            "service:user-service"
+                        ]
+
+                        echo "Cleaning..."
+                        sh './gradlew clean'
+
+                        allModules.each { module ->
+                            echo "Building for ${module}"
+                            sh "./gradlew :${module}:build"
+                        }
+
+//                     sh 'chmod +x buildModule.sh'
+//                     sh './buildModule.sh'
+                    }
+                }
             }
         }
 
