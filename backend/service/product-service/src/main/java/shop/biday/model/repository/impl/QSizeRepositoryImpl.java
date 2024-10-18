@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import shop.biday.model.domain.SizeModel;
 import shop.biday.model.dto.ProductDto;
-import shop.biday.model.entity.*;
 import shop.biday.model.repository.QSizeRepository;
 
 import java.util.List;

@@ -11,8 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import shop.biday.model.domain.ProductModel;
 import shop.biday.model.domain.SizeModel;
-import shop.biday.model.dto.*;
-import shop.biday.model.entity.*;
+import shop.biday.model.dto.ProductDto;
+import shop.biday.model.dto.SizeDto;
 import shop.biday.model.repository.QProductRepository;
 
 import java.util.List;
@@ -97,7 +97,7 @@ public class QProductRepositoryImpl implements QProductRepository {
     }
 
     @Override
-    public SizeModel findBySizeId(Long id) {
+    public SizeModel findBySizeId(Long sizeId) {
         return queryFactory
                 .select(Projections.constructor(SizeModel.class,
                         qSize.id,
@@ -111,7 +111,7 @@ public class QProductRepositoryImpl implements QProductRepository {
                 .leftJoin(qProduct.category, qCategory)
                 .leftJoin(qProduct.brand, qBrand)
                 .leftJoin(qWish).on(qProduct.id.eq(qWish.product.id))
-                .where(qSize.id.eq(id))
+                .where(qSize.id.eq(sizeId))
                 .fetchFirst();
     }
 

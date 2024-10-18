@@ -17,7 +17,7 @@ public interface ProductService {
 
     ResponseEntity<Map<Long, ProductModel>> findByProductId(Long id);
 
-    ResponseEntity<SizeModel> findBySizeId(Long id);
+    ResponseEntity<SizeModel> findBySizeId(Long sizeId);
 
     ResponseEntity<List<ProductDto>> findByFilter(String category, String brand, String keyword, String color, String order);
 

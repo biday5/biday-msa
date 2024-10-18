@@ -90,8 +90,8 @@ public class ProductController {
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     @Parameter(name = "sizeId", description = "product의 사이즈 id", example = "1")
-    public ResponseEntity<SizeModel> findBySizeId(@RequestParam(value = "sizeId", required = true) Long id) {
-        return productService.findBySizeId(id);
+    public ResponseEntity<SizeModel> findBySizeId(@RequestParam(value = "sizeId", required = true) Long sizeId) {
+        return productService.findBySizeId(sizeId);
     }
 
     @PostMapping

@@ -111,10 +111,10 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ResponseEntity<SizeModel> findBySizeId(Long id) {
-        log.info("Find product by Size id: {}", id);
+    public ResponseEntity<SizeModel> findBySizeId(Long sizeId) {
+        log.info("Find product by Size id: {}", sizeId);
 
-        return Optional.ofNullable(id)
+        return Optional.ofNullable(sizeId)
                 .filter(i -> i > 0)
                 .map(i -> {
                     if (sizeRepository.existsById(i)) {
@@ -127,7 +127,7 @@ public class ProductServiceImpl implements ProductService {
                     }
                 })
                 .orElseGet(() -> {
-                    log.error("Invalid sizeId: {}", id);
+                    log.error("Invalid sizeId: {}", sizeId);
                     return new ResponseEntity<SizeModel>(HttpStatus.BAD_REQUEST);
                 });
     }
