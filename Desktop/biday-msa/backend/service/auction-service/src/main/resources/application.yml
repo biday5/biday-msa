@@ -1,0 +1,103 @@
+server:
+  port: 9101
+
+eureka:
+  instance:
+    instance-id: ${spring.application.name}:${spring.cloud.client.ip-address}:${server.port}
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    service-url:
+      defaultZone: http://biday-eureka-server:8761/eureka/
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh
+
+spring:
+  output:
+    ansi:
+      enabled: always
+  application:
+    name: auction-service
+  profiles:
+    active: local
+  config:
+    import: optional:configserver:http://localhost:8888/
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        highlight_sql: true
+        use_sql_comments: true
+      time-zone: UTC
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://mysql:3306/bidaydb
+    username: root
+    password: biday
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      idle-timeout: 600000
+      max-lifetime: 18000000
+      pool-name: HikariCP
+
+  data:
+    redis:
+      host: redis
+      port: 6379
+      password: password
+      repositories:
+        enabled: false
+
+    mongodb:
+      username: root
+      password: biday
+      host: mongo
+      port: 27017
+      database: bidaydb
+      authentication-database: admin
+
+  quartz:
+    scheduler-name: QuartzScheduler
+    job-store-type: jdbc
+    jdbc:
+      initialize-schema: always
+      schema: classpath:org/quartz/impl/jdbcjobstore/tables_mysql_innodb.sql
+    properties:
+      org:
+        quartz:
+          jobStore:
+            class: org.quartz.impl.jdbcjobstore.JobStoreTX
+            useProperties: true
+            isClustered: true
+          scheduler:
+            instanceId: auto
+
+payments:
+  toss:
+    secret:
+      key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+
+openapi:
+  service:
+    url: http://localhost:8000
+  swagger-ui:
+    path: /swagger-ui
+
+springdoc:
+  api-docs:
+    version: openapi_3_1
+    enabled: true
+    path: /api/auctions/v3/api-docs
+  enable-spring-security: true
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json

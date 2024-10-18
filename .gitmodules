@@ -5,3 +5,6 @@
 [submodule "backend/server/secret-server"]
 	path = backend/server/secret-server
 	url = git@github.com:biday5/biday-secret.git
+[submodule "Desktop/biday-msa/Desktop/biday-msa/backend/server/secret-server"]
+	path = Desktop/biday-msa/Desktop/biday-msa/backend/server/secret-server
+	url = git@github.com:biday5/biday-secret.git

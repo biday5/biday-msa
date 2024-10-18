@@ -1,0 +1,195 @@
+server:
+  port: 8000
+
+eureka:
+  instance:
+    instance-id: ${spring.application.name}:${spring.cloud.client.ip-address}:${server.port}
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+spring:
+  output:
+    ansi:
+      enabled: always
+  application:
+    name: gateway-server
+  profiles:
+    active: local
+  config:
+    import: optional:configserver:http://localhost:8888/
+
+  jwt:
+    secret: vmfhaltmskdlstkfkdgodyroqkfwkdbalroqkfwkdbalaaaaaaaaaaaaaaaabbbbb
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: biday
+      repositories:
+        enabled: false
+---
+spring:
+  cloud:
+    gateway:
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin, RETAIN_FIRST
+      globalcors:
+        cors-configurations:
+          '[/**]': # 모든 경로에 대해 CORS 허용
+            allowedOrigins:
+              - http://localhost:3000  # 허용할 도메인만 지정
+            allow-credentials: true  # 쿠키 및 인증 관련 헤더 허용
+            allowedHeaders:
+              - 'UserInfo'  # 모든 헤더 허용
+              - "Content-Type"
+              - "Authorization"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+              - PATCH  # 허용할 HTTP 메소드 설정
+            exposedHeaders:
+              - Authorization  # Authorization 헤더 노출
+      routes:
+        - id: faq-service
+          uri: lb://ADMIN-SERVICE
+          predicates:
+            - Path=/api/faqs/**
+        - id: announcement-service
+          uri: lb://ADMIN-SERVICE
+          predicates:
+            - Path=/api/announcements/**
+
+        - id: auction-service
+          uri: lb://AUCTION-SERVICE
+          predicates:
+            - Path=/api/auctions/**
+        - id: award-service
+          uri: lb://AUCTION-SERVICE
+          predicates:
+            - Path=/api/awards/**
+        - id: bid-service
+          uri: lb://AUCTION-SERVICE
+          predicates:
+            - Path=/api/bids/**
+
+        - id: ftp-service
+          uri: lb://FTP-SERVICE
+          predicates:
+            - Path=/api/images/**
+
+        - id: payments-service
+          uri: lb://ORDER-SERVICE
+          predicates:
+            - Path=/api/payments/**
+        - id: refunds-service
+          uri: lb://ORDER-SERVICE
+          predicates:
+            - Path=/api/refunds/**
+        - id: seller-payments-service
+          uri: lb://ORDER-SERVICE
+          predicates:
+            - Path=/api/seller-payments/**
+        - id: shipper-service
+          uri: lb://ORDER-SERVICE
+          predicates:
+            - Path=/api/shippers/**
+
+        - id: brand-service
+          uri: lb://PRODUCT-SERVICE
+          predicates:
+            - Path=/api/brands/**
+        - id: category-service
+          uri: lb://PRODUCT-SERVICE
+          predicates:
+            - Path=/api/categories/**
+        - id: product-service
+          uri: lb://PRODUCT-SERVICE
+          predicates:
+            - Path=/api/products/**
+        - id: size-service
+          uri: lb://PRODUCT-SERVICE
+          predicates:
+            - Path=/api/sizes/**
+        - id: wish-service
+          uri: lb://PRODUCT-SERVICE
+          predicates:
+            - Path=/api/wishes/**
+
+        - id: sms-service
+          uri: lb://SMS-SERVICE
+          predicates:
+            - Path=/api/sms/**
+
+        - id: users-service
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/api/users/**
+            - Method=GET,POST,PUT,DELETE,PATCH
+          filters:
+            - RemoveRequestHeader=Cookie
+        - id: loginHistory-service
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/api/loginHistory/**
+            - Method=GET,POST,PUT,DELETE,PATCH
+          filters:
+            - RemoveRequestHeader=Cookie
+        - id: addresses-service
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/api/addresses/**
+            - Method=GET,POST,PUT,DELETE,PATCH
+          filters:
+            - RemoveRequestHeader=Cookie
+        - id: account-service
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/api/account/**
+            - Method=GET,POST,PUT,DELETE,PATCH
+          filters:
+            - RemoveRequestHeader=Cookie
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    use-root-path: true
+    enabled: true
+    path: /swagger-ui
+    config-url: /v3/api-docs/swagger-config
+    urls:
+      - name: Admin Service
+        url: /api/faqs/v3/api-docs
+
+      - name: Auction Service
+        url: /api/auctions/v3/api-docs
+
+      - name: FTP Service
+        url: /api/images/v3/api-docs
+
+      - name: Order Service
+        url: /api/payments/v3/api-docs
+
+      - name: Product Service
+        url: /api/products/v3/api-docs
+
+      - name: SMS Service
+        url: /api/sms/v3/api-docs
+
+      - name: Users Service
+        url: /api/users/v3/api-docs
+
+
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.springframework.cloud.gateway: DEBUG
+    org.springframework.cloud.netflix.eureka: DEBUG

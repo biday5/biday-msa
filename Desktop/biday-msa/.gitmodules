@@ -1,0 +1,4 @@
+[submodule "backend/server/config-server"]
+	path = backend/server/config-server
+	url = git@github.com:biday5/biday-config.git
+	branch = main
