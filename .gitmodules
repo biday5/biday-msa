@@ -2,3 +2,6 @@
 	path = backend/server/config-server
 	url = git@github.com:biday5/biday-config.git
 	branch = main
+[submodule "backend/server/secret-server"]
+	path = backend/server/secret-server
+	url = git@github.com:biday5/biday-secret.git
