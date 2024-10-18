@@ -9,6 +9,3 @@ include 'service:order-service'
 include 'service:product-service'
 include 'service:sms-service'
 include 'service:user-service'
-
-
-
