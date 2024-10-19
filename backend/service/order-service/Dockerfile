@@ -1,4 +1,4 @@
-FROM openjdk:24-ea-17-jdk-slim
+FROM openjdk:17-jdk-slim
 VOLUME /tmp
 ADD ./build/libs/*.jar order-service.jar
 
