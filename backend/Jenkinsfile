@@ -44,7 +44,7 @@ pipeline {
                     git branch: 'dev',
                         url: 'git@github.com:biday5/biday-msa.git'
 
-                    sh 'sudo git submodule update --init --recursive'
+                    sh 'git submodule update --init --recursive'
                 }
             }
         }
@@ -127,6 +127,13 @@ pipeline {
         }
         always{
             echo 'Workspace 정리..'
+            publishHTML(target: [
+                reportDir: 'backend/service/auction-service/build/reports/tests/test',
+                reportFiles: 'index.html',
+                reportName: 'Test Report',
+                keepAll: true,
+                alwaysLinkToLastBuild: true
+            ])
         }
     }
 }
