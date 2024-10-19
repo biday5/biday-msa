@@ -13,6 +13,7 @@ import shop.biday.model.domain.UserInfoModel;
 import shop.biday.model.dto.PaymentDto;
 import shop.biday.model.dto.PaymentRequest;
 import shop.biday.model.dto.PaymentResponse;
+import shop.biday.model.dto.PaymentSaveResponse;
 import shop.biday.model.entity.PaymentCardType;
 import shop.biday.model.entity.PaymentEntity;
 import shop.biday.model.entity.PaymentMethod;
@@ -81,7 +82,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public Boolean save(String userInfo, PaymentRequest paymentRequest) {
+    public PaymentSaveResponse save(String userInfo, PaymentRequest paymentRequest) {
         UserInfoModel userInfoModel = userInfoUtils.extractUserInfo(userInfo);
 
         PaymentDto paymentDto = getPaymentTempModel(paymentRequest);
@@ -91,6 +92,9 @@ public class PaymentServiceImpl implements PaymentService {
 
         ResponseEntity<PaymentModel> response = tossPaymentTemplate.exchangePostMethod(APPROVE_URI, paymentRequest);
         PaymentModel paymentModel = tossPaymentTemplate.getPayment(response);
+
+        PaymentCardModel card = paymentModel.getCard();
+        card.setIssuerName(PaymentCardType.getByCode(card.getIssuerCode()).getName());
 
         ZonedDateTime requestedAt = ZonedDateTime.parse(paymentModel.getRequestedAt(), DATE_TIME_FORMATTER);
         ZonedDateTime approvedAt = ZonedDateTime.parse(paymentModel.getApprovedAt(), DATE_TIME_FORMATTER);
@@ -112,9 +116,19 @@ public class PaymentServiceImpl implements PaymentService {
                 .vat(paymentModel.getVat())
                 .build();
 
-        paymentRepository.save(payment);
+        PaymentEntity savedPayment = paymentRepository.save(payment);
         deletePaymentTempModel(paymentRequest.orderId());
-        return true;
+
+        return new PaymentSaveResponse(
+                savedPayment.getId(),
+                savedPayment.getUserId(),
+                savedPayment.getTotalAmount(),
+                savedPayment.getOrderId(),
+                savedPayment.getPaymentStatus().getStatus(),
+                card,
+                paymentModel.getEasyPay(),
+                savedPayment.getApprovedAt()
+        );
     }
 
     @Override
