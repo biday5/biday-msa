@@ -3,6 +3,7 @@ package shop.biday.service;
 import shop.biday.model.domain.PaymentTempModel;
 import shop.biday.model.dto.PaymentRequest;
 import shop.biday.model.dto.PaymentResponse;
+import shop.biday.model.dto.PaymentSaveResponse;
 import shop.biday.model.entity.PaymentEntity;
 import shop.biday.model.entity.PaymentStatus;
 
@@ -12,7 +13,7 @@ public interface PaymentService {
 
     void savePaymentTemp(String userInfo, PaymentTempModel paymentTempModel);
 
-    Boolean save(String userInfo, PaymentRequest paymentRequest);
+    PaymentSaveResponse save(String userInfo, PaymentRequest paymentRequest);
 
     PaymentEntity findById(Long id);
 

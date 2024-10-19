@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import shop.biday.model.domain.PaymentTempModel;
 import shop.biday.model.dto.PaymentRequest;
 import shop.biday.model.dto.PaymentResponse;
+import shop.biday.model.dto.PaymentSaveResponse;
 import shop.biday.service.PaymentService;
 
 import java.util.List;
@@ -70,8 +71,8 @@ public class PaymentController {
                         } 
                     """)})
     })
-    public ResponseEntity<?> savePayment(@RequestHeader("UserInfo") String userInfo,
-                                         @RequestBody @Validated PaymentRequest paymentRequest) {
+    public ResponseEntity<PaymentSaveResponse> savePayment(@RequestHeader("UserInfo") String userInfo,
+                                                           @RequestBody @Validated PaymentRequest paymentRequest) {
         log.info("paymentRequest: {}: userInfo: {}", paymentRequest, userInfo);
         return new ResponseEntity<>(paymentService.save(userInfo, paymentRequest), HttpStatus.CREATED);
     }
