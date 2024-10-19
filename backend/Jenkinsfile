@@ -44,7 +44,7 @@ pipeline {
                     git branch: 'dev',
                         url: 'git@github.com:biday5/biday-msa.git'
 
-                    sh 'git submodule update --init --recursive'
+                    sh 'sudo git submodule update --init --recursive'
                 }
             }
         }
