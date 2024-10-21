@@ -96,8 +96,8 @@ public class OrderController {
                                     "recipientName" : "받는 분",
                                     "streetAddress" : "배송받을 주소(도로명, 기본 주소 아니어도 상관 x)", 
                                     "detailAddress" : "배송받을 주소(상세주소, 기본 주소 아니어도 상관 x)", 
-                                    "contactNumber" : "보내는분 연락처",
-                                    "contactEmail" : "받는분 이메일",
+                                    "contactNumber" : "받는 분 연락처",
+                                    "contactEmail" : "받는 분 이메일",
                                     "sellerId" : "판매자(경매등록한 사람) id",
                                     "buyerId" : "구매자(낙찰된사람) id"
                                 } 
