@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import shop.biday.model.domain.OrderModel;
+import shop.biday.model.domain.UserInfoModel;
 import shop.biday.model.dto.OrderDto;
 import shop.biday.model.entity.OrderEntity;
 import shop.biday.model.repository.OrderRepository;
@@ -49,16 +50,14 @@ public class OrderServiceImpl implements OrderService {
         log.info("Saving order: {}", order);
         return validateUser(userInfoHeader)
                 .filter(uid -> {
-                    boolean hasPermission =paymentRepository.existsById(order.getPaymentId()) &&
-//                                    userInfoUtils.extractUserInfo(userInfoHeader).getUserRole().equals("ROLE_USER") &&
+                    boolean hasPermission =
+                            paymentRepository.existsById(order.getPaymentId()) &&
+                                    userInfoUtils.extractUserInfo(userInfoHeader).getUserRole().equals("ROLE_USER") &&
                                     paymentRepository.existsByOrderId(order.getOrderId());
-//                            paymentRepository.existsById(order.getPaymentId()) &&
-//                                    userInfoUtils.extractUserInfo(userInfoHeader).getUserRole().equals("ROLE_USER") &&
-//                                    paymentRepository.existsByOrderId(order.getOrderId());
-//
-//                    if (!hasPermission) {
-//                        log.error("User does not have permission to save order or payment does not exist for order ID: {}", order.getOrderId());
-//                    }
+
+                    if (!hasPermission) {
+                        log.error("User does not have permission to save order or payment does not exist for order ID: {}", order.getOrderId());
+                    }
                     return hasPermission;
                 })
                 .map(t -> {
@@ -131,18 +130,17 @@ public class OrderServiceImpl implements OrderService {
 
     private Optional<String> validateUser(String userInfoHeader) {
         log.info("Validating user: {}", userInfoHeader);
-        return Optional.ofNullable(userInfoHeader);
-//        UserInfoModel userInfoModel = userInfoUtils.extractUserInfo(userInfoHeader);
-//        String role = userInfoModel.getUserRole();
-//
-//        return Optional.ofNullable(userInfoModel.getUserId())
-//                .filter(uid -> {
-//                    boolean isValid = !uid.isEmpty() && ("ROLE_SELLER".equals(role) || "ROLE_USER".equals(role));
-//                    if (!isValid) {
-//                        log.error("Invalid user ID: {} or role: {}", uid, role);
-//                    }
-//                    return isValid;
-//                });
+        UserInfoModel userInfoModel = userInfoUtils.extractUserInfo(userInfoHeader);
+        String role = userInfoModel.getUserRole();
+
+        return Optional.ofNullable(userInfoModel.getUserId())
+                .filter(uid -> {
+                    boolean isValid = !uid.isEmpty() && ("ROLE_SELLER".equals(role) || "ROLE_USER".equals(role));
+                    if (!isValid) {
+                        log.error("Invalid user ID: {} or role: {}", uid, role);
+                    }
+                    return isValid;
+                });
     }
 
     private OrderEntity createOrderEntity(OrderDto order) {
