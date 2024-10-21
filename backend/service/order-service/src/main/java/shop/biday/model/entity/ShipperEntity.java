@@ -25,8 +25,8 @@ public class ShipperEntity {
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "payment_id", nullable = false)
-    private PaymentEntity payment;
+    @JoinColumn(name = "order_id", nullable = false)
+    private OrderEntity order;
 
     @Column(name = "carrier", nullable = false)
     private String carrier;
