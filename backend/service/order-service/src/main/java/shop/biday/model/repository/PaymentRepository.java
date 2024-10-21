@@ -16,4 +16,6 @@ public interface PaymentRepository extends JpaRepository<PaymentEntity, Long>, Q
     void deleteById(Long id);
 
     void delete(PaymentEntity paymentEntity);
+
+    boolean existsByOrderId(String orderId);
 }

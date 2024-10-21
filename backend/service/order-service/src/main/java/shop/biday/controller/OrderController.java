@@ -1,5 +1,4 @@
-// package shop.biday.controller;
-package shop.biday.orderTest;
+package shop.biday.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -14,6 +13,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import shop.biday.model.domain.OrderModel;
+import shop.biday.model.dto.OrderDto;
+import shop.biday.model.entity.OrderEntity;
+import shop.biday.service.OrderService;
 
 import java.time.LocalDateTime;
 
@@ -81,14 +84,22 @@ public class OrderController {
                     @ExampleObject(name = "exampleOrderModel", value = """ 
                                 { 
                                     "orderId" : "주문 번호",
-                                    "userId" : "결제한 유저의 id", 
-                                    "address" : "배송받을 주소(기본 주소 아니어도 상관 x)", 
                                     "auctionId" : "경매 id",
                                     "awardId" : "낙찰 id",
+                                    "awardBid" : "낙찰가",                                   
+                                    "awardedAt" : "낙찰 시간==award의 bidedAt",
                                     "productId" : "상품 id",
-                                    "productName" : "상품 이름",
-                                    "size" : "실제 사이즈(M, L etc)",
-                                    "paymentId" : "결제 id")
+                                    "productName" : "상품 이름",                                     
+                                    "productSize" : "상품 사이즈(M, L etc)",
+                                    "paymentId" : "결제 id",
+                                    "shipperName" : "보내는 분",                                    
+                                    "recipientName" : "받는 분",
+                                    "streetAddress" : "배송받을 주소(도로명, 기본 주소 아니어도 상관 x)", 
+                                    "detailAddress" : "배송받을 주소(상세주소, 기본 주소 아니어도 상관 x)", 
+                                    "contactNumber" : "보내는분 연락처",
+                                    "contactEmail" : "받는분 이메일",
+                                    "sellerId" : "판매자(경매등록한 사람) id",
+                                    "buyerId" : "구매자(낙찰된사람) id"
                                 } 
                             """)})})
     public ResponseEntity<OrderEntity> findById(

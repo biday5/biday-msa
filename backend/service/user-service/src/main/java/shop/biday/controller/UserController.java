@@ -90,12 +90,9 @@ public class UserController {
     })
     public ResponseEntity<Mono<Boolean>> checkPassword(
             @Parameter(description = "사용자 정보를 포함한 헤더", required = true)
-            @RequestHeader("UserInfo") String userInfoHeader,
+            @RequestHeader("UserInfo") String userInfoHeader) {
 
-            @Parameter(description = "비밀번호 검증 요청", required = true)
-            @RequestBody UserModel userModel) {
-
-        return new ResponseEntity<>(userService.existsByPasswordAndEmail(userInfoHeader, userModel), HttpStatus.OK);
+        return new ResponseEntity<>(userService.existsByPasswordAndEmail(userInfoHeader), HttpStatus.OK);
     }
 
 

@@ -1,5 +1,4 @@
-// package shop.biday.model.repository.impl;
-package shop.biday.orderTest;
+package shop.biday.model.repository.impl;
 
 import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.Projections;
@@ -10,14 +9,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Repository;
-// import shop.biday.model.domain.AwardModel;
-// import shop.biday.model.dto.AuctionDto;
-// import shop.biday.model.entity.QAuctionEntity;
-// import shop.biday.model.entity.QAwardEntity;
-// import shop.biday.model.repository.QAwardRepository;
+import shop.biday.model.domain.OrderModel;
 import shop.biday.model.domain.ShipperModel;
 import shop.biday.model.dto.PaymentDto;
-import shop.biday.orderTest.*;
+import shop.biday.model.entity.QOrderEntity;
+import shop.biday.model.entity.QPaymentEntity;
+import shop.biday.model.entity.QShipperEntity;
+import shop.biday.model.repository.QOrderRepository;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -30,7 +28,7 @@ public class QOrderRepositoryImpl implements QOrderRepository {
 
     private final QOrderEntity qOrder = QOrderEntity.orderEntity;
     private final QPaymentEntity qPayment = QPaymentEntity.paymentEntity;
-    private final QShipperEntity qShipper = QShipperEntity.ShipperEntity;
+    private final QShipperEntity qShipper = QShipperEntity.shipperEntity;
 
     @Override
     public OrderModel findByOrderId(Long id) {
@@ -38,11 +36,8 @@ public class QOrderRepositoryImpl implements QOrderRepository {
                 .select(createOrderModelProjection())
                 .from(qOrder)
                 .leftJoin(qOrder.payment, qPayment)
-                .join(qShipper).on(qShipper.orderId)
-                .where(qOrder.id.eq(id)
-                        .and(qPayment.id.eq(qOrder.paymentId))
-                        .and(qShipper.id.eq(qOrder.shipperId))
-                )
+                .leftJoin(qOrder.shipper, qShipper)
+                .where(qOrder.id.eq(id))
                 .fetchOne();
     }
 
@@ -66,14 +61,12 @@ public class QOrderRepositoryImpl implements QOrderRepository {
         List<OrderModel> orders = queryFactory
                 .select(createOrderModelProjection())
                 .from(qOrder)
-//                .leftJoin(qOrder.payment, qPayment)
-//                .leftJoin(qOrder.shipper, qShipper)
+                .leftJoin(qOrder.payment, qPayment)
+                 .leftJoin(qOrder.shipper, qShipper)
                 .where(
-                        qOrder.userId.contains(userId)
+                        qOrder.seller.eq(userId).or(qOrder.buyer.eq(userId))
                         .and(datePredicate)
                         .and(cursorPredicate)
-                                .and(qPayment.id.eq(qOrder.paymentId))
-                                .and(qShipper.id.eq(qOrder.shipperId))
                 )
                 .orderBy(qOrder.createdAt.desc())
                 .limit(pageable.getPageSize() + 1)
@@ -87,39 +80,44 @@ public class QOrderRepositoryImpl implements QOrderRepository {
         return new SliceImpl<>(orders, pageable, hasNext);
     }
 
-// todo 수정하기
     private ConstructorExpression<OrderModel> createOrderModelProjection() {
         return Projections.constructor(OrderModel.class,
                 qOrder.id,
                 qOrder.orderId,
-                qOrder.userId,
-                qOrder.address,
-                qOrder.actionId,
+                qOrder.auctionId,
                 qOrder.awardId,
-                qOrder.awardedAt,
                 qOrder.awardBid,
+                qOrder.awardedAt,
                 qOrder.productId,
                 qOrder.productName,
-                qOrder.size,
+                qOrder.productSize,
                 createPaymentDtoProjection(),
+                qOrder.shipperName,
+                qOrder.streetAddress,
+                qOrder.detailAddress,
+                qOrder.contactNumber,
+                qOrder.contactEmail,
+                qOrder.seller,
+                qOrder.buyer,
                 createShipperModelProjection(),
                 qOrder.createdAt,
-                qOrder.updatedAt)
-                ;
+                qOrder.updatedAt
+        );
     }
-// payment, shipper 수정
+
     private ConstructorExpression<PaymentDto> createPaymentDtoProjection() {
         return Projections.constructor(PaymentDto.class,
                 qPayment.orderId,
-                qPayemnt.userId,
+                qPayment.userId,
                 qPayment.awardId,
-                qPayment.amount);
+                qPayment.totalAmount
+        );
     }
 
     private ConstructorExpression<ShipperModel> createShipperModelProjection() {
         return Projections.constructor(ShipperModel.class,
                 qShipper.id,
-                qShipper.paymentId,
+                qShipper.order.id,
                 qShipper.carrier,
                 qShipper.trackingNumber,
                 qShipper.shipmentDate,
@@ -128,6 +126,7 @@ public class QOrderRepositoryImpl implements QOrderRepository {
                 qShipper.status,
                 qShipper.deliveryAddress,
                 qShipper.createdAt,
-                qShipper.updatedAt);
+                qShipper.updatedAt
+        );
     }
 }

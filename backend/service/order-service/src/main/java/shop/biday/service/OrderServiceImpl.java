@@ -1,5 +1,4 @@
-// package shop.biday.model.repository;
-package shop.biday.orderTest;
+package shop.biday.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -8,9 +7,11 @@ import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import shop.biday.model.domain.UserInfoModel;
+import shop.biday.model.domain.OrderModel;
+import shop.biday.model.dto.OrderDto;
+import shop.biday.model.entity.OrderEntity;
+import shop.biday.model.repository.OrderRepository;
 import shop.biday.model.repository.PaymentRepository;
-import shop.biday.model.repository.ShipperRepository;
 import shop.biday.utils.UserInfoUtils;
 
 import java.time.LocalDateTime;
@@ -24,7 +25,6 @@ public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
     private final PaymentRepository paymentRepository;
-    private final ShipperRepository shipperRepository;
 
     private final UserInfoUtils userInfoUtils;
 
@@ -48,6 +48,19 @@ public class OrderServiceImpl implements OrderService {
     public ResponseEntity<OrderEntity> save(String userInfoHeader, OrderDto order) {
         log.info("Saving order: {}", order);
         return validateUser(userInfoHeader)
+                .filter(uid -> {
+                    boolean hasPermission =paymentRepository.existsById(order.getPaymentId()) &&
+//                                    userInfoUtils.extractUserInfo(userInfoHeader).getUserRole().equals("ROLE_USER") &&
+                                    paymentRepository.existsByOrderId(order.getOrderId());
+//                            paymentRepository.existsById(order.getPaymentId()) &&
+//                                    userInfoUtils.extractUserInfo(userInfoHeader).getUserRole().equals("ROLE_USER") &&
+//                                    paymentRepository.existsByOrderId(order.getOrderId());
+//
+//                    if (!hasPermission) {
+//                        log.error("User does not have permission to save order or payment does not exist for order ID: {}", order.getOrderId());
+//                    }
+                    return hasPermission;
+                })
                 .map(t -> {
                     try {
                         OrderEntity savedOrder = createOrderEntity(order);
@@ -70,7 +83,7 @@ public class OrderServiceImpl implements OrderService {
         return validateUser(userInfoHeader)
                 .flatMap(uid -> orderRepository.findById(orderId)
                         .filter(order -> {
-                            boolean isAuthorized = order.getUserId().equals(uid);
+                            boolean isAuthorized = order.getSeller().equals(uid) || order.getBuyer().equals(uid);
                             if (isAuthorized) {
                                 log.info("User {} is authorized for order id {}", uid, orderId);
                             } else {
@@ -118,33 +131,40 @@ public class OrderServiceImpl implements OrderService {
 
     private Optional<String> validateUser(String userInfoHeader) {
         log.info("Validating user: {}", userInfoHeader);
-        UserInfoModel userInfoModel = userInfoUtils.extractUserInfo(userInfoHeader);
-        return Optional.ofNullable(userInfoModel.getUserId())
-                .filter(uid -> {
-                    boolean isValid = !uid.isEmpty();
-                    if (!isValid) {
-                        log.error("Invalid user ID: {}", uid);
-                    }
-                    return isValid;
-                });
+        return Optional.ofNullable(userInfoHeader);
+//        UserInfoModel userInfoModel = userInfoUtils.extractUserInfo(userInfoHeader);
+//        String role = userInfoModel.getUserRole();
+//
+//        return Optional.ofNullable(userInfoModel.getUserId())
+//                .filter(uid -> {
+//                    boolean isValid = !uid.isEmpty() && ("ROLE_SELLER".equals(role) || "ROLE_USER".equals(role));
+//                    if (!isValid) {
+//                        log.error("Invalid user ID: {} or role: {}", uid, role);
+//                    }
+//                    return isValid;
+//                });
     }
 
     private OrderEntity createOrderEntity(OrderDto order) {
         log.info("Creating order entity for order: {}", order.getOrderId());
         return OrderEntity.builder()
-                .orderId(order.getOrderId())
-                .userId(order.getUserId())
-                .address(order.getAddress())
+                .orderId(paymentRepository.findById(order.getPaymentId()).orElse(null).getOrderId())
                 .auctionId(order.getAuctionId())
                 .awardId(order.getAwardId())
                 .awardedAt(order.getAwardedAt())
                 .awardBid(order.getAwardBid())
                 .productId(order.getProductId())
                 .productName(order.getProductName())
-                .size(order.getSize())
+                .productSize(order.getProductSize())
                 .payment(paymentRepository.findById(order.getPaymentId()).orElse(null))
-//                .payment(order.getPaymentId())
-//                .shipper(order.getShipperId())
+                .shipperName(order.getShipperName())
+                .recipientName(order.getRecipientName())
+                .streetAddress(order.getStreetAddress())
+                .detailAddress(order.getDetailAddress())
+                .contactNumber(order.getContactNumber())
+                .contactEmail(order.getContactEmail())
+                .seller(order.getSellerId())
+                .buyer(order.getBuyerId())
                 .build();
     }
 }

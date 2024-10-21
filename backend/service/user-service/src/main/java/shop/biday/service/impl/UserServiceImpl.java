@@ -28,13 +28,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public Flux<UserModel> findAll() {
         return userRepository.findAll()
-               .map(UserModel::fromDocument);
+                .map(UserModel::fromDocument);
     }
 
     @Override
     public Mono<UserModel> findById(String id) {
         return userRepository.findById(id)
-               .map(UserModel::fromDocument);
+                .map(UserModel::fromDocument);
     }
 
     @Override
@@ -87,11 +87,16 @@ public class UserServiceImpl implements UserService {
         return userRepository.existsByPhone(userModel.getPhoneNum());
     }
 
-    public Mono<Boolean> existsByPasswordAndEmail(String userInfoHeader, UserModel userModel) {
+    public Mono<Boolean> existsByPasswordAndEmail(String userInfoHeader) {
         UserInfoModel userInfo = userInfoUtils.extractUserInfo(userInfoHeader);
 
         return userRepository.findById(userInfo.getUserId())
-                .flatMap(user -> Mono.just(passwordEncoder.matches(userModel.getPassword(), user.getPassword()))) // 비밀번호 비교
+                .flatMap(user -> {
+                    String emailFromDb = user.getEmail();
+                    String passwordFromDb = user.getPassword();
+                    boolean isPasswordEmailSame = passwordEncoder.matches(emailFromDb, passwordFromDb);
+                    return Mono.just(isPasswordEmailSame);
+                })
                 .defaultIfEmpty(false);
     }
 

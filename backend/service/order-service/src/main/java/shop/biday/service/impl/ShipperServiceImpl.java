@@ -8,9 +8,9 @@ import org.springframework.stereotype.Service;
 import shop.biday.model.domain.ShipperModel;
 import shop.biday.model.domain.UserInfoModel;
 import shop.biday.model.entity.ShipperEntity;
+import shop.biday.model.repository.OrderRepository;
 import shop.biday.model.repository.ShipperRepository;
-import shop.biday.orderTest.OrderService;
-import shop.biday.service.PaymentService;
+import shop.biday.service.OrderService;
 import shop.biday.service.ShipperService;
 import shop.biday.utils.UserInfoUtils;
 
@@ -25,6 +25,7 @@ public class ShipperServiceImpl implements ShipperService {
     private final OrderService orderService;
     private final ShipperRepository shipperRepository;
     private final UserInfoUtils userInfoUtils;
+    private final OrderRepository orderRepository;
 
     @Override
     public ResponseEntity<List<ShipperModel>> findAll() {
@@ -54,6 +55,7 @@ public class ShipperServiceImpl implements ShipperService {
     public ResponseEntity<ShipperEntity> save(String userInfo, ShipperModel shipper) {
         log.info("Saving shipper started");
         return validateUser(userInfo)
+                .filter(t -> orderRepository.existsById(shipper.getOrderId()))
                 .map(user -> {
                     ShipperEntity savedShipper = createShipperEntity(shipper);
                     log.debug("Shipper saved successfully: {}", savedShipper.getId());
