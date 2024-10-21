@@ -88,8 +88,7 @@ public class OrderController {
                                     "productId" : "상품 id",
                                     "productName" : "상품 이름",
                                     "size" : "실제 사이즈(M, L etc)",
-                                    "paymentId" : "결제 id",
-                                    "shipperId" : "배송정보 id")
+                                    "paymentId" : "결제 id")
                                 } 
                             """)})})
     public ResponseEntity<OrderEntity> findById(

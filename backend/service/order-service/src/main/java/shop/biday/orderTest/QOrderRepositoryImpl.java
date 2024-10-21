@@ -37,8 +37,8 @@ public class QOrderRepositoryImpl implements QOrderRepository {
         return queryFactory
                 .select(createOrderModelProjection())
                 .from(qOrder)
-//                .leftJoin(qOrder.payment, qPayment)
-//                .leftJoin(qOrder.shipper, qShipper)
+                .leftJoin(qOrder.payment, qPayment)
+                .join(qShipper).on(qShipper.orderId)
                 .where(qOrder.id.eq(id)
                         .and(qPayment.id.eq(qOrder.paymentId))
                         .and(qShipper.id.eq(qOrder.shipperId))

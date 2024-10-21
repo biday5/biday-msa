@@ -28,5 +28,5 @@ public class OrderDto {
     private String productName;
     private String size;
     private Long paymentId;
-    private Long shipperId;
+//    private Long shipperId;
 }

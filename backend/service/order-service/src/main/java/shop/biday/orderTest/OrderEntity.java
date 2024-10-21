@@ -67,18 +67,18 @@ public class OrderEntity {
     private String size;
 
 // 결제 정보
-//     @OneToOne(fetch = FetchType.LAZY)
-//     @JoinColumn(name = "payment_id", nullable = true)
-//     private PaymentEntity payment;
-    @Column(name="payment_id", nullable=true)
-    private Long payment;
+     @OneToOne(fetch = FetchType.LAZY)
+     @JoinColumn(name = "payment_id", nullable = true)
+     private PaymentEntity payment;
+//    @Column(name="payment_id", nullable=false)
+//    private Long payment;
 
 // 배송지 정보
 //     @OneToOne(fetch = FetchType.LAZY)
 //     @JoinColumn(name = "shipper_id", nullable = true)
 //     private ShipperEntity shipper;
-    @Column(name="shipper_id", nullable=true)
-    private Long shipper;
+//    @Column(name="shipper_id", nullable=true)
+//    private Long shipper;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")

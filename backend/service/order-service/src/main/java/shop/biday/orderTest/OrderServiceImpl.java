@@ -9,13 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import shop.biday.model.domain.UserInfoModel;
-// import shop.biday.model.entity.OrderEntity;
-// import shop.biday.model.domain.OrderModel;
-// import shop.biday.model.repository.OrderRepository;
-// import shop.biday.service.OrderService;
 import shop.biday.model.repository.PaymentRepository;
 import shop.biday.model.repository.ShipperRepository;
-import shop.biday.order.*;
 import shop.biday.utils.UserInfoUtils;
 
 import java.time.LocalDateTime;
@@ -52,23 +47,21 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public ResponseEntity<OrderEntity> save(String userInfoHeader, OrderDto order) {
         log.info("Saving order: {}", order);
-        if(validateUser(userInfoHeader).isEmpty()){
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        } else {
-            OrderEntity savedOrder = createOrderEntity(order);
-
-        }
-
-//        return validateUser(userInfoHeader)
-//                .map(t -> {
-//                    OrderEntity savedOrder = createOrderEntity(order);
-//                    log.debug("Order saved successfully: {}", savedOrder.getId());
-//                    return new ResponseEntity<>(orderRepository.save(savedOrder), HttpStatus.OK);
-//                }
-//                .orElseGet(() -> {
-//                    log.error("Save Order failed: User does not have permission");
-//                    return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-//                });
+        return validateUser(userInfoHeader)
+                .map(t -> {
+                    try {
+                        OrderEntity savedOrder = createOrderEntity(order);
+                        log.debug("Order saved successfully: {}", savedOrder.getId());
+                        return new ResponseEntity<>(orderRepository.save(savedOrder), HttpStatus.OK);
+                    } catch (Exception e) {
+                        log.error("Save Order failed due to an exception", e);
+                        return new ResponseEntity<>((OrderEntity) null, HttpStatus.INTERNAL_SERVER_ERROR);
+                    }
+                })
+                .orElseGet(() -> {
+                    log.error("Save Order failed: User does not have permission");
+                    return new ResponseEntity<>((OrderEntity) null, HttpStatus.FORBIDDEN);
+                });
     }
 
     @Override
@@ -149,9 +142,9 @@ public class OrderServiceImpl implements OrderService {
                 .productId(order.getProductId())
                 .productName(order.getProductName())
                 .size(order.getSize())
-//                .payment(paymentRepository.findById(order.getPaymentId()))
-                .payment(order.getPaymentId())
-                .shipper(order.getShipperId())
+                .payment(paymentRepository.findById(order.getPaymentId()).orElse(null))
+//                .payment(order.getPaymentId())
+//                .shipper(order.getShipperId())
                 .build();
     }
 }

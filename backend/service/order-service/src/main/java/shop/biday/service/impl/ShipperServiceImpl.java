@@ -9,6 +9,7 @@ import shop.biday.model.domain.ShipperModel;
 import shop.biday.model.domain.UserInfoModel;
 import shop.biday.model.entity.ShipperEntity;
 import shop.biday.model.repository.ShipperRepository;
+import shop.biday.orderTest.OrderService;
 import shop.biday.service.PaymentService;
 import shop.biday.service.ShipperService;
 import shop.biday.utils.UserInfoUtils;
@@ -21,7 +22,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ShipperServiceImpl implements ShipperService {
 
-    private final PaymentService paymentService;
+    private final OrderService orderService;
     private final ShipperRepository shipperRepository;
     private final UserInfoUtils userInfoUtils;
 
@@ -121,7 +122,7 @@ public class ShipperServiceImpl implements ShipperService {
 
     private ShipperEntity createShipperEntity(ShipperModel shipper) {
         return ShipperEntity.builder()
-                .payment(paymentService.findById(shipper.getPaymentId()))
+                .order(orderService.findById(shipper.getOrderId()))
                 .carrier(shipper.getCarrier())
                 .trackingNumber(shipper.getTrackingNumber())
                 .shipmentDate(shipper.getShipmentDate())
