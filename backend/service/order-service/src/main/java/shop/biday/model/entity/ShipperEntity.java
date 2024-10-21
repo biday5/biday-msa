@@ -24,10 +24,6 @@ public class ShipperEntity {
     @Column(name = "id", nullable = false)
     private Long id;
 
-//    @OneToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "payment_id", nullable = false)
-//    private PaymentEntity payment;
-
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
     private OrderEntity order;
