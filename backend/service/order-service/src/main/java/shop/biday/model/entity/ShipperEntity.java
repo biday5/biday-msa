@@ -5,6 +5,7 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.UpdateTimestamp;
+import shop.biday.orderTest.OrderEntity;
 
 import java.time.LocalDateTime;
 
@@ -24,9 +25,13 @@ public class ShipperEntity {
     @Column(name = "id", nullable = false)
     private Long id;
 
+//    @OneToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "payment_id", nullable = false)
+//    private PaymentEntity payment;
+
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "payment_id", nullable = false)
-    private PaymentEntity payment;
+    @JoinColumn(name = "order_id", nullable = false)
+    private OrderEntity order;
 
     @Column(name = "carrier", nullable = false)
     private String carrier;

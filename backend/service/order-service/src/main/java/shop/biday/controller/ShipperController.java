@@ -66,7 +66,7 @@ public class ShipperController {
             @Parameter(examples = {
                     @ExampleObject(name = "exampleShipperModel", value = """ 
                         { 
-                            "paymentId" : "결제 id",
+                            "orderId" : "OrderEntity id",
                             "carrier" : "운송업체 이름", 
                             "trackingNumber" : "운송장번호", 
                             "shipmentDate" : "배송 시작 날짜",

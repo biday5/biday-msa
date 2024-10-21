@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 public class ShipperModel {
 
     private Long id;
-    private Long paymentId;
+    private Long orderId;
     private String carrier;
     private String trackingNumber;
     private LocalDateTime shipmentDate;
@@ -30,7 +30,7 @@ public class ShipperModel {
 
     public static ShipperModel of(final ShipperEntity shipper) {
         return ShipperModel.builder()
-                .paymentId(shipper.getPayment().getId())
+                .orderId(shipper.getOrder().getId())
                 .carrier(shipper.getCarrier())
                 .trackingNumber(shipper.getTrackingNumber())
                 .shipmentDate(shipper.getShipmentDate())
