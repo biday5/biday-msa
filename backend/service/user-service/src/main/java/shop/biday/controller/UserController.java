@@ -150,12 +150,12 @@ public class UserController {
     }
 
     @GetMapping("/findById/{id}")
-    public Mono<UserModel> findById(@PathVariable String id) {
+    public Mono<UserModel> findById(@PathVariable("id") String id) {
         return userService.findById(id);
     }
 
     @GetMapping("/existsById/{id}")
-    public Mono<Boolean> existsById(@PathVariable String id) {
+    public Mono<Boolean> existsById(@PathVariable("id") String id) {
         return userService.existsById(id);
     }
 
