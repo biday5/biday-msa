@@ -51,9 +51,9 @@ public class ImageController {
             @RequestPart("files") List<MultipartFile> files,
             @RequestParam("filePath") String filePath,
             @RequestParam("type") String type,
-            @RequestParam("referenceId") Long referenceId
+            @RequestParam("referencedId") Long referencedId
     ) {
-        return imageService.uploadFileByAdmin(userInfoHeader, files, filePath, type, referenceId);
+        return imageService.uploadFileByAdmin(userInfoHeader, files, filePath, type, referencedId);
     }
 
     @PostMapping("/uploadByUser")
@@ -75,9 +75,9 @@ public class ImageController {
             @RequestPart("files") List<MultipartFile> files,
             @RequestParam("filePath") String filePath,
             @RequestParam("type") String type,
-            @RequestParam("referenceId") Long referenceId
+            @RequestParam("referencedId") Long referencedId
     ) {
-        return imageService.uploadFilesByUser(userInfoHeader, files, filePath, type, referenceId);
+        return imageService.uploadFilesByUser(userInfoHeader, files, filePath, type, referencedId);
     }
 
     @PatchMapping

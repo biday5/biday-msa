@@ -41,8 +41,10 @@ pipeline {
         stage('Github') {
             steps {
                 sshagent(['github_ssh']) {
-                    git branch: 'dev',
+                    git(
+                        branch: 'dev',
                         url: 'git@github.com:biday5/biday-msa.git'
+                    )
 
                     sh 'git submodule update --init --recursive'
                 }
