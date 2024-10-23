@@ -2,9 +2,13 @@ pipeline {
     agent any
 
     environment {
+        WORKSPACE_PATH = "/var/lib/jenkins/workspace/biday-msa/backend"
         DOCKER_HUB_URL = "${docker_hub_url}"
-        DOCKER_HUB_CREDENTIAL = credentials('dockerhub')
-        GIT_SSH_CREDENTIALS = credentials('github_ssh')
+        GITHUB_URL = "${github_url}"
+        DOCKER_HUB_CREDENTIALS = 'dockerhub'
+        GIT_SSH_CREDENTIALS = 'git_ssh'
+        DOCKER_HUB_REPO = "hwijae/biday"
+        SLACK_CHANNEL = '#jenkins-log'
     }
 
     tools {
@@ -13,41 +17,36 @@ pipeline {
     }
 
     stages {
-        stage('Check for Changes') {
+        stage('Initialize') {
             steps {
                 script {
-                    // 현재 커밋 해시 가져오기
-                    def currentCommit = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
-                    echo "currentCommit: ${currentCommit}"
-
-                    // 이전 빌드의 커밋 해시 가져오기 (없으면 빈 문자열)
-                    def previousCommit = sh(script: 'git rev-parse HEAD~1 || echo ""', returnStdout: true).trim()
-                    echo "previousCommit: ${previousCommit}"
-
-                    def changes = sh(script: "git diff --name-only ${previousCommit} ${currentCommit}", returnStdout: true).trim()
-                    echo "changes: ${changes}"
-                    if (changes) {
-                        echo '변동사항이 있습니다.'
-                        echo "변경된 파일들: ${changes}"
-                    } else {
-                        echo '변동사항이 없습니다.'
-                        currentBuild.result = 'ABORTED'
-                        error '변동 사항이 없으므로 파이프라인을 중단합니다.'
-                    }
+                    modulePaths = [
+                        "config-server": "${WORKSPACE_PATH}/server/config-server",
+                        "eureka-server": "${WORKSPACE_PATH}/server/eureka-server",
+                        "gateway-server": "${WORKSPACE_PATH}/server/gateway-server",
+                        "admin-service": "${WORKSPACE_PATH}/service/admin-service",
+                        "auction-service": "${WORKSPACE_PATH}/service/auction-service",
+                        "ftp-service": "${WORKSPACE_PATH}/service/ftp-service",
+                        "order-service": "${WORKSPACE_PATH}/service/order-service",
+                        "product-service": "${WORKSPACE_PATH}/service/product-service",
+                        "sms-service": "${WORKSPACE_PATH}/service/sms-service",
+                        "user-service": "${WORKSPACE_PATH}/service/user-service"
+                    ]
                 }
             }
         }
 
-        stage('Github') {
+        stage('Github Checkout') {
             steps {
-                sshagent(['github_ssh']) {
-                    git(
-                        branch: 'dev',
-                        url: 'git@github.com:biday5/biday-msa.git'
-                    )
-
-                    sh 'git submodule update --init --recursive'
-                }
+                checkout scmGit(
+                    branches: [[name: '*/dev']],
+                    extensions: [
+                        submodule(parentCredentials: true, recursiveSubmodules: true, reference: '', trackingSubmodules: true)
+                    ],
+                    userRemoteConfigs: [
+                        [credentialsId: GIT_SSH_CREDENTIALS, url: GITHUB_URL]
+                    ]
+                )
             }
         }
 
@@ -56,86 +55,111 @@ pipeline {
                 echo '=== build modules shell script start ==='
                 dir('backend') {
                     script {
-                        sh 'chmod +x gradlew'
-
-                        def allModules = [
-                            "server:config-server",
-                            "server:eureka-server",
-                            "server:gateway-server",
-                            "service:admin-service",
-                            "service:auction-service",
-                            "service:ftp-service",
-                            "service:order-service",
-                            "service:product-service",
-                            "service:sms-service",
-                            "service:user-service"
-                        ]
-
-                        echo "Cleaning..."
-                        sh './gradlew clean'
-
-                        allModules.each { module ->
-                            echo "Building for ${module}"
-                            sh "./gradlew :${module}:build"
-                        }
-
-//                     sh 'chmod +x buildModule.sh'
-//                     sh './buildModule.sh'
+                        sh 'chmod +x buildModule.sh'
+                        sh './buildModule.sh'
                     }
                 }
             }
         }
 
-        stage('Docker Image Build and Push') {
+        stage('Docker Login') {
             steps {
                 script {
-                    echo "docker_hub_url >>>>>>> ${docker_hub_url}"
-                    echo "BUILD_TAG >>>>>> ${BUILD_TAG}"
-                    def allModules = [
-                        "server:config-server",
-                        "server:eureka-server",
-                        "server:gateway-server",
-                        "service:admin-service",
-                        "service:auction-service",
-                        "service:ftp-service",
-                        "service:order-service",
-                        "service:product-service",
-                        "service:sms-service",
-                        "service:user-service"
-                    ]                    
-
-                    docker.withRegistry('https://index.docker.io/v1/', DOCKER_HUB_CREDENTIAL) {
-                        for (module in allModules) {
-                            def repoName = "${DOCKER_HUB_URL}/biday-${module.split(':')[1]}"
-                            echo "Building and pushing ${repoName}..."
-
-                            def image = docker.build(repoName, "${module}:${BUILD_TAG}")
-
-                            image.push()
-                        }
+                    withCredentials([usernamePassword(credentialsId: 'DockerHub_IdPw', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                        sh "echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_USERNAME} --password-stdin"
                     }
+                }
+            }
+        }
+
+        stage('Docker Build') {
+            steps {
+                script {
+                    modulePaths.each { module, path ->
+                        echo "Building Docker image for ${module}..."
+                        sh """
+                            docker build -t biday/${module}:latest ${path} --file ${path}/Dockerfile || {
+                                echo 'Docker build failed for ${module} at ${path}';
+                                exit 1;
+                            }
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Docker Push') {
+            steps {
+                script {
+                    def version = "${BUILD_TAG}"
+
+                    modulePaths.each { module, path ->
+                        echo "Tagging and pushing ${module}..."
+                        sh """
+                            docker tag biday/${module}:latest hwijae/biday-${module}:${version} || { echo 'Docker tag failed for ${module}!'; exit 1; }
+                            docker push hwijae/biday-${module}:${version} || { echo 'Docker push failed for ${module}!'; exit 1; }
+                        """
+                    }
+
+                    echo "Docker images pushed successfully!"
+                }
+            }
+            post {
+                success {
+                    echo "Docker push completed successfully!"
+                }
+                failure {
+                    echo "Docker push failed!"
+                    error 'Docker push failed'
                 }
             }
         }
     }
-    
-    post{
-        success{
+
+    post {
+        success {
             echo "========pipeline executed successfully ========"
-            echo "Image 정리..."
+
+            // 슬랙 성공 메시지 보내기
+            slackSend(
+                channel: env.SLACK_CHANNEL,
+                attachments: [
+                    [
+                        text: "백엔드 배포가 성공적으로 완료되었습니다! 🚀",
+                        footer: "배포 시간: ${new Date()}",
+                        color: "#00FF00" // 초록색
+                    ]
+                ],
+                message: "배포 성공!",
+                tokenCredentialId: 'Slack_webhook' // 자격 증명 ID 입력
+            )
+
+            script {
+                modulePaths.keySet().each { module ->
+                    echo "Removing local image for ${module}..."
+                    sh "docker rmi biday/${module}:latest || echo 'Failed to remove image for ${module}'"
+                }
+            }
         }
-        failure{
+        failure {
             echo "========pipeline execution failed========"
+
+            // 슬랙 실패 메시지 보내기
+            slackSend(
+                channel: env.SLACK_CHANNEL,
+                attachments: [
+                    [
+                        text: "배포 중 오류가 발생했습니다. 🥲",
+                        footer: "오류 발생 시간: ${new Date()}",
+                        color: "#FF0000" // 빨간색
+                    ]
+                ],
+                message: "배포 실패!",
+                tokenCredentialId: 'Slack_webhook' // 자격 증명 ID 입력
+            )
         }
-        always{
-            echo 'Workspace 정리..'
-            publishHTML(target: [
-                reportDir: 'backend/service/auction-service/build/reports/tests/test',
-                reportFiles: 'index.html',
-                reportName: 'Test Report',
-                keepAll: true,
-                alwaysLinkToLastBuild: true
-            ])
+        always {
+            echo 'Cleaning workspace...'
         }
     }
 }
