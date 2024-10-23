@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class SizeModel {
     private Long id;
-    private ProductDto product;
+    private ProductDto sizeProduct;
     private String size;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
