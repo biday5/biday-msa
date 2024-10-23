@@ -170,7 +170,7 @@ pipeline {
                         text: "백엔드 배포가 성공적으로 완료되었습니다! 🚀",
                         footer: "배포 시간: ${new Date()}",
                         color: "#00FF00" // 초록색
-                    }
+                    ]
                 ],
                 message: "배포 성공!",
                 tokenCredentialId: 'Slack_webhook' // 자격 증명 ID 입력
@@ -194,7 +194,7 @@ pipeline {
                         text: "배포 중 오류가 발생했습니다. 🥲",
                         footer: "오류 발생 시간: ${new Date()}",
                         color: "#FF0000" // 빨간색
-                    }
+                    ]
                 ],
                 message: "배포 실패!",
                 tokenCredentialId: 'Slack_webhook' // 자격 증명 ID 입력
