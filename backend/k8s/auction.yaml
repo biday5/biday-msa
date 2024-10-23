@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auction-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: auction-service
+  template:
+    metadata:
+      labels:
+        app: auction-service
+    spec:
+      containers:
+        - name: auction-service
+          image: hwijae/biday-auction-service:1.0
+          ports:
+            - containerPort: 9101
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auction-service
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9101
+      targetPort: 9101
+  selector:
+    app: auction-service
