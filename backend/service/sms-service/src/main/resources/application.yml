@@ -1,0 +1,38 @@
+server:
+  port: 9105
+
+eureka:
+  instance:
+    instance-id: ${spring.application.name}:${spring.cloud.client.ip-address}:${server.port}
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+spring:
+  output:
+    ansi:
+      enabled: always
+  application:
+    name: sms-service
+  profiles:
+    active: local
+  config:
+    import: optional:configserver:http://localhost:8888/
+
+openapi:
+  service:
+    url: http://localhost:8000
+  swagger-ui:
+    path: /swagger-ui
+
+springdoc:
+  api-docs:
+    version: openapi_3_1
+    enabled: true
+    path: /api/sms/v3/api-docs
+  enable-spring-security: true
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
+
