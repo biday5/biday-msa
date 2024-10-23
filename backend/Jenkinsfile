@@ -9,6 +9,7 @@ pipeline {
         GIT_SSH_CREDENTIALS = 'git_ssh'
         DOCKER_HUB_REPO = "hwijae/biday"
         SLACK_CHANNEL = '#jenkins-log'
+        KUBECONFIG = "/var/lib/jenkins/.kube/config"
     }
 
     tools {
@@ -114,6 +115,47 @@ pipeline {
                 }
             }
         }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                script {
+                    // Kubernetes YAML 파일 경로 정의
+                    def kubernetesPaths = [
+                        "admin": "${WORKSPACE_PATH}/k8s/admin.yaml",
+                        "auction": "${WORKSPACE_PATH}/k8s/auction.yaml",
+                        "config": "${WORKSPACE_PATH}/k8s/config.yaml",
+                        "eureka": "${WORKSPACE_PATH}/k8s/eureka.yaml",
+                        "ftp": "${WORKSPACE_PATH}/k8s/ftp.yaml",
+                        "gateway": "${WORKSPACE_PATH}/k8s/gateway.yaml",
+                        "order": "${WORKSPACE_PATH}/k8s/order.yaml",
+                        "product": "${WORKSPACE_PATH}/k8s/product.yaml",
+                        "user": "${WORKSPACE_PATH}/k8s/user.yaml"
+                    ]
+
+                    // 각 모듈에 대해 Kubernetes 배포 수행
+                    kubernetesPaths.each { module, yamlPath ->
+                        echo "Applying Kubernetes deployment for ${module} using YAML file: ${yamlPath}"
+
+                        // YAML 파일을 사용하여 배포 적용
+                        sh """
+                        kubectl --kubeconfig=${KUBECONFIG} apply -f ${yamlPath} || {
+                            echo 'Kubernetes deployment failed for ${module}';
+                            exit 1;
+                        }
+                        """
+
+                        // 배포 롤아웃 상태 확인
+                        echo "Checking rollout status for deployment ${module}"
+                        sh """
+                        kubectl --kubeconfig=${KUBECONFIG} rollout status deployment/${module} || {
+                            echo 'Rollout status check failed for ${module}';
+                            exit 1;
+                        }
+                        """
+                    }
+                }
+            }
+        }
     }
 
     post {
@@ -128,7 +170,7 @@ pipeline {
                         text: "백엔드 배포가 성공적으로 완료되었습니다! 🚀",
                         footer: "배포 시간: ${new Date()}",
                         color: "#00FF00" // 초록색
-                    ]
+                    }
                 ],
                 message: "배포 성공!",
                 tokenCredentialId: 'Slack_webhook' // 자격 증명 ID 입력
@@ -152,7 +194,7 @@ pipeline {
                         text: "배포 중 오류가 발생했습니다. 🥲",
                         footer: "오류 발생 시간: ${new Date()}",
                         color: "#FF0000" // 빨간색
-                    ]
+                    }
                 ],
                 message: "배포 실패!",
                 tokenCredentialId: 'Slack_webhook' // 자격 증명 ID 입력

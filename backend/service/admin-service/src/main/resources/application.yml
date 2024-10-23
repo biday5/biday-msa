@@ -1,0 +1,11 @@
+spring:
+  output:
+    ansi:
+      enabled: always
+  application:
+    name: admin-service
+  profiles:
+    active: local
+  config:
+    import: optional:configserver:http://localhost:8888/
+

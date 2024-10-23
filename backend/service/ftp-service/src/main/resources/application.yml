@@ -1,0 +1,14 @@
+spring:
+  output:
+    ansi:
+      enabled: always
+  application:
+    name: ftp-service
+  profiles:
+    active: local
+  config:
+    import: optional:configserver:http://localhost:8888/
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
