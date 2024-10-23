@@ -36,10 +36,6 @@ out/
 ### VS Code ###
 .vscode/
 
-# yaml&yml
-**/*.yml
-**/*.yaml
-
 # MacOS 관련 파일
 .DS_Store
 
@@ -55,3 +51,5 @@ database/**
 backend/mysql/**
 backend/mongodb/**
 backend/redis/**
+
+docker-compose.yml
