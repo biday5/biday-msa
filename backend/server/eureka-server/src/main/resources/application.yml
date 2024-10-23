@@ -7,6 +7,10 @@ spring:
       enabled: always
   application:
     name: eureka-server
+  cloud:
+    config:
+      enabled: false
+
 
 eureka:
   client:
