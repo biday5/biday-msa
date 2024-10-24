@@ -171,7 +171,8 @@ pipeline {
             script {
                 modulePaths.keySet().each { module ->
                     echo "Removing local image for ${module}..."
-                    sh "docker rmi biday/${module}:latest || echo 'Failed to remove image for ${module}'"
+                    sh "docker rmi biday/${module} || echo 'Failed to remove image for ${module}'"
+                    sh "docker rmi biday/${module}:${version} || echo 'Failed to remove image for ${module}'"
                 }
             }
         }
