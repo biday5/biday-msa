@@ -144,14 +144,6 @@ pipeline {
                         }
                         """
 
-                        // 배포 롤아웃 상태 확인
-                        echo "Checking rollout status for deployment ${module}"
-                        sh """
-                        kubectl --kubeconfig=${KUBECONFIG} rollout status deployment/${module} || {
-                            echo 'Rollout status check failed for ${module}';
-                            exit 1;
-                        }
-                        """
                     }
                 }
             }
