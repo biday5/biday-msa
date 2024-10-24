@@ -243,14 +243,17 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public ResponseEntity<String> deleteById(String id) {
+    public ResponseEntity<String> deleteById(String userInfoHeader, String id) {
         return imageRepository.findById(id)
                 .map(image -> {
+                    if(validateRole(userInfoHeader).isEmpty()) {
+                        return ResponseEntity.status(403).body("fail");
+                    }
                     deleteImageFromS3(image.getUploadPath(), image.getUploadName());
                     imageRepository.delete(image);
                     return ResponseEntity.ok("success");
                 })
-                .orElseGet(() -> ResponseEntity.status(404).body("이미지 찾을 수 없습니다."));
+                .orElseGet(() -> ResponseEntity.status(404).body("fail"));
     }
 
     private void deleteImageFromS3(String filePath, String uploadName) {
