@@ -243,21 +243,14 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public ResponseEntity<String> deleteById(String role, String id) {
-        log.info("Image delete start.");
-        return Optional.of(id)
-                .filter(imageRepository::existsById)
-                .map(existingId -> {
-                    boolean deleteByS3 = deleteImageFromS3(imageRepository.findById(id).get().getUploadPath(), imageRepository.findById(id).get().getUploadName());
-                    if (!deleteByS3) {
-                        return ResponseEntity.status(404).body("이미지 삭제 실패");
-                    } else {
-                        imageRepository.deleteById(existingId);
-                        log.debug("Image deleted from Mongo: {}", existingId);
-                        return ResponseEntity.ok("success");
-                    }
+    public ResponseEntity<String> deleteById(String id) {
+        return imageRepository.findById(id)
+                .map(image -> {
+                    deleteImageFromS3(image.getUploadPath(), image.getUploadName());
+                    imageRepository.delete(image);
+                    return ResponseEntity.ok("success");
                 })
-                .orElse(ResponseEntity.status(404).body("fail"));
+                .orElseGet(() -> ResponseEntity.status(404).body("이미지 찾을 수 없습니다."));
     }
 
     private void deleteImageFromS3(String filePath, String uploadName) {
@@ -268,7 +261,6 @@ public class ImageServiceImpl implements ImageService {
                 .build());
         log.info("Deleted file from S3: {}/{}", bucketName, keyName);
     }
-
 
     private Optional<String> validateRole(String userInfoHeader, String... validRoles) {
         log.info("Validate role started for user: {}", userInfoHeader);
