@@ -168,13 +168,14 @@ pipeline {
                 tokenCredentialId: 'Slack_webhook' // 자격 증명 ID 입력
             )
 
-            script {
-                modulePaths.keySet().each { module ->
-                    echo "Removing local image for ${module}..."
-                    sh "docker rmi biday/${module} || echo 'Failed to remove image for ${module}'"
-                    sh "docker rmi biday/${module}:${version} || echo 'Failed to remove image for ${module}'"
-                }
-            }
+             script {
+                 modulePaths.keySet().each { module ->
+                     echo "Removing local image for ${module}..."
+                     // 로컬 도커 이미지 삭제
+                     sh "docker rmi biday/${module} || echo 'Failed to remove local image for ${module}'"
+                     sh "docker rmi hwijae/biday-${module}:1.0 || echo 'Failed to remove tagged image for ${module}'"
+                 }
+             }
         }
         failure {
             echo "========pipeline execution failed========"

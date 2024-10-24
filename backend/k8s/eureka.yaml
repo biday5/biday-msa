@@ -23,7 +23,7 @@ kind: Service
 metadata:
   name: eureka-server
 spec:
-  type: ClusterIP
+  type: LoadBalancer
   ports:
     - port: 8761
       targetPort: 8761
