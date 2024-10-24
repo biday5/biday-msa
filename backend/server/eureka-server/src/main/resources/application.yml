@@ -7,12 +7,12 @@ spring:
       enabled: always
   application:
     name: eureka-server
-  cloud:
-    config:
-      enabled: false
-
 
 eureka:
   client:
     register-with-eureka: false
     fetch-registry: false
+
+
+
+
