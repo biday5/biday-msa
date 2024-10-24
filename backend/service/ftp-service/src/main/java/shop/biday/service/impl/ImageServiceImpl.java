@@ -17,10 +17,7 @@ import shop.biday.utils.UserInfoUtils;
 import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.GetObjectResponse;
-import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -67,16 +64,28 @@ public class ImageServiceImpl implements ImageService {
     @Override
     public ResponseEntity<String> uploadFileByAdmin(String userInfoHeader, List<MultipartFile> multipartFiles, String filePath, String type, Long referencedId) {
         log.info("Image upload By Admin started");
+
         return validateRole(userInfoHeader, "ROLE_ADMIN")
-                .map(validRole -> uploadFiles(multipartFiles, filePath, type, referencedId))
+                .map(validRole -> {
+                    if (multipartFiles.size() > 3) {
+                        throw new IllegalArgumentException("파일은 최대 3장까지만 업로드할 수 있습니다.");
+                    }
+                    return uploadFiles(multipartFiles, filePath, type, referencedId);
+                })
                 .orElseThrow(() -> new IllegalArgumentException("User does not have the necessary permissions or the role is invalid."));
     }
 
     @Override
     public ResponseEntity<String> uploadFilesByUser(String role, List<MultipartFile> multipartFiles, String filePath, String type, Long referencedId) {
         log.info("Images upload By User started");
+
         return validateRole(role, "ROLE_SELLER", "ROLE_USER")
-                .map(validRole -> uploadFiles(multipartFiles, filePath, type, referencedId))
+                .map(validRole -> {
+                    if (multipartFiles.size() > 3) {
+                        throw new IllegalArgumentException("파일은 최대 3장까지만 업로드할 수 있습니다.");
+                    }
+                    return uploadFiles(multipartFiles, filePath, type, referencedId);
+                })
                 .orElseThrow(() -> new IllegalArgumentException("User does not have the necessary permissions or the role is invalid."));
     }
 
@@ -86,30 +95,36 @@ public class ImageServiceImpl implements ImageService {
             return ResponseEntity.badRequest().body("파일이 비어있습니다.");
         }
 
-        StringBuilder resultMessage = new StringBuilder();
-        multipartFiles.forEach(multipartFile -> {
-            if (multipartFile.isEmpty()) {
-                resultMessage.append("파일이 비어 있습니다.\n");
-            } else {
-                handleFileUpload(multipartFile, filePath, type, referencedId, resultMessage);
-            }
-        });
+        boolean allFilesUploaded = true;
 
-        return ResponseEntity.ok(resultMessage.toString());
+        for (MultipartFile multipartFile : multipartFiles) {
+            if (multipartFile.isEmpty()) {
+                allFilesUploaded = false;
+            } else {
+                allFilesUploaded &= handleFileUpload(multipartFile, filePath, type, referencedId);
+            }
+        }
+
+        return allFilesUploaded ? ResponseEntity.ok("success") : ResponseEntity.status(500).body("fail");
     }
 
-    private void handleFileUpload(MultipartFile multipartFile, String filePath, String type, Long referencedId, StringBuilder resultMessage) {
+    private boolean handleFileUpload(MultipartFile multipartFile, String filePath, String type, Long referencedId) {
         String originalFileName = multipartFile.getOriginalFilename();
         String uploadFileName = getUuidFileName(originalFileName);
-        String uploadFileUrl = uploadToS3(multipartFile, filePath, uploadFileName, resultMessage);
+        String uploadFileUrl = uploadToS3(multipartFile, filePath, uploadFileName);
 
         if (uploadFileUrl != null) {
-            saveImageDocument(originalFileName, uploadFileName, filePath, uploadFileUrl, type, referencedId);
-            resultMessage.append("파일 업로드 성공: ").append(originalFileName).append("\n");
+            ImageDocument image = saveImageDocument(originalFileName, uploadFileName, filePath, uploadFileUrl, type, referencedId);
+            log.debug("image {} : {}", originalFileName, image);
+            return true; // 업로드 성공
+        } else {
+            deleteImageFromS3(filePath, uploadFileName);
+            log.error("Image saved To Mongo Failed : {}", originalFileName);
+            return false; // 업로드 실패
         }
     }
 
-    private String uploadToS3(MultipartFile file, String filePath, String uploadFileName, StringBuilder resultMessage) {
+    private String uploadToS3(MultipartFile file, String filePath, String uploadFileName) {
         try (InputStream inputStream = file.getInputStream()) {
             String keyName = filePath + "/" + uploadFileName;
 
@@ -127,12 +142,12 @@ public class ImageServiceImpl implements ImageService {
 
         } catch (IOException e) {
             log.error("Error uploading file: {}", e.getMessage());
-            resultMessage.append("파일 업로드 실패: ").append(file.getOriginalFilename()).append("\n");
             return null;
         }
     }
 
-    private void saveImageDocument(String originalFileName, String uploadFileName, String filePath, String uploadFileUrl, String type, Long referencedId) {
+    private ImageDocument saveImageDocument(String originalFileName, String uploadFileName, String filePath, String uploadFileUrl, String type, Long referencedId) {
+        log.info("Saving image {} to Mongo: {}", originalFileName, uploadFileName);
         ImageDocument image = ImageDocument.builder()
                 .originalName(originalFileName)
                 .uploadName(uploadFileName)
@@ -144,6 +159,7 @@ public class ImageServiceImpl implements ImageService {
                 .build();
         imageRepository.save(image);
         log.debug("Image saved to Mongo: {}", image);
+        return image;
     }
 
     public String getUuidFileName(String fileName) {
@@ -160,10 +176,7 @@ public class ImageServiceImpl implements ImageService {
     public ResponseEntity<String> update(String role, List<MultipartFile> multipartFiles, String id) {
         log.info("Image update started for ID: {}", id);
         return imageRepository.findById(id)
-                .map(image -> {
-                    String updateResult = updateImage(image, multipartFiles);
-                    return ResponseEntity.ok(updateResult);
-                })
+                .map(image -> ResponseEntity.ok(updateImage(image, multipartFiles)))
                 .orElseGet(() -> {
                     log.error("Image not found: {}", id);
                     return ResponseEntity.status(404).body("이미지 찾을 수 없습니다.");
@@ -173,14 +186,15 @@ public class ImageServiceImpl implements ImageService {
     private String updateImage(ImageDocument image, List<MultipartFile> multipartFiles) {
         if (multipartFiles.isEmpty()) {
             log.error("File is empty");
-            return "업로드할 파일이 비어있습니다.";
+            return "fail";
         }
 
-        StringBuilder resultMessage = new StringBuilder();
-        multipartFiles.forEach(file -> {
+        boolean isSuccess = true;
+
+        for (MultipartFile file : multipartFiles) {
             String originalFileName = file.getOriginalFilename();
             String uploadFileName = getUuidFileName(originalFileName);
-            String uploadFileUrl = uploadToS3(file, image.getUploadPath(), uploadFileName, resultMessage);
+            String uploadFileUrl = uploadToS3(file, image.getUploadPath(), uploadFileName);
 
             if (uploadFileUrl != null) {
                 image.setOriginalName(originalFileName);
@@ -190,11 +204,13 @@ public class ImageServiceImpl implements ImageService {
 
                 imageRepository.save(image);
                 log.debug("Image updated in Mongo: {}", image);
-                resultMessage.append("파일 업데이트 성공: ").append(originalFileName).append("\n");
+            } else {
+                isSuccess = false;
+                log.error("Failed to upload file: {}", originalFileName);
             }
-        });
+        }
 
-        return resultMessage.toString();
+        return isSuccess ? "success" : "fail";
     }
 
     private ResponseEntity<byte[]> fetchImageFromS3(ImageDocument image, String logMessage) throws IOException {
@@ -232,12 +248,27 @@ public class ImageServiceImpl implements ImageService {
         return Optional.of(id)
                 .filter(imageRepository::existsById)
                 .map(existingId -> {
-                    imageRepository.deleteById(existingId);
-                    log.debug("Image deleted from Mongo: {}", existingId);
-                    return ResponseEntity.ok("이미지 삭제 성공");
+                    boolean deleteByS3 = deleteImageFromS3(imageRepository.findById(id).get().getUploadPath(), imageRepository.findById(id).get().getUploadName());
+                    if (!deleteByS3) {
+                        return ResponseEntity.status(404).body("이미지 삭제 실패");
+                    } else {
+                        imageRepository.deleteById(existingId);
+                        log.debug("Image deleted from Mongo: {}", existingId);
+                        return ResponseEntity.ok("success");
+                    }
                 })
-                .orElse(ResponseEntity.status(404).body("이미지 삭제 실패"));
+                .orElse(ResponseEntity.status(404).body("fail"));
     }
+
+    private void deleteImageFromS3(String filePath, String uploadName) {
+        String keyName = filePath + "/" + uploadName;
+        amazonS3Client.deleteObject(DeleteObjectRequest.builder()
+                .bucket(bucketName)
+                .key(keyName)
+                .build());
+        log.info("Deleted file from S3: {}/{}", bucketName, keyName);
+    }
+
 
     private Optional<String> validateRole(String userInfoHeader, String... validRoles) {
         log.info("Validate role started for user: {}", userInfoHeader);
@@ -250,40 +281,3 @@ public class ImageServiceImpl implements ImageService {
                 });
     }
 }
-
-
-//    @Override
-//    public Optional<ImageDocument> findById(String id) {
-//        log.info("Find Image By id: {}", id);
-//        return imageRepository.findById(id);
-//    }
-//
-//    @Override
-//    public ImageModel findByTypeAndUploadPath(String type, String uploadPath) {
-//        log.info("Find Image by Type: {}", type);
-//        return imageRepository.findByType(type);
-//    }
-//
-//    @Override
-//    public ImageModel findByOriginalNameAndType(String name, String type) {
-//        log.info("Find Image by Name: {}, Type: {}", name + ".jpg", type);
-//        return imageRepository.findByOriginalNameAndType(name + ".jpg", type);
-//    }
-//
-//    @Override
-//    public ImageModel findByOriginalNameAndTypeAndReferencedId(String name, String type, Long referencedId) {
-//        log.info("Find Image by Name: {} Type: {} ReferencedId: {}", name + ".jpg", type, referencedId);
-//        return imageRepository.findByOriginalNameAndTypeAndReferencedId(name + ".jpg", type, referencedId);
-//    }
-//
-//    @Override
-//    public ImageModel findByTypeAndReferencedIdAndUploadPath(String type, String referencedId, String uploadPath) {
-//        log.info("Find Image by Type: {} ReferencedId: {} UploadPath: {}", type, referencedId, uploadPath);
-//        return imageRepository.findByTypeAndReferencedIdAndUploadPath(type, referencedId, uploadPath);
-//    }
-//
-//    @Override
-//    public List<ImageModel> findByTypeAndReferencedId(String type, Long referencedId) {
-//        log.info("Find Image List by Type: {}, ReferencedId: {}", type, referencedId);
-//        return imageRepository.findByTypeAndReferencedId(type, referencedId);
-//    }
