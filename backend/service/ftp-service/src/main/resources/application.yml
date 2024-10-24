@@ -5,9 +5,9 @@ spring:
   application:
     name: ftp-service
   profiles:
-    active: prod
+    active: local
   config:
-    import: configserver:http://config-server:8888/
+    import: configserver:http://localhost:8888/
   servlet:
     multipart:
       max-file-size: 10MB
