@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: config-server
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: config-server
@@ -19,8 +19,9 @@ spec:
             - containerPort: 8888
           volumeMounts:
             - name: ssh-key
-              mountPath: /root/.ssh
-              readOnly: true
+              mountPath: /var/lib/jenkins/.ssh/id_rsa
+              subPath: id_rsa
+
           env:
             - name: SPRING_CLOUD_CONFIG_SERVER_GIT_URI
               value: "git@github.com:biday5/biday-secret.git"
@@ -34,7 +35,7 @@ kind: Service
 metadata:
   name: config-server
 spec:
-  type: ClusterIP
+  type: LoadBalancer
   ports:
     - port: 8888
       targetPort: 8888

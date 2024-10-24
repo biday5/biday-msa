@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: eureka-server
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: eureka-server
@@ -23,7 +23,7 @@ kind: Service
 metadata:
   name: eureka-server
 spec:
-  type: ClusterIP
+  type: LoadBalancer
   ports:
     - port: 8761
       targetPort: 8761

@@ -121,15 +121,15 @@ pipeline {
                 script {
                     // Kubernetes YAML 파일 경로 정의
                     def kubernetesPaths = [
-                        "admin": "${WORKSPACE_PATH}/k8s/admin.yaml",
-                        "auction": "${WORKSPACE_PATH}/k8s/auction.yaml",
-                        "config": "${WORKSPACE_PATH}/k8s/config.yaml",
-                        "eureka": "${WORKSPACE_PATH}/k8s/eureka.yaml",
-                        "ftp": "${WORKSPACE_PATH}/k8s/ftp.yaml",
-                        "gateway": "${WORKSPACE_PATH}/k8s/gateway.yaml",
-                        "order": "${WORKSPACE_PATH}/k8s/order.yaml",
-                        "product": "${WORKSPACE_PATH}/k8s/product.yaml",
-                        "user": "${WORKSPACE_PATH}/k8s/user.yaml"
+                        "admin-service": "${WORKSPACE_PATH}/k8s/admin.yaml",
+                        "auction-service": "${WORKSPACE_PATH}/k8s/auction.yaml",
+                        "config-server": "${WORKSPACE_PATH}/k8s/config.yaml",
+                        "eureka-server": "${WORKSPACE_PATH}/k8s/eureka.yaml",
+                        "ftp-service": "${WORKSPACE_PATH}/k8s/ftp.yaml",
+                        "gateway-server": "${WORKSPACE_PATH}/k8s/gateway.yaml",
+                        "order-service": "${WORKSPACE_PATH}/k8s/order.yaml",
+                        "product-service": "${WORKSPACE_PATH}/k8s/product.yaml",
+                        "user-service": "${WORKSPACE_PATH}/k8s/user.yaml"
                     ]
 
                     // 각 모듈에 대해 Kubernetes 배포 수행
@@ -144,14 +144,6 @@ pipeline {
                         }
                         """
 
-                        // 배포 롤아웃 상태 확인
-                        echo "Checking rollout status for deployment ${module}"
-                        sh """
-                        kubectl --kubeconfig=${KUBECONFIG} rollout status deployment/${module} || {
-                            echo 'Rollout status check failed for ${module}';
-                            exit 1;
-                        }
-                        """
                     }
                 }
             }
@@ -176,12 +168,14 @@ pipeline {
                 tokenCredentialId: 'Slack_webhook' // 자격 증명 ID 입력
             )
 
-            script {
-                modulePaths.keySet().each { module ->
-                    echo "Removing local image for ${module}..."
-                    sh "docker rmi biday/${module}:latest || echo 'Failed to remove image for ${module}'"
-                }
-            }
+             script {
+                 modulePaths.keySet().each { module ->
+                     echo "Removing local image for ${module}..."
+                     // 로컬 도커 이미지 삭제
+                     sh "docker rmi biday/${module} || echo 'Failed to remove local image for ${module}'"
+                     sh "docker rmi hwijae/biday-${module}:1.0 || echo 'Failed to remove tagged image for ${module}'"
+                 }
+             }
         }
         failure {
             echo "========pipeline execution failed========"

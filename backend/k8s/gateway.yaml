@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: gateway-server
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: gateway-server
@@ -23,7 +23,7 @@ kind: Service
 metadata:
   name: gateway-server
 spec:
-  type: ClusterIP
+  type: LoadBalancer
   ports:
     - port: 8000
       targetPort: 8000
