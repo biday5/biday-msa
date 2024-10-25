@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: auction-service
-          image: hwijae/biday-auction-service:1.0
+          image: testxxboy/biday-auction-service:1.0
           ports:
             - containerPort: 9101
 ---
