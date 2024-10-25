@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: admin-service
-          image: hwijae/biday-admin-service:1.0
+          image: testxxboy/biday-admin-service:1.0
           ports:
             - containerPort: 9100
 ---

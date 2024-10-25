@@ -12,7 +12,7 @@ public enum Size {
     L("L"),
     XL("XL"),
     XXL("XXL"),
-    ONE("ONE");
+    FREE("FREE");
 
     private final String size;
 
