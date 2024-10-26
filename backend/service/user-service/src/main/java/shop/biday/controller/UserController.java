@@ -44,6 +44,7 @@ public class UserController {
             @Parameter(name = "phoneNum", description = "번호", example = "000-0000-0000")
     })
     public ResponseEntity<Mono<UserDocument>> register(@RequestBody UserModel model) {
+        log.info("oauth 회원가입 진입 : ", model);
         return new ResponseEntity<>(userService.register(model), HttpStatus.OK);
     }
     //TODO 예전 비번이랑 바꾸는 비번이랑 같을 경우 체크?
@@ -111,6 +112,7 @@ public class UserController {
             @Parameter(name = "phoneNum", description = "번호", example = "000-0000-0000"),
     })
     public ResponseEntity<Mono<UserDocument>> join(@RequestBody @Validated UserRequest userRequest) {
+        log.info("일반 회원가입 진입 : ", userRequest);
         return new ResponseEntity<>(userService.save(userRequest), HttpStatus.OK);
     }
 
