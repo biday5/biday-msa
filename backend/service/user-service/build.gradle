@@ -69,7 +69,6 @@ dependencies {
     testImplementation 'io.projectreactor:reactor-test'
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    implementation 'io.projectreactor.netty:reactor-netty:' // 사용 중인 버전에 맞게 수정
 
 }
 
