@@ -29,8 +29,13 @@ public class  CustomReactiveAuthenticationManager implements ReactiveAuthenticat
     public Mono<Authentication> authenticate(Authentication authentication) throws AuthenticationException {
         String email = authentication.getName();
         String password = authentication.getCredentials().toString();
+
+        // 로그 추가: 요청 URI
+        String requestUri = SERVER_URL.replace("{email}", email);
+        log.info("Requesting URI: {}", requestUri);
+
         return webClient.get()
-                .uri(SERVER_URL, email)
+                .uri(requestUri)
                 .retrieve()
                 .bodyToMono(UserModel.class)
                 .flatMap(userDocument -> {
