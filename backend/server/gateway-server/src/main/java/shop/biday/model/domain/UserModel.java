@@ -25,7 +25,6 @@ public class UserModel {
     private String phoneNum;
     private LocalDateTime createAt;
     private LocalDateTime updateAt;
-   // private Role role;
     private String status;
     private Long totalRating;
 
@@ -41,8 +40,6 @@ public class UserModel {
         this.role = Collections.singletonList(Role.valueOf(roleAsString));
     }
 
-//    public String getRoleAsString() {
-//        return role != null ? role.getAuthority() : "";
-//    }
+
 
 }

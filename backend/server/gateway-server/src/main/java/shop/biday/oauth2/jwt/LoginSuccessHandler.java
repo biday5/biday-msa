@@ -21,6 +21,8 @@ public class LoginSuccessHandler {
     private static final int COOKIE_MAX_AGE_SECONDS = 24 * 60 * 60; // 1 day
     private static final String ACCESS_TOKEN_TYPE = "access";
     private static final String REFRESH_TOKEN_TYPE = "refresh";
+    private static final String LOGIN_HISTORY_BASE_URL = "http://110.165.19.104:9106/api/loginHistory";  // 추가된 URL 상수
+
 
     private final WebClient webClient;
     private final JWTUtil jwtUtil;
@@ -65,7 +67,7 @@ public class LoginSuccessHandler {
 
     private Mono<Void> saveLoginHistory(String userId) {
         return webClient.get()
-                .uri("http://localhost:9106/api/loginHistory/{userId}", userId)
+                .uri(LOGIN_HISTORY_BASE_URL + "/{userId}", userId)
                 .retrieve()
                 .bodyToMono(Boolean.class)
                 .doOnNext(exists -> log.info("Login history exists for userId {}: {}", userId, exists))
@@ -75,7 +77,7 @@ public class LoginSuccessHandler {
                         LoginHistoryModel loginHistoryModel = new LoginHistoryModel();
                         loginHistoryModel.setUserId(userId);
                         return webClient.post()
-                                .uri("http://localhost:9106/api/loginHistory")
+                                .uri(LOGIN_HISTORY_BASE_URL)
                                 .bodyValue(loginHistoryModel)
                                 .retrieve()
                                 .bodyToMono(LoginHistoryModel.class)
