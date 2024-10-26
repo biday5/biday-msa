@@ -16,6 +16,7 @@ public class  CustomReactiveAuthenticationManager implements ReactiveAuthenticat
 
     private final WebClient webClient;
     private final PasswordEncoder passwordEncoder;
+    private static final String SERVER_URL = "http://110.165.19.104:9106/api/users/oauthLogin/{email}";
 
 
     public CustomReactiveAuthenticationManager(WebClient webClient, PasswordEncoder passwordEncoder) {
@@ -29,7 +30,7 @@ public class  CustomReactiveAuthenticationManager implements ReactiveAuthenticat
         String email = authentication.getName();
         String password = authentication.getCredentials().toString();
         return webClient.get()
-                .uri("http://localhost:9106/api/users/oauthLogin/{email}", email)
+                .uri(SERVER_URL, email)
                 .retrieve()
                 .bodyToMono(UserModel.class)
                 .flatMap(userDocument -> {
