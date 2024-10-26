@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: order-service
-          image: hwijae/biday-order-service:1.0
+          image: testxxboy/biday-order-service:1.0
           ports:
             - containerPort: 9103
 ---

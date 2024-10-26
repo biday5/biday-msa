@@ -9,9 +9,6 @@ public class NaverResponse implements OAuth2Response {
 
         this.attribute = attribute; // 직접 attribute를 저장합니다.
     }
-//    public NaverResponse(Map<String, Object> attribute) {
-//        this.attribute = (Map<String, Object>) attribute.get("response");
-//    }
 
     @Override
     public String getProvider() {

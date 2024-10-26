@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: ftp-service
-          image: hwijae/biday-ftp-service:1.0
+          image: testxxboy/biday-ftp-service:1.0
           ports:
             - containerPort: 9102
 ---

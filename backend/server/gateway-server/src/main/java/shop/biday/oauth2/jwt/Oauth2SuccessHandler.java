@@ -30,6 +30,7 @@ public class Oauth2SuccessHandler implements ServerAuthenticationSuccessHandler 
     private static final String ACCESS_TOKEN_TYPE = "access";
     private static final String REFRESH_TOKEN_TYPE = "refresh";
     private static final String REDIRECT_URL = "http://localhost:3000/login";
+    private static final String LOGIN_HISTORY_BASE_URL = "http://110.165.19.104:9106/api/loginHistory";  // 추가된 URL 상수
 
     private final JWTUtil jwtUtil;
     private final WebClient webClient;
@@ -71,7 +72,7 @@ public class Oauth2SuccessHandler implements ServerAuthenticationSuccessHandler 
 
     private Mono<Void> saveLoginHistory(String userId) {
         return webClient.get()
-                .uri("http://localhost:9106/api/loginHistory/{userId}", userId)
+                .uri(LOGIN_HISTORY_BASE_URL + "/{userId}", userId)
                 .retrieve()
                 .bodyToMono(Boolean.class)
                 .doOnNext(exists -> log.info("Login history exists for userId {}: {}", userId, exists))
@@ -81,7 +82,7 @@ public class Oauth2SuccessHandler implements ServerAuthenticationSuccessHandler 
                         LoginHistoryModel loginHistoryModel = new LoginHistoryModel();
                         loginHistoryModel.setUserId(userId);
                         return webClient.post()
-                                .uri("http://localhost:9106/api/loginHistory")
+                                .uri(LOGIN_HISTORY_BASE_URL )
                                 .bodyValue(loginHistoryModel)
                                 .retrieve()
                                 .bodyToMono(LoginHistoryModel.class)
