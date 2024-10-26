@@ -175,7 +175,7 @@ public class ReactiveOAuth2UserDetailsService implements ReactiveOAuth2UserServi
     private static final int MINIMUM_AGE = 19;
     private static final String ROLE_USER = "ROLE_USER";
     private static final String ALLOWED_SOCIAL_PROVIDERS = "naver";
-    private static final String SERVER_URL = "http://110.165.19.104:9106/api/users/register";
+    private static final String SERVER_URL = "/api/users/register";
 
     private final WebClient webClient;
 
