@@ -30,9 +30,16 @@ public class  CustomReactiveAuthenticationManager implements ReactiveAuthenticat
         String email = authentication.getName();
         String password = authentication.getCredentials().toString();
 
-        // 로그 추가: 요청 URI
+        // 요청 URI 생성
         String requestUri = SERVER_URL.replace("{email}", email);
-        log.info("Requesting URI: {}", requestUri);
+
+        // WebClient의 base URL 가져오기
+        String baseUrl = webClient.get().toString();
+        log.info("webClient to String: {}", baseUrl);
+
+        // 전체 요청 URI 로그
+        String fullRequestUri = baseUrl + requestUri;
+        log.info("Requesting full URI: {}", fullRequestUri);
 
         return webClient.get()
                 .uri(requestUri)
