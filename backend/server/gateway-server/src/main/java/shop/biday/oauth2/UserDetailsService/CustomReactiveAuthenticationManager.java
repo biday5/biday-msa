@@ -17,17 +17,17 @@ public class  CustomReactiveAuthenticationManager implements ReactiveAuthenticat
 
     private final WebClient webClient;
     private final PasswordEncoder passwordEncoder;
-    private static final String SERVER_URL = "http://110.165.19.104:8000/api/users/oauthLogin/{email}";
+    private static final String SERVER_URL = "/api/users/oauthLogin/{email}";
 
-//    public CustomReactiveAuthenticationManager(WebClient webClient, PasswordEncoder passwordEncoder) {
-//        this.webClient = webClient;
-//        this.passwordEncoder = passwordEncoder;
-//    }
-
-    public CustomReactiveAuthenticationManager(WebClient.Builder webClientBuilder, PasswordEncoder passwordEncoder) {
-        this.webClient = webClientBuilder.build();
+    public CustomReactiveAuthenticationManager(WebClient webClient, PasswordEncoder passwordEncoder) {
+        this.webClient = webClient;
         this.passwordEncoder = passwordEncoder;
     }
+
+//    public CustomReactiveAuthenticationManager(WebClient.Builder webClientBuilder, PasswordEncoder passwordEncoder) {
+//        this.webClient = webClientBuilder.build();
+//        this.passwordEncoder = passwordEncoder;
+//    }
 
     @Override
     public Mono<Authentication> authenticate(Authentication authentication) throws AuthenticationException {
@@ -35,11 +35,13 @@ public class  CustomReactiveAuthenticationManager implements ReactiveAuthenticat
         String password = authentication.getCredentials().toString();
 
         // 전체 요청 URI 로그
-        String fullRequestUri = SERVER_URL.replace("{email}", email);
-        log.info("Requesting full URI: {}", fullRequestUri);
+        String requestUri = SERVER_URL.replace("{email}", email);
+        log.info("Requesting full URI: {}", requestUri);
+        String fullRequestUri = String.valueOf(webClient.get().uri(SERVER_URL, email));
+        log.warn("Full Requesting full URI: {}", fullRequestUri);
 
         return webClient.get()
-                .uri(fullRequestUri)
+                .uri(requestUri)
 //                .uri(uriBuilder -> uriBuilder.path(SERVER_URL).build(email)) // SERVER_URL과 email 파라미터 결합
                 .retrieve()
                 .bodyToMono(UserModel.class)
