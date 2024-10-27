@@ -19,32 +19,27 @@ public class  CustomReactiveAuthenticationManager implements ReactiveAuthenticat
     private final PasswordEncoder passwordEncoder;
     private static final String SERVER_URL = "/api/users/oauthLogin/{email}";
 
-    @Value("${base.url}") // baseUrl을 주입받는 방법
-    private String baseUrl;
+//    public CustomReactiveAuthenticationManager(WebClient webClient, PasswordEncoder passwordEncoder) {
+//        this.webClient = webClient;
+//        this.passwordEncoder = passwordEncoder;
+//    }
 
-    public CustomReactiveAuthenticationManager(WebClient webClient, PasswordEncoder passwordEncoder) {
-        this.webClient = webClient;
+    public CustomReactiveAuthenticationManager(WebClient.Builder webClientBuilder, PasswordEncoder passwordEncoder) {
+        this.webClient = webClientBuilder.build();  // 주입된 Builder로 WebClient 생성
         this.passwordEncoder = passwordEncoder;
     }
-
 
     @Override
     public Mono<Authentication> authenticate(Authentication authentication) throws AuthenticationException {
         String email = authentication.getName();
         String password = authentication.getCredentials().toString();
 
-        // 요청 URI 생성
-        String requestUri = SERVER_URL.replace("{email}", email);
-
-        // WebClient의 base URL 가져오기
-        log.info("webClient to String: {}", baseUrl);
-
         // 전체 요청 URI 로그
-        String fullRequestUri = baseUrl + requestUri;
+        String fullRequestUri = SERVER_URL.replace("{email}", email);
         log.info("Requesting full URI: {}", fullRequestUri);
 
         return webClient.get()
-                .uri(requestUri)
+                .uri(fullRequestUri)
                 .retrieve()
                 .bodyToMono(UserModel.class)
                 .flatMap(userDocument -> {
