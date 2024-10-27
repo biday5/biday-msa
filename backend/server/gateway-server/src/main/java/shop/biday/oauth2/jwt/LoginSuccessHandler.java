@@ -21,7 +21,8 @@ public class LoginSuccessHandler {
     private static final int COOKIE_MAX_AGE_SECONDS = 24 * 60 * 60; // 1 day
     private static final String ACCESS_TOKEN_TYPE = "access";
     private static final String REFRESH_TOKEN_TYPE = "refresh";
-    private static final String LOGIN_HISTORY_BASE_URL = "http://110.165.19.104:9106/api/loginHistory";  // 추가된 URL 상수
+//    private static final String LOGIN_HISTORY_BASE_URL = "http://user-service:9106/api/loginHistory";  // 추가된 URL 상수
+    private static final String LOGIN_HISTORY_BASE_URL = "/api/loginHistory";  // 추가된 URL 상수
 
 
     private final WebClient webClient;
