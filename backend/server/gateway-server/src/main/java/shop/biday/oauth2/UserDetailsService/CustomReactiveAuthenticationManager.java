@@ -1,6 +1,7 @@
 package shop.biday.oauth2.UserDetailsService;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -18,6 +19,8 @@ public class  CustomReactiveAuthenticationManager implements ReactiveAuthenticat
     private final PasswordEncoder passwordEncoder;
     private static final String SERVER_URL = "/api/users/oauthLogin/{email}";
 
+    @Value("${base.url}") // baseUrl을 주입받는 방법
+    private String baseUrl;
 
     public CustomReactiveAuthenticationManager(WebClient webClient, PasswordEncoder passwordEncoder) {
         this.webClient = webClient;
@@ -34,7 +37,6 @@ public class  CustomReactiveAuthenticationManager implements ReactiveAuthenticat
         String requestUri = SERVER_URL.replace("{email}", email);
 
         // WebClient의 base URL 가져오기
-        String baseUrl = webClient.get().toString();
         log.info("webClient to String: {}", baseUrl);
 
         // 전체 요청 URI 로그
