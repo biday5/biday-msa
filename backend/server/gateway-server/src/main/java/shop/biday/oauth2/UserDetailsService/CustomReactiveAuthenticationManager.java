@@ -17,7 +17,7 @@ public class  CustomReactiveAuthenticationManager implements ReactiveAuthenticat
 
     private final WebClient webClient;
     private final PasswordEncoder passwordEncoder;
-    private static final String SERVER_URL = "/api/users/oauthLogin/{email}";
+    private static final String SERVER_URL = "http://110.165.19.104:9106/api/users/oauthLogin/{email}";
 
 //    public CustomReactiveAuthenticationManager(WebClient webClient, PasswordEncoder passwordEncoder) {
 //        this.webClient = webClient;
@@ -39,8 +39,8 @@ public class  CustomReactiveAuthenticationManager implements ReactiveAuthenticat
         log.info("Requesting full URI: {}", fullRequestUri);
 
         return webClient.get()
-//                .uri(fullRequestUri)
-                .uri(uriBuilder -> uriBuilder.path(SERVER_URL).build(email)) // SERVER_URL과 email 파라미터 결합
+                .uri(fullRequestUri)
+//                .uri(uriBuilder -> uriBuilder.path(SERVER_URL).build(email)) // SERVER_URL과 email 파라미터 결합
                 .retrieve()
                 .bodyToMono(UserModel.class)
                 .flatMap(userDocument -> {
