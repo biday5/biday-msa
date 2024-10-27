@@ -25,7 +25,7 @@ public class  CustomReactiveAuthenticationManager implements ReactiveAuthenticat
 //    }
 
     public CustomReactiveAuthenticationManager(WebClient.Builder webClientBuilder, PasswordEncoder passwordEncoder) {
-        this.webClient = webClientBuilder.build();  // 주입된 Builder로 WebClient 생성
+        this.webClient = webClientBuilder.build();
         this.passwordEncoder = passwordEncoder;
     }
 

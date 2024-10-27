@@ -22,15 +22,15 @@ public class WebClientConfig {
     @Bean
     public WebClient webClient() {
         HttpClient httpClient = HttpClient.create()
-                .responseTimeout(Duration.ofSeconds(5)) // 응답 타임아웃 설정
+                .responseTimeout(Duration.ofSeconds(5))
                 .wiretap("reactor.netty.http.client.HttpClient", LogLevel.DEBUG,
-                        AdvancedByteBufFormat.TEXTUAL); // 로깅 설정
+                        AdvancedByteBufFormat.TEXTUAL);
 
         return WebClient.builder()
                 .clientConnector(new ReactorClientHttpConnector(httpClient))
-                .baseUrl("http://110.165.19.104:8000")
+//                .baseUrl("http://110.165.19.104:8000")
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .filter(logRequest()) // 요청 로깅 필터 추가
+                .filter(logRequest())
                 .build();
     }
 
