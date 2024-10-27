@@ -39,8 +39,8 @@ public class  CustomReactiveAuthenticationManager implements ReactiveAuthenticat
         log.info("Requesting full URI: {}", fullRequestUri);
 
         return webClient.get()
-//                .uri(fullRequestUri)
-                .uri(uriBuilder -> uriBuilder.path(SERVER_URL).build(email)) // SERVER_URL과 email 파라미터 결합
+                .uri(fullRequestUri)
+//                .uri(uriBuilder -> uriBuilder.path(SERVER_URL).build(email)) // SERVER_URL과 email 파라미터 결합
                 .retrieve()
                 .bodyToMono(UserModel.class)
                 .flatMap(userDocument -> {
