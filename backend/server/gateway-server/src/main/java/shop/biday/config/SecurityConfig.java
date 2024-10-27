@@ -103,7 +103,8 @@ public class SecurityConfig {
 
     @Bean
     public CustomReactiveAuthenticationManager customReactiveAuthenticationManager() {
-        return new CustomReactiveAuthenticationManager(webClient, passwordEncoder);
+//        return new CustomReactiveAuthenticationManager(webClient, passwordEncoder);
+        return new CustomReactiveAuthenticationManager(WebClient.builder(), passwordEncoder);
     }
 
     @Bean

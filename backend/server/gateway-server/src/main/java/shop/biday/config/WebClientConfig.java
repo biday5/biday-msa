@@ -15,8 +15,6 @@ import java.time.Duration;
 @Configuration
 public class WebClientConfig {
 
-    private static final String BASE_URL = "http://110.165.19.104:8000";
-
     @Bean
     public WebClient webClient() {
         HttpClient httpClient = HttpClient.create()
@@ -26,14 +24,8 @@ public class WebClientConfig {
 
         return WebClient.builder()
                 .clientConnector(new ReactorClientHttpConnector(httpClient))
-                .baseUrl(BASE_URL)
+                .baseUrl("http://110.165.19.104:8000")
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .build();
-    }
-
-
-    @Bean
-    public String baseUrl() {
-        return BASE_URL; // baseUrl을 반환하는 메서드
     }
 }
