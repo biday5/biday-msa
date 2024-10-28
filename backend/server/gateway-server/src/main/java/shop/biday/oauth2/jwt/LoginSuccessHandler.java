@@ -98,8 +98,7 @@ public class LoginSuccessHandler {
         return ResponseCookie.from(key, value)
                 .maxAge(COOKIE_MAX_AGE_SECONDS)
                 .path("/")
-                .secure(false)  // HTTPS에서만 전송
-                .sameSite("Lax") // SameSite=Lax 설정
+                .httpOnly(false)
                 .build();
     }
 
