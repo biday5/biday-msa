@@ -3,10 +3,12 @@ package shop.biday.service.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import shop.biday.model.document.BidDocument;
 import shop.biday.model.domain.BidModel;
 import shop.biday.model.domain.UserInfoModel;
+import shop.biday.model.dto.BidDto;
 import shop.biday.model.dto.BidResponse;
 import shop.biday.model.repository.BidRepository;
 import shop.biday.service.BidService;
@@ -19,6 +21,14 @@ public class BidServiceImpl implements BidService {
 
     private final BidRepository bidRepository;
     private final UserInfoUtils userInfoUtils;
+
+
+    @Override
+    public Flux<BidDto> findByUserId(String userInfo) {
+        return bidRepository.findByUserIdAndAwardFalse(userInfoUtils.extractUserInfo(userInfo).getUserId())
+                .map(BidDto::convertToDto);
+    }
+
 
     @Override
     public Mono<BidResponse> save(String userInfo, BidModel bid) {

@@ -12,4 +12,6 @@ public interface BidRepository extends ReactiveMongoRepository<BidDocument, Stri
     @Query(value = "{ 'auctionId': ?0 }", sort = "{ 'currentBid': -1, 'bidedAt': 1 }")
     Flux<BidDocument> findFirstByAuctionIdOrderByCurrentBidDescAndBidedAtAsc(Long auctionId);
 
+
+    Flux<BidDocument> findByUserIdAndAwardFalse(String userId);
 }
