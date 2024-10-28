@@ -103,6 +103,7 @@ public class Oauth2SuccessHandler implements ServerAuthenticationSuccessHandler 
                 .maxAge(COOKIE_MAX_AGE_SECONDS)
                 .path("/")
                 .httpOnly(false)
+                .sameSite("Lax") // SameSite 설정
                 .build();
     }
 
