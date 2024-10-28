@@ -103,7 +103,6 @@ public class Oauth2SuccessHandler implements ServerAuthenticationSuccessHandler 
                 .maxAge(COOKIE_MAX_AGE_SECONDS)
                 .path("/")
                 .httpOnly(false)
-                .secure(false)  // HTTPS에서만 전송
                 .build();
     }
 

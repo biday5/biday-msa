@@ -99,7 +99,6 @@ public class LoginSuccessHandler {
                 .maxAge(COOKIE_MAX_AGE_SECONDS)
                 .path("/")
                 .httpOnly(false)
-                .secure(false)  // HTTPS에서만 전송
                 .build();
     }
 
