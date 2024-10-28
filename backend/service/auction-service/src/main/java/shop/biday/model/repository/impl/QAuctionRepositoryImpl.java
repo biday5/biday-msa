@@ -50,7 +50,8 @@ public class QAuctionRepositoryImpl implements QAuctionRepository {
                                 qAward.userId,
                                 qAward.bidedAt,
                                 qAward.currentBid,
-                                qAward.count)))
+                                qAward.count,
+                                qAward.createdAt)))
                 .from(qAuction)
                 .leftJoin(qAuction.award, qAward)
                 .where(qAuction.id.eq(id))
