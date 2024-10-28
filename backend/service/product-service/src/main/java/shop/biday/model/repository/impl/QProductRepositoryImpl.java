@@ -123,6 +123,7 @@ public class QProductRepositoryImpl implements QProductRepository {
                 qCategory.name.as("category"),
                 qProduct.name,
                 qProduct.subName,
+                qProduct.description,
                 qProduct.productCode,
                 qProduct.price,
                 qProduct.color.stringValue(),

@@ -80,7 +80,8 @@ public class QAwardRepositoryImpl implements QAwardRepository {
                 qAward.userId,
                 qAward.bidedAt,
                 qAward.currentBid,
-                qAward.count);
+                qAward.count,
+                qAward.createdAt);
     }
 
     private ConstructorExpression<AuctionDto> createAuctionDtoProjection() {

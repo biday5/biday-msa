@@ -3,6 +3,7 @@ package shop.biday.model.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicInsert;
 
 import java.math.BigInteger;
@@ -40,4 +41,8 @@ public class AwardEntity {
     @ColumnDefault("1")
     @Column(name = "count", nullable = false)
     private Long count;
+
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    private LocalDateTime createdAt;
 }
