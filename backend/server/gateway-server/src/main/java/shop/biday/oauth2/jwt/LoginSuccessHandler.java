@@ -21,7 +21,6 @@ public class LoginSuccessHandler {
     private static final int COOKIE_MAX_AGE_SECONDS = 24 * 60 * 60; // 1 day
     private static final String ACCESS_TOKEN_TYPE = "access";
     private static final String REFRESH_TOKEN_TYPE = "refresh";
-//    private static final String LOGIN_HISTORY_BASE_URL = "http://user-service:9106/api/loginHistory";  // 추가된 URL 상수
     private static final String LOGIN_HISTORY_BASE_URL = "/api/loginHistory";  // 추가된 URL 상수
 
 
@@ -99,7 +98,7 @@ public class LoginSuccessHandler {
         return ResponseCookie.from(key, value)
                 .maxAge(COOKIE_MAX_AGE_SECONDS)
                 .path("/")
-                .httpOnly(true)
+                .httpOnly(false)
                 .secure(true)  // HTTPS에서만 전송
                 .sameSite("None")  // Cross-site 요청 허용
                 .build();
