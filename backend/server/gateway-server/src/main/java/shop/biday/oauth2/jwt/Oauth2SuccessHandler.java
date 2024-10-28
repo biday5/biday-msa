@@ -104,7 +104,6 @@ public class Oauth2SuccessHandler implements ServerAuthenticationSuccessHandler 
                 .path("/")
                 .httpOnly(false)
                 .secure(false)  // HTTPS에서만 전송
-                .sameSite("None")  // Cross-site 요청 허용
                 .build();
     }
 
