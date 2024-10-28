@@ -24,11 +24,6 @@ public class  CustomReactiveAuthenticationManager implements ReactiveAuthenticat
         this.passwordEncoder = passwordEncoder;
     }
 
-//    public CustomReactiveAuthenticationManager(WebClient.Builder webClientBuilder, PasswordEncoder passwordEncoder) {
-//        this.webClient = webClientBuilder.build();
-//        this.passwordEncoder = passwordEncoder;
-//    }
-
     @Override
     public Mono<Authentication> authenticate(Authentication authentication) throws AuthenticationException {
         String email = authentication.getName();
@@ -36,13 +31,10 @@ public class  CustomReactiveAuthenticationManager implements ReactiveAuthenticat
 
         // 전체 요청 URI 로그
         String requestUri = SERVER_URL.replace("{email}", email);
-        log.info("Requesting full URI: {}", requestUri);
-        String fullRequestUri = String.valueOf(webClient.get().uri(SERVER_URL, email));
-        log.warn("Full Requesting full URI: {}", fullRequestUri);
+
 
         return webClient.get()
                 .uri(requestUri)
-//                .uri(uriBuilder -> uriBuilder.path(SERVER_URL).build(email)) // SERVER_URL과 email 파라미터 결합
                 .retrieve()
                 .bodyToMono(UserModel.class)
                 .flatMap(userDocument -> {

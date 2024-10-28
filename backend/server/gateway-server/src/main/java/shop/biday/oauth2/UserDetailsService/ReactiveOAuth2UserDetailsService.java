@@ -182,37 +182,31 @@ public class ReactiveOAuth2UserDetailsService implements ReactiveOAuth2UserServi
     @Override
     public Mono<OAuth2User> loadUser(OAuth2UserRequest userRequest) {
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
-        log.info("loadUser: 소셜 제공자 {}의 사용자 정보 로드 시작", registrationId);
 
         return getOAuth2User(userRequest)
                 .flatMap(oAuth2User -> {
                     OAuth2Response oAuth2Response = null;
                     try {
                         if (registrationId.equals(ALLOWED_SOCIAL_PROVIDERS)) {
-                            log.info("loadUser: 소셜 제공자가 허용 목록에 있음 - {}", ALLOWED_SOCIAL_PROVIDERS);
                             oAuth2Response = new NaverResponse(oAuth2User.getAttributes());
                         }
 
                         if (oAuth2Response != null) {
                             return processUser(oAuth2Response);
                         } else {
-                            log.warn("loadUser: 지원하지 않는 소셜 제공자입니다: {}", registrationId);
                             return Mono.error(new IllegalArgumentException("지원하지 않는 소셜 제공자입니다."));
                         }
                     } catch (IllegalArgumentException e) {
-                        log.error("loadUser: 잘못된 사용자 정보 - {}", e.getMessage());
                         return Mono.error(new OAuth2AuthenticationException("잘못된 사용자 정보: " + e.getMessage()));
                     }
                 });
     }
 
     private Mono<OAuth2User> getOAuth2User(OAuth2UserRequest userRequest) {
-        log.info("getOAuth2User: 사용자 정보 요청 URI 설정");
         WebClient webClient = WebClient.builder().build();
 
         String userInfoUri = userRequest.getClientRegistration().getProviderDetails().getUserInfoEndpoint().getUri();
         String accessToken = userRequest.getAccessToken().getTokenValue();
-        log.info("getOAuth2User: 요청 URI - {}, Access Token - {}", userInfoUri, accessToken);
 
         return webClient.get()
                 .uri(userInfoUri)
@@ -231,30 +225,24 @@ public class ReactiveOAuth2UserDetailsService implements ReactiveOAuth2UserServi
                                 "id"
                         ));
                     } else {
-                        log.error("getOAuth2User: 사용자 정보 응답 형식이 잘못되었습니다.");
                         sink.error(new IllegalArgumentException("잘못된 사용자 정보 응답 형식"));
                     }
                 })
                 .doOnError(ex -> log.error("getOAuth2User: 사용자 정보 요청 중 오류 발생 - {}", ex.getMessage()))
                 .onErrorMap(ex -> {
-                    log.error("getOAuth2User: OAuth2 제공자 오류 발생 - {}", ex.getMessage());
                     return new OAuth2AuthenticationException("OAuth2 제공자에서 사용자 정보를 가져오는 데 실패했습니다.");
                 });
     }
 
     private Mono<CustomOAuth2User> processUser(OAuth2Response oAuth2Response) {
-        log.info("processUser: OAuth2 응답 처리 시작");
 
         if (oAuth2Response == null) {
-            log.error("processUser: OAuth2Response가 비어있습니다.");
             return Mono.error(new OAuth2AuthenticationException("OAuth2Response가 빈 값 입니다."));
         }
 
         String birthYearString = oAuth2Response.getBirthyear();
-        log.info("processUser: 생년 정보 - {}", birthYearString);
 
         if (birthYearString == null || birthYearString.isEmpty()) {
-            log.error("processUser: 생년 정보 누락");
             return Mono.error(new OAuth2AuthenticationException("생년월일 값이 누락되었습니다."));
         }
 
@@ -263,35 +251,27 @@ public class ReactiveOAuth2UserDetailsService implements ReactiveOAuth2UserServi
             int currentYear = java.time.Year.now().getValue();
             int age = currentYear - birthYear;
 
-            log.info("processUser: 사용자 나이 계산 완료 - 나이: {}", age);
 
             if (age < MINIMUM_AGE) {
-                log.warn("processUser: 나이 제한 미달 - 사용자 나이: {}", age);
                 return Mono.error(new OAuth2AuthenticationException("사용자는 " + MINIMUM_AGE + "세 미만입니다."));
             }
 
             String oauthName = oAuth2Response.getProvider() + " " + oAuth2Response.getProviderId();
-            log.info("processUser: OAuth 이름 설정 완료 - {}", oauthName);
             return registerUser(oAuth2Response, oauthName);
         } catch (NumberFormatException e) {
-            log.error("processUser: 생년 형식 오류 - {}", e.getMessage());
             return Mono.error(new OAuth2AuthenticationException("잘못된 생년 형식입니다: " + e.getMessage()));
         } catch (Exception e) {
-            log.error("processUser: OAuth2 응답 처리 중 예기치 못한 오류 발생 - {}", e.getMessage());
             return Mono.error(new OAuth2AuthenticationException("OAuth2 응답 처리 중 오류가 발생했습니다: " + e.getMessage()));
         }
     }
 
     private Mono<CustomOAuth2User> registerUser(OAuth2Response oAuth2Response, String oauthName) {
-        log.info("registerUser: 사용자 등록 요청 시작");
 
         UserRegistrationRequest registrationRequest = new UserRegistrationRequest();
         registrationRequest.setEmail(oAuth2Response.getEmail());
         registrationRequest.setOauthName(oauthName);
         registrationRequest.setName(oAuth2Response.getName());
         registrationRequest.setPhoneNum(oAuth2Response.getMobile());
-
-        log.info("registerUser: 사용자 등록 요청 데이터 - {}", registrationRequest);
 
         return webClient.post()
                 .uri(SERVER_URL)
@@ -302,7 +282,6 @@ public class ReactiveOAuth2UserDetailsService implements ReactiveOAuth2UserServi
                 .map(CustomOAuth2User::new)
                 .doOnError(e -> log.error("registerUser: 사용자 등록 중 오류 발생 - {}", e.getMessage()))
                 .onErrorMap(e -> {
-                    log.error("registerUser: 회원가입 실패 - {}", e.getMessage());
                     return new IllegalArgumentException("회원가입에 실패했습니다.");
                 });
     }

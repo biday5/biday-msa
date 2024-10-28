@@ -30,8 +30,6 @@ public class LoginFilter extends AuthenticationWebFilter {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
-        log.info("LoginFilter ServerWebExchange : {} chain : {}", exchange, chain);
-        log.info("LoginFiler exchange.getRequest().getURI().getPath() : {}", exchange.getRequest().getURI().getPath());
         if (exchange.getRequest().getURI().getPath().equals("/login")) {
             return authenticate(exchange, chain);
         }
@@ -76,7 +74,6 @@ public Mono<Void> authenticate(ServerWebExchange exchange, WebFilterChain chain)
     }
 
     private Mono<Authentication> authenticateUser(Map<String, String> loginData) {
-        log.debug("LoginFiler authenticateUser loginData : {}", loginData);
 
         String email = loginData.get("username");
         String password = loginData.get("password");

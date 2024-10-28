@@ -33,7 +33,7 @@ public class JWTReissueController {
         return ResponseCookie.from(key, value)
                 .maxAge(24 * 60 * 60)
                 .path("/")
-                .httpOnly(true)
+                .httpOnly(false)
                 .build();
     }
 }
