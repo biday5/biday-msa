@@ -8,6 +8,4 @@ import shop.biday.model.entity.AwardEntity;
 @Repository
 public interface AwardRepository extends JpaRepository<AwardEntity, Long>, QAwardRepository {
 
-    AwardDto findByAuctionId(Long auctionId);
-
 }
