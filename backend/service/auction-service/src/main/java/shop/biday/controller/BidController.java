@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +16,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.Sinks;
 import shop.biday.model.domain.BidModel;
+import shop.biday.model.dto.BidDto;
 import shop.biday.model.dto.BidResponse;
 import shop.biday.service.AuctionService;
 import shop.biday.service.BidService;
@@ -37,6 +39,23 @@ public class BidController {
 
     private final BidService bidService;
     private final AuctionService auctionService;
+
+    @Operation(summary = "입찰 내역 조회", description = "마이페이지 입찰한 내역 전체 조회")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "입찰 가져오기 성공"),
+            @ApiResponse(responseCode = "403", description = "권한 없음"),
+            @ApiResponse(responseCode = "404", description = "잘못된 조회"),
+            @ApiResponse(responseCode = "500", description = "서버 오류")
+    })
+    @Parameters({
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
+                    example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}"),
+    })
+    @GetMapping
+    public Flux<BidDto> findByUserIdAndAuctionId(@RequestHeader("UserInfo") String userInfo) {
+        log.info("findByUserIdAndAuctionId userInfo= {}", userInfo);
+        return bidService.findByUserId(userInfo);
+    }
 
     @Operation(summary = "입찰 조회", description = "auctionId로 최고 입찰가를 조회합니다.(SSE)")
     @Parameters({
