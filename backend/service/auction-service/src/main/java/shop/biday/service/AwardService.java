@@ -4,6 +4,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
 import shop.biday.model.domain.AwardModel;
+import shop.biday.model.dto.AwardDto;
 import shop.biday.model.entity.AwardEntity;
 
 import java.time.LocalDateTime;
@@ -18,6 +19,8 @@ public interface AwardService {
     AwardEntity save(AwardEntity award);
 
     ResponseEntity<AwardModel> findByAwardId(String userInfoHeader, Long awardId);
+
+    ResponseEntity<AwardDto> findByAuctionId(Long auctionId);
 
     ResponseEntity<Slice<AwardModel>> findByUser(String userInfoHeader, String period, LocalDateTime cursor, Pageable pageable);
 }
