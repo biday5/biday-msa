@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import shop.biday.model.domain.PaymentTempModel;
+import shop.biday.model.dto.PaymentData;
 import shop.biday.model.dto.PaymentRequest;
 import shop.biday.model.dto.PaymentResponse;
 import shop.biday.model.dto.PaymentSaveResponse;
@@ -95,7 +96,7 @@ public class PaymentController {
                     example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}"),
     })
     @GetMapping("/findByUser")
-    public ResponseEntity<List<PaymentRequest>> findByUser(@RequestHeader("UserInfo") String userInfo) {
+    public ResponseEntity<List<PaymentData>> findByUser(@RequestHeader("UserInfo") String userInfo) {
         log.info("findByUser: {}", userInfo);
         return new ResponseEntity<>(paymentService.findByUser(userInfo), HttpStatus.OK);
     }

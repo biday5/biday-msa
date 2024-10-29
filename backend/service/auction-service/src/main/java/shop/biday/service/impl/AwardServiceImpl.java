@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import shop.biday.model.domain.AwardModel;
 import shop.biday.model.domain.UserInfoModel;
+import shop.biday.model.dto.AwardDto;
 import shop.biday.model.entity.AwardEntity;
 import shop.biday.model.repository.AwardRepository;
 import shop.biday.service.AwardService;
@@ -79,6 +80,20 @@ public class AwardServiceImpl implements AwardService {
                         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
                     }
                 }).getBody();
+    }
+
+    @Override
+    public ResponseEntity<AwardDto> findByAuctionId(Long auctionId) {
+        log.info("Finding Award by Auction Id: {}", auctionId);
+        return Optional.ofNullable(awardRepository.findByAuctionId(auctionId))
+                .map(award -> {
+                    log.info("Award found for Auction Id: {}", auctionId);
+                    return ResponseEntity.ok(award);
+                })
+                .orElseGet(() -> {
+                    log.warn("No award found for Auction Id: {}", auctionId);
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+                });
     }
 
     @Override

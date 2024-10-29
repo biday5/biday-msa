@@ -4,6 +4,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import shop.biday.model.dto.PaymentData;
 import shop.biday.model.dto.PaymentRequest;
 import shop.biday.model.entity.QPaymentEntity;
 import shop.biday.model.repository.QPaymentRepository;
@@ -18,13 +19,14 @@ public class QPaymentRepositoryImpl implements QPaymentRepository {
     private final QPaymentEntity qPayment = QPaymentEntity.paymentEntity;
 
     @Override
-    public List<PaymentRequest> findByUser(String userId) {
+    public List<PaymentData> findByUser(String userId) {
         return queryFactory
-                .select(Projections.constructor(PaymentRequest.class,
+                .select(Projections.constructor(PaymentData.class,
                         qPayment.awardId,
                         qPayment.paymentKey,
                         qPayment.totalAmount,
-                        qPayment.orderId
+                        qPayment.orderId,
+                        qPayment.approvedAt
                 ))
                 .from(qPayment)
                 .where(qPayment.userId.eq(userId))

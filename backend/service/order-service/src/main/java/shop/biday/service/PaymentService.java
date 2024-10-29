@@ -1,6 +1,7 @@
 package shop.biday.service;
 
 import shop.biday.model.domain.PaymentTempModel;
+import shop.biday.model.dto.PaymentData;
 import shop.biday.model.dto.PaymentRequest;
 import shop.biday.model.dto.PaymentResponse;
 import shop.biday.model.dto.PaymentSaveResponse;
@@ -29,5 +30,5 @@ public interface PaymentService {
 
     PaymentEntity updateCancelStatus(Long id, PaymentStatus paymentStatus);
 
-    List<PaymentRequest> findByUser(String user);
+    List<PaymentData> findByUser(String user);
 }

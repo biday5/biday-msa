@@ -10,10 +10,7 @@ import shop.biday.model.domain.PaymentCardModel;
 import shop.biday.model.domain.PaymentModel;
 import shop.biday.model.domain.PaymentTempModel;
 import shop.biday.model.domain.UserInfoModel;
-import shop.biday.model.dto.PaymentDto;
-import shop.biday.model.dto.PaymentRequest;
-import shop.biday.model.dto.PaymentResponse;
-import shop.biday.model.dto.PaymentSaveResponse;
+import shop.biday.model.dto.*;
 import shop.biday.model.entity.PaymentCardType;
 import shop.biday.model.entity.PaymentEntity;
 import shop.biday.model.entity.PaymentMethod;
@@ -166,7 +163,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public List<PaymentRequest> findByUser(String userInfo) {
+    public List<PaymentData> findByUser(String userInfo) {
         UserInfoModel userInfoModel = userInfoUtils.extractUserInfo(userInfo);
         log.info("Find Payment By UserInfo: {}", userInfo);
         return paymentRepository.findByUser(userInfoModel.getUserId());
