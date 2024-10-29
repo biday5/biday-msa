@@ -11,6 +11,7 @@ import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Repository;
 import shop.biday.model.domain.AwardModel;
 import shop.biday.model.dto.AuctionDto;
+import shop.biday.model.dto.AwardDto;
 import shop.biday.model.entity.QAuctionEntity;
 import shop.biday.model.entity.QAwardEntity;
 import shop.biday.model.repository.QAwardRepository;
@@ -34,6 +35,22 @@ public class QAwardRepositoryImpl implements QAwardRepository {
                 .from(qAward)
                 .leftJoin(qAward.auction, qAuction)
                 .where(qAward.id.eq(id))
+                .fetchOne();
+    }
+
+    @Override
+    public AwardDto findByAuctionId(Long auctionId) {
+        return queryFactory
+                .select(Projections.constructor(AwardDto.class,
+                        qAward.id,
+                        qAward.auction.id,
+                        qAward.userId,
+                        qAward.bidedAt,
+                        qAward.currentBid,
+                        qAward.count,
+                        qAward.createdAt))
+                .from(qAward)
+                .where(qAward.auction.id.eq(auctionId))
                 .fetchOne();
     }
 
