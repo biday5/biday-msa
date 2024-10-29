@@ -72,8 +72,7 @@ public class AwardController {
     @Operation(summary = "낙찰 상세보기", description = "경매가 종료된 페이지에서 호출")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "낙찰 불러오기 성공"),
-            @ApiResponse(responseCode = "404", description = "낙찰 찾을 수 없음"),
-            @ApiResponse(responseCode = "403", description = "권한 없음")
+            @ApiResponse(responseCode = "404", description = "낙찰 찾을 수 없음")
     })
     @Parameters({
             @Parameter(name = "awardId", description = "낙찰 정보 확인할 경매 id", example = "1")

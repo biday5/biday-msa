@@ -84,8 +84,16 @@ public class AwardServiceImpl implements AwardService {
 
     @Override
     public ResponseEntity<AwardDto> findByAuctionId(Long auctionId) {
-        log.info("Find Award by Auction Id: {}", auctionId);
-        return ResponseEntity.ok(awardRepository.findByAuctionId(auctionId));
+        log.info("Finding Award by Auction Id: {}", auctionId);
+        return Optional.ofNullable(awardRepository.findByAuctionId(auctionId))
+                .map(award -> {
+                    log.info("Award found for Auction Id: {}", auctionId);
+                    return ResponseEntity.ok(award);
+                })
+                .orElseGet(() -> {
+                    log.warn("No award found for Auction Id: {}", auctionId);
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+                });
     }
 
     @Override
