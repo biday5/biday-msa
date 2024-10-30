@@ -188,4 +188,22 @@ public class AuctionController {
             @RequestParam("auctionId") Long id) {
         return auctionService.deleteById(userInfoHeader, id);
     }
+
+    @Operation(summary = "경매 취소", description = "진행 예정 경매 수정, 기존 시작 날짜 전에만 시작 날짜 + 끝나는 날짜만 변경 가능")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "경매 수정 성공"),
+            @ApiResponse(responseCode = "403", description = "권한 없음"),
+            @ApiResponse(responseCode = "404", description = "경매 찾을 수 없음"),
+            @ApiResponse(responseCode = "500", description = "서버 오류")
+    })
+    @Parameters({
+            @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
+                    example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}"),
+            @Parameter(name = "auctionId", description = "경매 id", example = "1")
+    })
+    public ResponseEntity<String> cancel(
+            @RequestHeader("UserInfo") String userInfoHeader,
+            @RequestParam("auctionId") Long auctionId) {
+        return auctionService.cancel(userInfoHeader, auctionId);
+    }
 }

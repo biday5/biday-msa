@@ -75,7 +75,7 @@ public class AwardController {
             @ApiResponse(responseCode = "404", description = "낙찰 찾을 수 없음")
     })
     @Parameters({
-            @Parameter(name = "awardId", description = "낙찰 정보 확인할 경매 id", example = "1")
+            @Parameter(name = "auctionId", description = "낙찰 정보 확인할 경매 id", example = "1")
     })
     public ResponseEntity<AwardDto> findById(
             @RequestParam(value = "auctionId", required = true) Long auctionId) {
