@@ -189,6 +189,7 @@ public class AuctionController {
         return auctionService.deleteById(userInfoHeader, id);
     }
 
+    @PatchMapping("/cancel")
     @Operation(summary = "경매 취소", description = "진행 예정 경매 수정, 기존 시작 날짜 전에만 시작 날짜 + 끝나는 날짜만 변경 가능")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "경매 수정 성공"),
