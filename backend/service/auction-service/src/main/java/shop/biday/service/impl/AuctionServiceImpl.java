@@ -187,21 +187,48 @@ public class AuctionServiceImpl implements AuctionService {
                     AuctionEntity auction = auctionRepository.findById(id)
                             .orElseThrow(() -> {
                                 log.error("Auction not found for id: {}", id);
-                                return new NoSuchElementException("Auction not found"); // 404 반환
+                                return new NoSuchElementException("Auction not found");
                             });
 
                     if (!auction.getUserId().equals(userInfoUtils.extractUserInfo(userInfoHeader).getUserId())) {
                         log.error("User with ID {} does not have Delete Authority for auction id: {}", userInfoUtils.extractUserInfo(userInfoHeader).getUserId(), id);
-                        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("삭제 권한이 없습니다"); // 403 반환
+                        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("삭제 권한이 없습니다");
                     }
 
                     auctionRepository.deleteById(id);
                     log.debug("Delete Auction By User for id: {}", id);
-                    return ResponseEntity.ok("경매 삭제 성공"); // 200 반환
+                    return ResponseEntity.ok("경매 삭제 성공");
                 })
                 .orElseGet(() -> {
                     log.error("User does not have role SELLER or does not exist");
-                    return ResponseEntity.status(HttpStatus.FORBIDDEN).body("유효하지 않은 사용자"); // 403 반환
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN).body("유효하지 않은 사용자");
+                });
+    }
+
+    @Override
+    public ResponseEntity<String> cancel(String userInfoHeader, Long id) {
+        log.info("Cancel Auction By User {} Auction id : {}", userInfoHeader, id);
+        return validateUser(userInfoHeader)
+                .map(t -> {
+                    AuctionEntity auction = auctionRepository.findById(id)
+                            .orElseThrow(() -> {
+                                log.error("Auction not found for id: {}", id);
+                                return new NoSuchElementException("Auction not found");
+                            });
+
+                    if (!auction.getUserId().equals(userInfoUtils.extractUserInfo(userInfoHeader).getUserId())) {
+                        log.error("User with ID {} does not have Cancel Authority for auction id: {}", userInfoUtils.extractUserInfo(userInfoHeader).getUserId(), id);
+                        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("취소 권한이 없습니다");
+                    }
+
+                    auction.setStatus(true);
+                    auctionRepository.save(auction);
+                    log.debug("Cancel Auction By User for id: {}", id);
+                    return ResponseEntity.ok("경매 취소 성공");
+                })
+                .orElseGet(() -> {
+                    log.error("User does not have role SELLER or does not exist");
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN).body("유효하지 않은 사용자");
                 });
     }
 

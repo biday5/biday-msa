@@ -30,4 +30,6 @@ public interface AuctionService {
     ResponseEntity<AuctionEntity> update(String userInfoHeader, AuctionDto auction);
 
     ResponseEntity<String> deleteById(String userInfoHeader, Long id);
+
+    ResponseEntity<String> cancel(String userInfoHeader, Long id);
 }
