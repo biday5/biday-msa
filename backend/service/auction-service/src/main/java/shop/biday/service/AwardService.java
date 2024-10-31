@@ -22,5 +22,7 @@ public interface AwardService {
 
     ResponseEntity<AwardDto> findByAuctionId(Long auctionId);
 
+    ResponseEntity<List<AwardModel>> findBySizeId(Long sizeId);
+
     ResponseEntity<Slice<AwardModel>> findByUser(String userInfoHeader, String period, LocalDateTime cursor, Pageable pageable);
 }

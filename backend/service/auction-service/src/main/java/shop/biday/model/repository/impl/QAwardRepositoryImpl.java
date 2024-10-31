@@ -55,6 +55,16 @@ public class QAwardRepositoryImpl implements QAwardRepository {
     }
 
     @Override
+    public List<AwardModel> findBySizeId(Long sizeId) {
+        return queryFactory
+                .select(createAwardModelProjection())
+                .from(qAward)
+                .leftJoin(qAward.auction, qAuction)
+                .where(qAuction.sizeId.eq(sizeId))
+                .fetch();
+    }
+
+    @Override
     public Slice<AwardModel> findByUser(String userId, String period, LocalDateTime cursor, Pageable pageable) {
         LocalDateTime startDate = switch (period) {
             case "3개월" -> LocalDateTime.now().minus(3, ChronoUnit.MONTHS);

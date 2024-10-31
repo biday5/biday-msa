@@ -97,6 +97,20 @@ public class AwardServiceImpl implements AwardService {
     }
 
     @Override
+    public ResponseEntity<List<AwardModel>> findBySizeId(Long sizeId) {
+        log.info("Finding Awards by Size Id: {}", sizeId);
+        return Optional.ofNullable(awardRepository.findBySizeId(sizeId))
+                .map(award -> {
+                    log.info("Awards found for Size Id: {}", sizeId);
+                    return ResponseEntity.ok(award);
+                })
+                .orElseGet(() -> {
+                    log.warn("No awards found for Size Id: {}", sizeId);
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+                });
+    }
+
+    @Override
     public ResponseEntity<Slice<AwardModel>> findByUser(String userInfoHeader, String period, LocalDateTime cursor, Pageable pageable) {
         log.info("Finding awards for User: {}", userInfoHeader);
         return validateUser(userInfoHeader)

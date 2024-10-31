@@ -17,6 +17,7 @@ import shop.biday.model.dto.AwardDto;
 import shop.biday.service.AwardService;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -51,7 +52,7 @@ public class AwardController {
     }
 
     @GetMapping("/findById")
-    @Operation(summary = "낙찰 상세보기", description = "마이페이지에서 낙찰 리스트 통해 이동 가능")
+    @Operation(summary = "낙찰 id 기준 낙찰 상세보기", description = "마이페이지에서 낙찰 리스트 통해 이동 가능")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "낙찰 불러오기 성공"),
             @ApiResponse(responseCode = "404", description = "낙찰 찾을 수 없음"),
@@ -62,14 +63,14 @@ public class AwardController {
                     example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}"),
             @Parameter(name = "awardId", description = "상세보기할 낙찰의 id", example = "1")
     })
-    public ResponseEntity<AwardModel> findById(
+    public ResponseEntity<AwardModel> findByAwardId(
             @RequestHeader("UserInfo") String userInfoHeader,
             @RequestParam(value = "awardId", required = true) Long awardId) {
         return awardService.findByAwardId(userInfoHeader, awardId);
     }
 
     @GetMapping("/findByAuction")
-    @Operation(summary = "낙찰 상세보기", description = "경매가 종료된 페이지에서 호출")
+    @Operation(summary = "경매 id 기준 낙찰 상세보기", description = "경매가 종료된 페이지 내에서 호출")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "낙찰 불러오기 성공"),
             @ApiResponse(responseCode = "404", description = "낙찰 찾을 수 없음")
@@ -77,8 +78,22 @@ public class AwardController {
     @Parameters({
             @Parameter(name = "auctionId", description = "낙찰 정보 확인할 경매 id", example = "1")
     })
-    public ResponseEntity<AwardDto> findById(
+    public ResponseEntity<AwardDto> findByAuctionId(
             @RequestParam(value = "auctionId", required = true) Long auctionId) {
         return awardService.findByAuctionId(auctionId);
+    }
+
+    @GetMapping("/findBySize")
+    @Operation(summary = "사이즈 id 기준 낙찰 리스트 호출", description = "상품 상세 페이지 내에서 호출")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "낙찰 불러오기 성공"),
+            @ApiResponse(responseCode = "404", description = "낙찰 찾을 수 없음")
+    })
+    @Parameters({
+            @Parameter(name = "sizeId", description = "낙찰 리스트 불러올 사이즈 id", example = "1")
+    })
+    public ResponseEntity<List<AwardModel>> findBySizeId(
+            @RequestParam(value = "sizeId", required = true) Long sizeId) {
+        return awardService.findBySizeId(sizeId);
     }
 }
