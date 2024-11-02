@@ -66,7 +66,7 @@ public class UserController {
     }
 
     //TODO 아이디 찾기 핸드폰 인증 후 폰번호로 요청시 email 클라이언트측으로 전달
-    @PostMapping("/retrieve ")
+    @PostMapping("/retrieve")
     @Operation(summary = "전화번호로 이메일 조회", description = "제공된 전화번호에 연결된 이메일 주소를 조회합니다."
     )
     @ApiResponses(value = {
