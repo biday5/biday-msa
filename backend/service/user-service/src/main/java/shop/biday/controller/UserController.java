@@ -65,8 +65,7 @@ public class UserController {
         return ResponseEntity.ok(userService.changePassword(userInfoHeader,userModel));
     }
 
-    //TODO 아이디 찾기 핸드폰 인증 후 폰번호로 요청시 email 클라이언트측으로 전달
-    @PostMapping("/retrieve ")
+    @PostMapping("/retrieve")
     @Operation(summary = "전화번호로 이메일 조회", description = "제공된 전화번호에 연결된 이메일 주소를 조회합니다."
     )
     @ApiResponses(value = {
@@ -78,6 +77,7 @@ public class UserController {
     @Parameter(name = "phone", description = "이메일을 조회할 전화번호", example = "123-456-7890"
     )
     public ResponseEntity<Mono<String>> getEmailByPhone(@RequestBody UserModel userModel) {
+        log.info("getEmailByPhone {}", userModel);
         return ResponseEntity.ok(userService.getEmailByPhone(userModel));
     }
 
