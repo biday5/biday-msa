@@ -164,6 +164,8 @@ import shop.biday.model.repository.MUserRepository;
 import shop.biday.service.UserService;
 import shop.biday.utils.UserInfoUtils;
 
+import java.security.SecureRandom;
+import java.util.Base64;
 import java.util.Collections;
 
 @Slf4j
@@ -296,6 +298,11 @@ public class UserServiceImpl implements UserService {
                 .flatMap(user -> {
                     if (passwordEncoder.matches(userModel.getPassword(), user.getPassword())) {
                         log.info("changePassword: 비밀번호 일치 확인, 비밀번호 업데이트 중");
+
+                        if (passwordEncoder.matches(userModel.getNewPassword(), user.getPassword())) {
+                            log.warn("changePassword: 새 비밀번호가 기존 비밀번호와 동일함");
+                            return Mono.just("새 비밀번호가 기존 비밀번호와 동일합니다.");
+                        }
                         user.setPassword(passwordEncoder.encode(userModel.getNewPassword()));
                         return userRepository.save(user)
                                 .then(Mono.just("비밀번호 변경이 완료했습니다."));
@@ -334,5 +341,31 @@ public class UserServiceImpl implements UserService {
                 .doOnSuccess(user -> log.info("register: 사용자 등록 완료: {}", user))
                 .doOnError(e -> log.error("register: 사용자 등록 중 오류 발생", e))
                 .onErrorResume(e -> Mono.error(new RuntimeException("사용자 등록 중 오류 발생: " + e.getMessage())));
+    }
+
+    public Mono<UserDocument> resetPassword(UserModel userModel) {
+        log.info("메일과 전화번호를 통한 User 검증 : Email {} Phone {}", userModel.getEmail(), userModel.getPhoneNum());
+        return userRepository.findByEmailAndPhone(userModel.getEmail(), userModel.getPhoneNum())
+                .flatMap(user -> {
+                    log.debug("사용자 조회 성공: {}", user);
+                    String newPassword = generateRandomPassword();
+                    log.debug("새로운 비밀번호 생성 완료: {}", newPassword);
+                    user.setPassword(passwordEncoder.encode(newPassword));
+                    return userRepository.save(user)
+                            .doOnSuccess(updatedUser -> log.info("비밀번호 변경 완료: {}", updatedUser.getEmail())) // 비밀번호 변경 성공 로그
+                            .then(Mono.just(user));
+                })
+                .switchIfEmpty(Mono.defer(() -> {
+                    log.warn("사용자를 찾을 수 없습니다: Email {} Phone {}", userModel.getEmail(), userModel.getPhoneNum());
+                    return Mono.empty();
+                }));
+    }
+
+    private String generateRandomPassword() {
+        log.info("새로운 비밀번호 8자 생성 시작");
+        SecureRandom random = new SecureRandom();
+        byte[] randomBytes = new byte[6];
+        random.nextBytes(randomBytes);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(randomBytes);
     }
 }
