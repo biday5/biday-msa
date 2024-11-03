@@ -49,7 +49,6 @@ public class UserController {
         return new ResponseEntity<>(userService.register(model), HttpStatus.OK);
     }
 
-    //TODO 예전 비번이랑 바꾸는 비번이랑 같을 경우 체크?
     @PatchMapping("/changepass")
     @Operation(summary = "비밀번호 변경", description = "사용자의 비밀번호를 변경합니다.")
     @ApiResponses(value = {
