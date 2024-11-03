@@ -1,7 +1,6 @@
 package shop.biday.model.repository;
 
 import shop.biday.model.dto.PaymentData;
-import shop.biday.model.dto.PaymentRequest;
 
 import java.util.List;
 
