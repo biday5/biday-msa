@@ -19,5 +19,6 @@ public class AwardDto {
     private LocalDateTime bidedAt;
     private BigInteger currentBid;
     private Long count;
+    private boolean status;
     private LocalDateTime createdAt;
 }
