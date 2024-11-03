@@ -48,6 +48,7 @@ public class QAwardRepositoryImpl implements QAwardRepository {
                         qAward.bidedAt,
                         qAward.currentBid,
                         qAward.count,
+                        qAward.status,
                         qAward.createdAt))
                 .from(qAward)
                 .where(qAward.auction.id.eq(auctionId))
@@ -108,6 +109,7 @@ public class QAwardRepositoryImpl implements QAwardRepository {
                 qAward.bidedAt,
                 qAward.currentBid,
                 qAward.count,
+                qAward.status,
                 qAward.createdAt);
     }
 

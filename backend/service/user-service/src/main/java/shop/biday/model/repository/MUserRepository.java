@@ -4,7 +4,6 @@ import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;
 import shop.biday.model.document.UserDocument;
-import shop.biday.model.domain.UserModel;
 
 
 @Repository

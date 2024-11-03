@@ -5,7 +5,6 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import shop.biday.model.dto.PaymentData;
-import shop.biday.model.dto.PaymentRequest;
 import shop.biday.model.entity.QPaymentEntity;
 import shop.biday.model.repository.QPaymentRepository;
 

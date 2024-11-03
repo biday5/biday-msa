@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import shop.biday.model.domain.AwardModel;
 import shop.biday.model.dto.AwardDto;
+import shop.biday.model.entity.AwardEntity;
 import shop.biday.service.AwardService;
 
 import java.time.LocalDateTime;
@@ -95,5 +96,19 @@ public class AwardController {
     public ResponseEntity<List<AwardModel>> findBySizeId(
             @RequestParam(value = "sizeId", required = true) Long sizeId) {
         return awardService.findBySizeId(sizeId);
+    }
+
+    @PatchMapping("/updateStatus")
+    @Operation(summary = "결제했다면 status 업데이트", description = "결제 여부 확인하기 위함, true라면 결제 완료")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "낙찰 status 변경 성공"),
+            @ApiResponse(responseCode = "404", description = "낙찰 찾을 수 없음")
+    })
+    @Parameters({
+            @Parameter(name = "awardId", description = "낙찰 id", example = "1")
+    })
+    public ResponseEntity<AwardEntity> updateStatus(
+            @RequestParam(value = "awardId", required = true) Long awardId) {
+        return awardService.updateStatus(awardId);
     }
 }

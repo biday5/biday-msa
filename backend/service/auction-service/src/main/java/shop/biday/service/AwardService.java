@@ -25,4 +25,6 @@ public interface AwardService {
     ResponseEntity<List<AwardModel>> findBySizeId(Long sizeId);
 
     ResponseEntity<Slice<AwardModel>> findByUser(String userInfoHeader, String period, LocalDateTime cursor, Pageable pageable);
+
+    ResponseEntity<AwardEntity> updateStatus(Long awardId);
 }

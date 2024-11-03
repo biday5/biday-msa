@@ -131,6 +131,25 @@ public class AwardServiceImpl implements AwardService {
                 });
     }
 
+    @Override
+    public ResponseEntity<AwardEntity> updateStatus(Long awardId) {
+        log.info("Award Status update: {}", awardId);
+
+        return awardRepository.findById(awardId)
+                .map(award-> {
+                    award.setStatus(true);
+                    return awardRepository.save(award);
+                })
+                .map(updatedAward -> {
+                    log.info("Award status updated successfully: {}", updatedAward);
+                    return ResponseEntity.ok(updatedAward);
+                })
+                .orElseGet(() -> {
+                    log.warn("Award not found for id: {}", awardId);
+                    return ResponseEntity.notFound().build();
+                });
+    }
+
     private Optional<String> validateUser(String userInfoHeader) {
         log.info("Validating user: {}", userInfoHeader);
         UserInfoModel userInfoModel = userInfoUtils.extractUserInfo(userInfoHeader);

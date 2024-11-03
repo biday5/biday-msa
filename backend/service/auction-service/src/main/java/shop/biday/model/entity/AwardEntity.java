@@ -42,6 +42,10 @@ public class AwardEntity {
     @Column(name = "count", nullable = false)
     private Long count;
 
+    @ColumnDefault("b'0'")
+    @Column(name = "status", nullable = false)
+    private boolean status;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime createdAt;
