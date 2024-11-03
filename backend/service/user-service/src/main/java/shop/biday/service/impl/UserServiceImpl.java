@@ -362,9 +362,9 @@ public class UserServiceImpl implements UserService {
     }
 
     private String generateRandomPassword() {
-        log.info("새로운 비밀번호 생성 시작");
+        log.info("새로운 비밀번호 8자 생성 시작");
         SecureRandom random = new SecureRandom();
-        byte[] randomBytes = new byte[24];
+        byte[] randomBytes = new byte[6];
         random.nextBytes(randomBytes);
         return Base64.getUrlEncoder().withoutPadding().encodeToString(randomBytes);
     }

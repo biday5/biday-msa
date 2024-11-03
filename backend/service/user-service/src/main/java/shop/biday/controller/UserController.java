@@ -83,7 +83,7 @@ public class UserController {
         return ResponseEntity.ok(userService.getEmailByPhone(userModel));
     }
 
-    // 비밀번호 잊은 유저 전화번호&이메일로 조회 이후 password 변경하기 위함
+    // 비밀번호 잊은 유저 전화번호&이메일로 조회 이후 새로운 password 8자 반환
     @PostMapping("/check")
     @Operation(summary = "전화번호&이메일 통해 user 조회 및 비번 초기화", description = "제공된 전화번호와 이메일로 가입된 유저를 조회하고 비밀번호를 초기화합니다."
     )
