@@ -23,6 +23,6 @@ public interface MUserRepository extends ReactiveMongoRepository<UserDocument,  
 
     Mono<Void> deleteById(String id);
 
-    Mono<UserModel> findByEmailAndPhone(String email, String phone);
+    Mono<UserDocument> findByEmailAndPhone(String email, String phone);
 
 }
