@@ -4,6 +4,7 @@ import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;
 import shop.biday.model.document.UserDocument;
+import shop.biday.model.domain.UserModel;
 
 
 @Repository
@@ -21,5 +22,7 @@ public interface MUserRepository extends ReactiveMongoRepository<UserDocument,  
     Mono<Boolean> existsById(String id);
 
     Mono<Void> deleteById(String id);
+
+    Mono<UserModel> findByEmailAndPhone(String email, String phone);
 
 }

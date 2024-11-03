@@ -18,6 +18,7 @@ import reactor.core.publisher.Mono;
 import shop.biday.model.document.UserDocument;
 import shop.biday.model.domain.UserModel;
 import shop.biday.model.domain.UserRequest;
+import shop.biday.model.dto.UserDto;
 import shop.biday.service.impl.UserServiceImpl;
 
 
@@ -47,6 +48,7 @@ public class UserController {
         log.info("oauth 회원가입 진입 : ", model);
         return new ResponseEntity<>(userService.register(model), HttpStatus.OK);
     }
+
     //TODO 예전 비번이랑 바꾸는 비번이랑 같을 경우 체크?
     @PatchMapping("/changepass")
     @Operation(summary = "비밀번호 변경", description = "사용자의 비밀번호를 변경합니다.")
@@ -62,7 +64,7 @@ public class UserController {
             @Parameter(description = "비밀번호 변경 요청", required = true)
             @RequestBody UserModel userModel) {
 
-        return ResponseEntity.ok(userService.changePassword(userInfoHeader,userModel));
+        return ResponseEntity.ok(userService.changePassword(userInfoHeader, userModel));
     }
 
     @PostMapping("/retrieve")
@@ -81,6 +83,40 @@ public class UserController {
         return ResponseEntity.ok(userService.getEmailByPhone(userModel));
     }
 
+    // 비밀번호 잊은 유저 전화번호&이메일로 조회 이후 password 변경하기 위함
+    @PostMapping("/check")
+    @Operation(summary = "전화번호와 이메일로 user 조회", description = "제공된 전화번호와 이메일로 가입된 유저를 조회합니다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "유저가 성공적으로 조회되었습니다.", content = @Content(mediaType = "application/json")
+            ),
+            @ApiResponse(responseCode = "404", description = "제공된 전화번호 및 이메일로 사용자를 찾을 수 없습니다.", content = @Content(mediaType = "application/json")
+            )
+    })
+    @Parameters({
+            @Parameter(name = "email", description = "이메일", example = "chrome123@naver.com"),
+            @Parameter(name = "phoneNum", description = "번호", example = "000-0000-0000"),
+    })
+    public ResponseEntity<Mono<UserModel>> getUserByEmailAndPhone(@RequestBody UserModel userModel) {
+        log.info("getUserByEmailAndPhone {}", userModel);
+        return ResponseEntity.ok(userService.getUserByEmailAndPhone(userModel));
+    }
+
+    // 위에서 검증 이후 비번 변경
+    @PatchMapping("/resetPassword")
+    @Operation(summary = "비밀번호 변경", description = "사용자의 비밀번호를 초기화 및 변경합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "비밀번호가 성공적으로 변경되었습니다.", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청. 올바르지 않은 비밀번호 형식이거나 기존 비밀번호와 같습니다.", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없습니다.", content = @Content(mediaType = "application/json"))
+    })
+    public ResponseEntity<Mono<String>> resetPassword(
+            @Parameter(description = "비밀번호 변경 요청", required = true)
+            @RequestBody UserModel userModel) {
+
+        return ResponseEntity.ok(userService.resetPassword(userModel));
+    }
+
     @PostMapping("/password")
     @Operation(summary = "유저 비밀번호 검증", description = "소셜 로그인 후 이메일과 비밀번호 같은 검증 api")
     @ApiResponses(value = {
@@ -95,7 +131,6 @@ public class UserController {
 
         return new ResponseEntity<>(userService.existsByPasswordAndEmail(userInfoHeader), HttpStatus.OK);
     }
-
 
     @PostMapping("/join")
     @Operation(summary = "유저 회원가입", description = "유저 회원가입할 때 사용하는 api")
