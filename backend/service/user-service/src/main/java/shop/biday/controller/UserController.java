@@ -84,7 +84,7 @@ public class UserController {
     }
 
     // 비밀번호 잊은 유저 전화번호&이메일로 조회 이후 새로운 password 8자 반환
-    @PostMapping("/check")
+    @PostMapping("/resetPassword")
     @Operation(summary = "전화번호&이메일 통해 user 조회 및 비번 초기화", description = "제공된 전화번호와 이메일로 가입된 유저를 조회하고 비밀번호를 초기화합니다."
     )
     @ApiResponses(value = {
