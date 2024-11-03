@@ -97,7 +97,7 @@ public class UserController {
             @Parameter(name = "email", description = "이메일", example = "chrome123@naver.com"),
             @Parameter(name = "phoneNum", description = "번호", example = "000-0000-0000"),
     })
-    public ResponseEntity<Mono<UserDocument>> getUserByEmailAndPhone(@RequestBody UserModel userModel) {
+    public ResponseEntity<Mono<UserDocument>> resetPassword(@RequestBody UserModel userModel) {
         log.info("getUserByEmailAndPhone {}", userModel);
         return ResponseEntity.ok(userService.resetPassword(userModel));
     }
