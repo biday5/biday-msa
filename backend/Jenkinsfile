@@ -121,15 +121,16 @@ pipeline {
                 script {
                     // Kubernetes YAML 파일 경로 정의
                     def kubernetesPaths = [
-                        "admin-service": "${WORKSPACE_PATH}/k8s/admin.yaml",
-                        "auction-service": "${WORKSPACE_PATH}/k8s/auction.yaml",
                         "config-server": "${WORKSPACE_PATH}/k8s/config.yaml",
                         "eureka-server": "${WORKSPACE_PATH}/k8s/eureka.yaml",
-                        "ftp-service": "${WORKSPACE_PATH}/k8s/ftp.yaml",
                         "gateway-server": "${WORKSPACE_PATH}/k8s/gateway.yaml",
+                        "admin-service": "${WORKSPACE_PATH}/k8s/admin.yaml",
+                        "auction-service": "${WORKSPACE_PATH}/k8s/auction.yaml",
+                        "ftp-service": "${WORKSPACE_PATH}/k8s/ftp.yaml",
                         "order-service": "${WORKSPACE_PATH}/k8s/order.yaml",
                         "product-service": "${WORKSPACE_PATH}/k8s/product.yaml",
-                        "user-service": "${WORKSPACE_PATH}/k8s/user.yaml"
+                        "user-service": "${WORKSPACE_PATH}/k8s/user.yaml",
+                        "ingress": "${WORKSPACE_PATH}/k8s/ingress.yaml",
                     ]
 
                     // 각 모듈에 대해 Kubernetes 배포 수행
@@ -138,7 +139,7 @@ pipeline {
 
                         // YAML 파일을 사용하여 배포 적용
                         sh """
-                        kubectl --kubeconfig=${KUBECONFIG} apply -f ${yamlPath} || {
+                        kubectl apply -f ${yamlPath} || {
                             echo 'Kubernetes deployment failed for ${module}';
                             exit 1;
                         }

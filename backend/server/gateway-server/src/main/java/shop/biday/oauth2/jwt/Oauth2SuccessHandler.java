@@ -24,7 +24,7 @@ import java.util.Iterator;
 @RequiredArgsConstructor
 public class Oauth2SuccessHandler implements ServerAuthenticationSuccessHandler {
 
-    private static final long ACCESS_TOKEN_EXPIRY_MS = 600000L; // 10 minutes
+    private static final long ACCESS_TOKEN_EXPIRY_MS = 3600000L; // 1 hour
     private static final long REFRESH_TOKEN_EXPIRY_MS = 86400000L; // 1 day
     private static final int COOKIE_MAX_AGE_SECONDS = 24 * 60 * 60; // 1 day
     private static final String ACCESS_TOKEN_TYPE = "access";
