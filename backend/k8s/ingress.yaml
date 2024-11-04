@@ -15,143 +15,30 @@ spec:
       http:
         paths:
           - path: /login
+            pathType: Prefix
+            backend:
+              service:
+                name: gateway-server
+                port:
+                  number: 8000
+          - path: /oauth2/authorization/naver
             pathType: ImplementationSpecific
             backend:
               service:
                 name: gateway-server
                 port:
                   number: 8000
-          - path: /api/announcements
-            pathType: ImplementationSpecific
+          - path: /oauth2/callback/naver
+            pathType: Prefix
             backend:
               service:
                 name: gateway-server
                 port:
                   number: 8000
-          - path: /api/faqs
-            pathType: ImplementationSpecific
+          - path: /api
+            pathType: Prefix
             backend:
               service:
                 name: gateway-server
                 port:
                   number: 8000
-          - path: /api/auctions
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: gateway-server
-                port:
-                  number: 8000
-          - path: /api/awards
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: gateway-server
-                port:
-                  number: 8000
-          - path: /api/bids
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: gateway-server
-                port:
-                  number: 8000
-          - path: /api/images
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: gateway-server
-                port:
-                  number: 8000
-          - path: /api/payments
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: gateway-server
-                port:
-                  number: 8000
-          - path: /api/refunds
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: gateway-server
-                port:
-                  number: 8000
-          - path: /api/seller-payments
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: gateway-server
-                port:
-                  number: 8000
-          - path: /api/shippers
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: gateway-server
-                port:
-                  number: 8000
-          - path: /api/brands
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: gateway-server
-                port:
-                  number: 8000
-          - path: /api/categories
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: gateway-server
-                port:
-                  number: 8000
-          - path: /api/products
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: gateway-server
-                port:
-                  number: 8000
-          - path: /api/sizes
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: gateway-server
-                port:
-                  number: 8000
-          - path: /api/wishes
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: gateway-server
-                port:
-                  number: 8000
-          - path: /api/users
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: gateway-server
-                port:
-                  number: 8000
-          - path: /api/loginHistory
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: gateway-server
-                port:
-                  number: 8000
-          - path: /api/addresses
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: gateway-server
-                port:
-                  number: 8000
-          - path: /api/account
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: gateway-server
-                port:
-                  number: 8000
-

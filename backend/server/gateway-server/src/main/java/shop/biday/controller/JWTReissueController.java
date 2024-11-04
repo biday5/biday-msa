@@ -34,6 +34,9 @@ public class JWTReissueController {
                 .maxAge(24 * 60 * 60)
                 .path("/")
                 .httpOnly(false)
+                .secure(true) // HTTPS에서만 쿠키 전송
+                .sameSite("None") // SameSite 설정
+                .domain("biday.shop") // 도메인 설정
                 .build();
     }
 }
