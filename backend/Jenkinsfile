@@ -129,8 +129,7 @@ pipeline {
                         "ftp-service": "${WORKSPACE_PATH}/k8s/ftp.yaml",
                         "order-service": "${WORKSPACE_PATH}/k8s/order.yaml",
                         "product-service": "${WORKSPACE_PATH}/k8s/product.yaml",
-                        "user-service": "${WORKSPACE_PATH}/k8s/user.yaml",
-                        "ingress": "${WORKSPACE_PATH}/k8s/ingress.yaml",
+                        "user-service": "${WORKSPACE_PATH}/k8s/user.yaml"
                     ]
 
                     // 각 모듈에 대해 Kubernetes 배포 수행
