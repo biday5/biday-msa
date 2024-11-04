@@ -29,7 +29,7 @@ public class Oauth2SuccessHandler implements ServerAuthenticationSuccessHandler 
     private static final int COOKIE_MAX_AGE_SECONDS = 24 * 60 * 60; // 1 day
     private static final String ACCESS_TOKEN_TYPE = "access";
     private static final String REFRESH_TOKEN_TYPE = "refresh";
-    private static final String REDIRECT_URL = "http://localhost:3000/login";
+    private static final String REDIRECT_URL = "http://www.biday.shop/login";
     private static final String LOGIN_HISTORY_BASE_URL = "/api/loginHistory";  // 추가된 URL 상수
 
     private final JWTUtil jwtUtil;
