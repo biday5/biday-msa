@@ -29,7 +29,6 @@ public class Oauth2SuccessHandler implements ServerAuthenticationSuccessHandler 
     private static final int COOKIE_MAX_AGE_SECONDS = 24 * 60 * 60; // 1 day
     private static final String ACCESS_TOKEN_TYPE = "access";
     private static final String REFRESH_TOKEN_TYPE = "refresh";
-    private static final String REDIRECT_URL = "https://www.biday.shop/login";
     private static final String LOGIN_HISTORY_BASE_URL = "/api/loginHistory";  // 추가된 URL 상수
 
     private final JWTUtil jwtUtil;
@@ -59,7 +58,7 @@ public class Oauth2SuccessHandler implements ServerAuthenticationSuccessHandler 
                     response.addCookie(createCookie("Authorization", access));
                     response.addCookie(createCookie("refresh", refresh));
                     response.setStatusCode(HttpStatus.FOUND);
-                    response.getHeaders().setLocation(URI.create(REDIRECT_URL));
+                    response.getHeaders().setLocation(URI.create("https://www.biday.shop/login"));
                     return response.setComplete();
                 }))
                 .onErrorResume(IllegalArgumentException.class, e -> {
@@ -103,9 +102,12 @@ public class Oauth2SuccessHandler implements ServerAuthenticationSuccessHandler 
                 .maxAge(COOKIE_MAX_AGE_SECONDS)
                 .path("/")
                 .httpOnly(false)
-                .sameSite("Lax") // SameSite 설정
+                .secure(true) // HTTPS에서만 쿠키 전송
+                .sameSite("None") // SameSite 설정
+                .domain("biday.shop") // 도메인 설정
                 .build();
     }
+
 
     private Mono<Void> addRefreshEntity(String id, String refresh, Long expiredMs) {
         return Mono.fromRunnable(() -> {
