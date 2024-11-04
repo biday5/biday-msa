@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: gateway
-          image: hwijae/biday-gateway-server:1.5
+          image: hwijae/biday-gateway-server:3.0
           ports:
             - containerPort: 8000
           env:

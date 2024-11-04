@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: order
-          image: hwijae/biday-order-service:1.5
+          image: hwijae/biday-order-service:3.0
           env:
             - name: SPRING_CLOUD_CONFIG_URI
               value: "http://config-server:8888"
