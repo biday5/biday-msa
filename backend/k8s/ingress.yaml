@@ -1,0 +1,157 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nginx-ingress
+  namespace: biday
+
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - api.biday.shop
+      secretName: tls-certs
+  rules:
+    - host: api.biday.shop
+      http:
+        paths:
+          - path: /login
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: gateway-server
+                port:
+                  number: 8000
+          - path: /api/announcements
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: gateway-server
+                port:
+                  number: 8000
+          - path: /api/faqs
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: gateway-server
+                port:
+                  number: 8000
+          - path: /api/auctions
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: gateway-server
+                port:
+                  number: 8000
+          - path: /api/awards
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: gateway-server
+                port:
+                  number: 8000
+          - path: /api/bids
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: gateway-server
+                port:
+                  number: 8000
+          - path: /api/images
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: gateway-server
+                port:
+                  number: 8000
+          - path: /api/payments
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: gateway-server
+                port:
+                  number: 8000
+          - path: /api/refunds
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: gateway-server
+                port:
+                  number: 8000
+          - path: /api/seller-payments
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: gateway-server
+                port:
+                  number: 8000
+          - path: /api/shippers
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: gateway-server
+                port:
+                  number: 8000
+          - path: /api/brands
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: gateway-server
+                port:
+                  number: 8000
+          - path: /api/categories
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: gateway-server
+                port:
+                  number: 8000
+          - path: /api/products
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: gateway-server
+                port:
+                  number: 8000
+          - path: /api/sizes
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: gateway-server
+                port:
+                  number: 8000
+          - path: /api/wishes
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: gateway-server
+                port:
+                  number: 8000
+          - path: /api/users
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: gateway-server
+                port:
+                  number: 8000
+          - path: /api/loginHistory
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: gateway-server
+                port:
+                  number: 8000
+          - path: /api/addresses
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: gateway-server
+                port:
+                  number: 8000
+          - path: /api/account
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: gateway-server
+                port:
+                  number: 8000
+

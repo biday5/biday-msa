@@ -1,31 +1,48 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: auction-service
+  name: auction-deploy
+  namespace: biday
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: auction-service
+      app: auction
   template:
     metadata:
       labels:
-        app: auction-service
+        app: auction
     spec:
       containers:
-        - name: auction-service
-          image: testxxboy/biday-auction-service:1.0
+        - name: auction
+          image: hwijae/biday-auction-service:3.0
           ports:
             - containerPort: 9101
+          env:
+            - name: SPRING_CLOUD_CONFIG_URI
+              value: "http://config-server:8888"
+            - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+              value: "http://eureka-server:8761/eureka"
+            - name: EUREKA_INSTANCE_HOSTNAME
+              value: "auction-service"
+            - name: EUREKA_INSTANCE_PREFER_IP_ADDRESS
+              value: "false"
+            - name: EUREKA_INSTANCE_INSTANCE_ID
+              value: "auction-service:${server.port}"
+            - name: SPRING_PROFILES_ACTIVE
+              value: "prod"
+
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: auction-service
+  namespace: biday
 spec:
   type: ClusterIP
+  selector:
+    app: auction
   ports:
     - port: 9101
       targetPort: 9101
-  selector:
-    app: auction-service
+

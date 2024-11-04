@@ -1,31 +1,48 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: admin-service
+  name: admin-deploy
+  namespace: biday
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: admin-service
+      app: admin
   template:
     metadata:
       labels:
-        app: admin-service
+        app: admin
     spec:
       containers:
-        - name: admin-service
-          image: testxxboy/biday-admin-service:1.0
+        - name: admin
+          image: hwijae/biday-admin-service:3.0
           ports:
             - containerPort: 9100
+          env:
+            - name: SPRING_CLOUD_CONFIG_URI
+              value: "http://config-server:8888"
+            - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+              value: "http://eureka-server:8761/eureka"
+            - name: EUREKA_INSTANCE_HOSTNAME          # Eureka hostname 설정
+              value: "admin-service"
+            - name: EUREKA_INSTANCE_PREFER_IP_ADDRESS # IP 대신 hostname 사용
+              value: "false"
+            - name: EUREKA_INSTANCE_INSTANCE_ID       # 인스턴스 ID를 admin-service로 설정
+              value: "admin-service:${server.port}"
+            - name: SPRING_PROFILES_ACTIVE
+              value: "prod"
+
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: admin-service
+  namespace: biday
 spec:
   type: ClusterIP
+  selector:
+    app: admin
   ports:
     - port: 9100
       targetPort: 9100
-  selector:
-    app: admin-service
+
