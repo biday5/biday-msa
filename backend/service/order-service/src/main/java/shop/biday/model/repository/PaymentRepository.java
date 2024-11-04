@@ -18,4 +18,6 @@ public interface PaymentRepository extends JpaRepository<PaymentEntity, Long>, Q
     void delete(PaymentEntity paymentEntity);
 
     boolean existsByOrderId(String orderId);
+
+    boolean findByAwardId(Long awardId);
 }
