@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: config
-          image: hwijae/biday-config-server:3.0
+          image: hwijae/biday-config-server:3.1
           ports:
             - containerPort: 8888
           volumeMounts:

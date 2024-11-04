@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: ftp
-          image: hwijae/biday-ftp-service:3.0
+          image: hwijae/biday-ftp-service:3.1
           env:
             - name: SPRING_CLOUD_CONFIG_URI
               value: "http://config-server:8888"
