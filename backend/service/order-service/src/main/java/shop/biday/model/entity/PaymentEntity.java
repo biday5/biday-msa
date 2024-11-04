@@ -26,7 +26,7 @@ public class PaymentEntity {
     @Column(name = "user_id", nullable = false)
     private String userId;
 
-    @Column(name = "award_id", nullable = false)
+    @Column(name = "award_id", nullable = false, unique = true)
     private Long awardId;
 
     @Column(name = "payment_key", nullable = false)
