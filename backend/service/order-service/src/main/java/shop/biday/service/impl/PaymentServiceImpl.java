@@ -88,7 +88,7 @@ public class PaymentServiceImpl implements PaymentService {
         }
 
         if (paymentRepository.existsByAwardId(paymentDto.getAwardId())) {
-            throw new PaymentException(HttpStatus.ALREADY_REPORTED, "EXIST AWARD ID", "이미 결제 정보가 존재하는 낙찰입니다.");
+            throw new PaymentException(HttpStatus.ALREADY_REPORTED, "208", "이미 결제 정보가 존재하는 낙찰입니다.");
         }
 
         ResponseEntity<PaymentModel> response = tossPaymentTemplate.exchangePostMethod(APPROVE_URI, paymentRequest);
