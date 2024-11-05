@@ -19,5 +19,5 @@ public interface PaymentRepository extends JpaRepository<PaymentEntity, Long>, Q
 
     boolean existsByOrderId(String orderId);
 
-    boolean findByAwardId(Long awardId);
+    boolean  existsByAwardId(Long awardId);
 }
