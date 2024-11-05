@@ -3,7 +3,6 @@ kind: Ingress
 metadata:
   name: nginx-ingress
   namespace: biday
-
 spec:
   ingressClassName: nginx
   tls:
@@ -14,6 +13,13 @@ spec:
     - host: api.biday.shop
       http:
         paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: gateway-server
+                port:
+                  number: 8000
           - path: /login
             pathType: Prefix
             backend:
@@ -35,7 +41,14 @@ spec:
                 name: gateway-server
                 port:
                   number: 8000
-          - path: /api
+          - path: /logout
+            pathType: Prefix
+            backend:
+              service:
+                name: gateway-server
+                port:
+                  number: 8000
+          - path: /reissue
             pathType: Prefix
             backend:
               service:

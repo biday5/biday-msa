@@ -95,7 +95,9 @@ public class PaymentServiceImpl implements PaymentService {
         PaymentModel paymentModel = tossPaymentTemplate.getPayment(response);
 
         PaymentCardModel card = paymentModel.getCard();
-        card.setIssuerName(PaymentCardType.getByCode(card.getIssuerCode()).getName());
+        if (card != null) {
+            card.setIssuerName(PaymentCardType.getByCode(card.getIssuerCode()).getName());
+        }
 
         ZonedDateTime requestedAt = ZonedDateTime.parse(paymentModel.getRequestedAt(), DATE_TIME_FORMATTER);
         ZonedDateTime approvedAt = ZonedDateTime.parse(paymentModel.getApprovedAt(), DATE_TIME_FORMATTER);
@@ -141,7 +143,9 @@ public class PaymentServiceImpl implements PaymentService {
         PaymentModel paymentModel = tossPaymentTemplate.getPayment(response);
 
         PaymentCardModel card = paymentModel.getCard();
-        card.setIssuerName(PaymentCardType.getByCode(card.getIssuerCode()).getName());
+        if (card != null) {
+            card.setIssuerName(PaymentCardType.getByCode(card.getIssuerCode()).getName());
+        }
 
         ZonedDateTime approvedAt = ZonedDateTime.parse(paymentModel.getApprovedAt(), DATE_TIME_FORMATTER);
 
