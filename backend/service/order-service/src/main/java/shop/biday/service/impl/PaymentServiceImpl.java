@@ -87,7 +87,7 @@ public class PaymentServiceImpl implements PaymentService {
             throw new PaymentException(HttpStatus.BAD_REQUEST, "INVALID_DATA_REQUEST", "일치하지 않는 정보 입니다.");
         }
 
-        if(!paymentRepository.findByAwardId(paymentDto.getAwardId())) {
+        if (paymentRepository.existsByAwardId(paymentDto.getAwardId())) {
             throw new PaymentException(HttpStatus.ALREADY_REPORTED, "EXIST AWARD ID", "이미 결제 정보가 존재하는 낙찰입니다.");
         }
 
