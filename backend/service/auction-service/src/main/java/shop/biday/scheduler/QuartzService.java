@@ -10,6 +10,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 @Slf4j
@@ -51,7 +52,7 @@ public class QuartzService {
         Instant instant = seoulZonedDateTime.toInstant();
         log.info("QuartzService instant: {}", instant);
 
-        Date startedAt = Date.from(instant);
+        Date startedAt = Date.from(instant.plus(9, ChronoUnit.HOURS));
         log.info("QuartzService startedAt: {}", startedAt);
         log.info("QuartzService startedAt millisecond: {}", startedAt.getTime());
 
