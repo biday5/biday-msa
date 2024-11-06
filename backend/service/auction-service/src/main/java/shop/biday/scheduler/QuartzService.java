@@ -6,8 +6,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.quartz.*;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Date;
 
 @Slf4j
@@ -38,13 +40,21 @@ public class QuartzService {
     }
 
     private Trigger buildTrigger(Long auctionId, LocalDateTime endedAt) {
+        log.info("QuartzService endedAt: {}", endedAt);
+        ZonedDateTime zonedDateTime = endedAt.atZone(ZoneId.of("Asia/Seoul"));
+        log.info("QuartzService zonedDateTime: {}", zonedDateTime);
+
+        Instant instant = zonedDateTime.toInstant();
+        log.info("QuartzService instant: {}", instant);
+
+        Date startedAt = Date.from(instant);
+        log.info("QuartzService startedAt: {}", startedAt);
+        log.info("QuartzService startedAt millisecond: {}", startedAt.getTime());
+
         return TriggerBuilder.newTrigger()
                 .withIdentity(StringUtils.joinWith("_", "AuctionEndsTrigger", auctionId))
                 .withDescription("경매 종료 처리 Trigger")
-                .startAt(Date.from(
-                        endedAt.atZone(ZoneId.of("Asia/Seoul"))
-                                .toInstant())
-                )
+                .startAt(startedAt)
                 .build();
     }
 
