@@ -44,7 +44,7 @@ public class QuartzService {
         ZonedDateTime utcZonedDateTime = endedAt.atZone(ZoneId.of("UTC"));
         log.info("QuartzService UTC ZonedDateTime: {}", utcZonedDateTime);
 
-        ZonedDateTime seoulZonedDateTime = utcZonedDateTime.withZoneSameInstant(ZoneId.of("Asia/Seoul"));
+        ZonedDateTime seoulZonedDateTime = utcZonedDateTime.withZoneSameInstant(ZoneId.of("Asia/Seoul")).plusHours(9);
         log.info("QuartzService Korea ZonedDateTime: {}", seoulZonedDateTime);
 
         Instant instant = seoulZonedDateTime.toInstant();
