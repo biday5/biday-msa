@@ -41,10 +41,13 @@ public class QuartzService {
 
     private Trigger buildTrigger(Long auctionId, LocalDateTime endedAt) {
         log.info("QuartzService endedAt: {}", endedAt);
-        ZonedDateTime zonedDateTime = endedAt.atZone(ZoneId.of("Asia/Seoul"));
-        log.info("QuartzService zonedDateTime: {}", zonedDateTime);
+        ZonedDateTime utcZonedDateTime = endedAt.atZone(ZoneId.of("UTC"));
+        log.info("QuartzService UTC ZonedDateTime: {}", utcZonedDateTime);
 
-        Instant instant = zonedDateTime.toInstant();
+        ZonedDateTime seoulZonedDateTime = utcZonedDateTime.withZoneSameInstant(ZoneId.of("Asia/Seoul"));
+        log.info("QuartzService Korea ZonedDateTime: {}", seoulZonedDateTime);
+
+        Instant instant = seoulZonedDateTime.toInstant();
         log.info("QuartzService instant: {}", instant);
 
         Date startedAt = Date.from(instant);
