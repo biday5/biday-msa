@@ -6,7 +6,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.quartz.*;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -43,20 +42,13 @@ public class QuartzService {
     private Trigger buildTrigger(Long auctionId, LocalDateTime endedAt) {
         log.info("QuartzService endedAt: {}", endedAt);
 
-        ZonedDateTime utcZonedDateTime = endedAt.atZone(ZoneId.of("UTC"));
-        log.info("QuartzService UTC ZonedDateTime: {}", utcZonedDateTime);
-
-        ZonedDateTime seoulZonedDateTime = utcZonedDateTime.plusHours(9);
-        log.info("QuartzService Korea ZonedDateTime (KST): {}", seoulZonedDateTime);
-
-        Date startedAt = Date.from(seoulZonedDateTime.toInstant());
-        log.info("QuartzService startedAt (KST): {}", startedAt);
-        log.info("QuartzService startedAt millisecond: {}", startedAt.getTime());
+        LocalDateTime startedAt = endedAt.truncatedTo(ChronoUnit.MINUTES).plusHours(9);
+        log.info("QuartzService >>>> startedAt: {}", startedAt);
 
         return TriggerBuilder.newTrigger()
                 .withIdentity(StringUtils.joinWith("_", "AuctionEndsTrigger", auctionId))
                 .withDescription("경매 종료 처리 Trigger")
-                .startAt(startedAt)
+                .startAt(Date.from(startedAt.atZone(ZoneId.systemDefault()).toInstant()))
                 .build();
     }
 
