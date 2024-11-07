@@ -150,7 +150,7 @@ public class AuctionController {
             @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
                     example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}"),
             @Parameter(examples = {
-                    @ExampleObject(name = "exampleProductModel", value = """ 
+                    @ExampleObject(name = "exampleAuctionModel", value = """ 
                         { 
                             "id" : "경매 id"
                             "userId" : "변경 불가, 판매자 userId",
@@ -179,7 +179,7 @@ public class AuctionController {
     })
     @Parameters({
             @Parameter(examples = {
-                    @ExampleObject(name = "exampleProductModel", value = """ 
+                    @ExampleObject(name = "exampleAuctionModel", value = """ 
                         { 
                             "id" : "경매 id"
                             "userId" : "변경 불가, 판매자 userId",
