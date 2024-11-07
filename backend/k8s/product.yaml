@@ -1,31 +1,48 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: product-service
+  name: product-deploy
+  namespace: biday
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: product-service
+      app: product
   template:
     metadata:
       labels:
-        app: product-service
+        app: product
     spec:
       containers:
-        - name: product-service
-          image: testxxboy/biday-product-service:1.0
+        - name: product
+          image: hwijae/biday-product-service:3.1
+          env:
+            - name: SPRING_CLOUD_CONFIG_URI
+              value: "http://config-server:8888"
+            - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+              value: "http://eureka-server:8761/eureka"
+            - name: EUREKA_INSTANCE_HOSTNAME
+              value: "product-service"
+            - name: EUREKA_INSTANCE_PREFER_IP_ADDRESS
+              value: "false"
+            - name: EUREKA_INSTANCE_INSTANCE_ID
+              value: "product-service:${server.port}"
+            - name: SPRING_PROFILES_ACTIVE
+              value: "prod"
           ports:
             - containerPort: 9104
+
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: product-service
+  namespace: biday
 spec:
   type: ClusterIP
+  selector:
+    app: product
   ports:
     - port: 9104
       targetPort: 9104
-  selector:
-    app: product-service
+

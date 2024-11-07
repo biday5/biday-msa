@@ -1,31 +1,48 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: order-service
+  name: order-deploy
+  namespace: biday
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: order-service
+      app: order
   template:
     metadata:
       labels:
-        app: order-service
+        app: order
     spec:
       containers:
-        - name: order-service
-          image: testxxboy/biday-order-service:1.0
+        - name: order
+          image: hwijae/biday-order-service:3.1
+          env:
+            - name: SPRING_CLOUD_CONFIG_URI
+              value: "http://config-server:8888"
+            - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+              value: "http://eureka-server:8761/eureka"
+            - name: EUREKA_INSTANCE_HOSTNAME
+              value: "order-service"
+            - name: EUREKA_INSTANCE_PREFER_IP_ADDRESS
+              value: "false"
+            - name: EUREKA_INSTANCE_INSTANCE_ID
+              value: "order-service:${server.port}"
+            - name: SPRING_PROFILES_ACTIVE
+              value: "prod"
           ports:
             - containerPort: 9103
+
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: order-service
+  namespace: biday
 spec:
   type: ClusterIP
+  selector:
+    app: order
   ports:
     - port: 9103
       targetPort: 9103
-  selector:
-    app: order-service
+

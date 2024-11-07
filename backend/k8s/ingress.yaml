@@ -1,0 +1,57 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nginx-ingress
+  namespace: biday
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - api.biday.shop
+      secretName: tls-certs
+  rules:
+    - host: api.biday.shop
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: gateway-server
+                port:
+                  number: 8000
+          - path: /login
+            pathType: Prefix
+            backend:
+              service:
+                name: gateway-server
+                port:
+                  number: 8000
+          - path: /oauth2/authorization/naver
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: gateway-server
+                port:
+                  number: 8000
+          - path: /oauth2/callback/naver
+            pathType: Prefix
+            backend:
+              service:
+                name: gateway-server
+                port:
+                  number: 8000
+          - path: /logout
+            pathType: Prefix
+            backend:
+              service:
+                name: gateway-server
+                port:
+                  number: 8000
+          - path: /reissue
+            pathType: Prefix
+            backend:
+              service:
+                name: gateway-server
+                port:
+                  number: 8000

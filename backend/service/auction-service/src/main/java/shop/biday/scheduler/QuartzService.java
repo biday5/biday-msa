@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 @Slf4j
@@ -38,13 +40,20 @@ public class QuartzService {
     }
 
     private Trigger buildTrigger(Long auctionId, LocalDateTime endedAt) {
+        log.info("QuartzService endedAt: {}", endedAt);
+
+        ZonedDateTime startedAt = endedAt.truncatedTo(ChronoUnit.MINUTES)
+                .plusHours(9)
+                .atZone(ZoneId.of("Asia/Seoul"));
+        log.info("QuartzService >>>> startedAt: {}", startedAt);
+
+        Date startAt = Date.from(startedAt.toInstant());
+        log.info("QuartzService >>>> startAt: {}", startAt);
+
         return TriggerBuilder.newTrigger()
                 .withIdentity(StringUtils.joinWith("_", "AuctionEndsTrigger", auctionId))
                 .withDescription("경매 종료 처리 Trigger")
-                .startAt(Date.from(
-                        endedAt.atZone(ZoneId.of("Asia/Seoul"))
-                                .toInstant())
-                )
+                .startAt(startAt)
                 .build();
     }
 

@@ -87,11 +87,17 @@ public class PaymentServiceImpl implements PaymentService {
             throw new PaymentException(HttpStatus.BAD_REQUEST, "INVALID_DATA_REQUEST", "일치하지 않는 정보 입니다.");
         }
 
+        if (paymentRepository.existsByAwardId(paymentDto.getAwardId())) {
+            throw new PaymentException(HttpStatus.CONFLICT, "DUPLICATE_PAYMENT", "이미 결제 정보가 존재하는 낙찰입니다.");
+        }
+
         ResponseEntity<PaymentModel> response = tossPaymentTemplate.exchangePostMethod(APPROVE_URI, paymentRequest);
         PaymentModel paymentModel = tossPaymentTemplate.getPayment(response);
 
         PaymentCardModel card = paymentModel.getCard();
-        card.setIssuerName(PaymentCardType.getByCode(card.getIssuerCode()).getName());
+        if (card != null) {
+            card.setIssuerName(PaymentCardType.getByCode(card.getIssuerCode()).getName());
+        }
 
         ZonedDateTime requestedAt = ZonedDateTime.parse(paymentModel.getRequestedAt(), DATE_TIME_FORMATTER);
         ZonedDateTime approvedAt = ZonedDateTime.parse(paymentModel.getApprovedAt(), DATE_TIME_FORMATTER);
@@ -137,7 +143,9 @@ public class PaymentServiceImpl implements PaymentService {
         PaymentModel paymentModel = tossPaymentTemplate.getPayment(response);
 
         PaymentCardModel card = paymentModel.getCard();
-        card.setIssuerName(PaymentCardType.getByCode(card.getIssuerCode()).getName());
+        if (card != null) {
+            card.setIssuerName(PaymentCardType.getByCode(card.getIssuerCode()).getName());
+        }
 
         ZonedDateTime approvedAt = ZonedDateTime.parse(paymentModel.getApprovedAt(), DATE_TIME_FORMATTER);
 
