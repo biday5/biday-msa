@@ -4,7 +4,7 @@ metadata:
   name: gateway-deploy
   namespace: biday
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: gateway
