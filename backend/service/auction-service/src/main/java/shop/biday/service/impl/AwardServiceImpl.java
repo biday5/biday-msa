@@ -136,15 +136,11 @@ public class AwardServiceImpl implements AwardService {
         log.info("Award Status update: {}", awardId);
 
         return awardRepository.findById(awardId)
-                .map(award-> {
+                .map(award -> {
                     award.setStatus(true);
                     AwardEntity updatedAward = awardRepository.save(award);
                     log.debug("Auction Status updated with id: {}", updatedAward.getId());
                     return ResponseEntity.ok("success");
-                })
-                .map(updatedAward -> {
-                    log.debug("Award status updated successfully: {}", updatedAward);
-                    return updatedAward;
                 })
                 .orElseGet(() -> {
                     log.warn("Award not found for id: {}", awardId);
