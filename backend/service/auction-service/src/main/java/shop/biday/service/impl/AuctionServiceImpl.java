@@ -106,16 +106,6 @@ public class AuctionServiceImpl implements AuctionService {
     }
 
     @Override
-    public AuctionEntity updateState(Long id) {
-        log.info("Update Auction Status by id: {}", id);
-        return auctionRepository.findById(id)
-                .map(auction -> {
-                    auction.setStatus(true);
-                    return auctionRepository.save(auction);
-                }).orElseThrow(() -> new NoSuchElementException("Auction not found with id: " + id));
-    }
-
-    @Override
     public ResponseEntity<AuctionEntity> save(String userInfoHeader, AuctionDto auction) {
         log.info("Save Auction started");
         return validateUser(userInfoHeader)
@@ -177,6 +167,35 @@ public class AuctionServiceImpl implements AuctionService {
                     log.error("User does not have role SELLER or does not exist");
                     return ResponseEntity.status(HttpStatus.FORBIDDEN).body(AuctionEntity.builder().build());
                 });
+    }
+
+    @Override
+    public ResponseEntity<AuctionEntity> updateCurrentBid(AuctionDto auction) {
+        log.info("Update Auction CurrentBid {} for id: {}", auction.getCurrentBid(), auction.getId());
+
+        return auctionRepository.findById(auction.getId())
+                .map(existingAuction -> {
+                    existingAuction.setCurrentBid(auction.getCurrentBid());
+
+                    AuctionEntity updatedAuction = auctionRepository.save(existingAuction);
+
+                    log.debug("Updated Auction for id: {}", auction.getId());
+                    return ResponseEntity.ok(updatedAuction);
+                })
+                .orElseThrow(() -> {
+                    log.error("Auction not found for id: {}", auction.getId());
+                    return new IllegalArgumentException("Auction not found");
+                });
+    }
+
+    @Override
+    public AuctionEntity updateState(Long id) {
+        log.info("Update Auction Status by id: {}", id);
+        return auctionRepository.findById(id)
+                .map(auction -> {
+                    auction.setStatus(true);
+                    return auctionRepository.save(auction);
+                }).orElseThrow(() -> new NoSuchElementException("Auction not found with id: " + id));
     }
 
     @Override

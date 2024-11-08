@@ -107,7 +107,7 @@ public class AwardController {
     @Parameters({
             @Parameter(name = "awardId", description = "낙찰 id", example = "1")
     })
-    public ResponseEntity<AwardEntity> updateStatus(
+    public ResponseEntity<String> updateStatus(
             @RequestParam(value = "awardId", required = true) Long awardId) {
         return awardService.updateStatus(awardId);
     }

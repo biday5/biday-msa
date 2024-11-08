@@ -132,17 +132,15 @@ public class AwardServiceImpl implements AwardService {
     }
 
     @Override
-    public ResponseEntity<AwardEntity> updateStatus(Long awardId) {
+    public ResponseEntity<String> updateStatus(Long awardId) {
         log.info("Award Status update: {}", awardId);
 
         return awardRepository.findById(awardId)
-                .map(award-> {
+                .map(award -> {
                     award.setStatus(true);
-                    return awardRepository.save(award);
-                })
-                .map(updatedAward -> {
-                    log.info("Award status updated successfully: {}", updatedAward);
-                    return ResponseEntity.ok(updatedAward);
+                    AwardEntity updatedAward = awardRepository.save(award);
+                    log.debug("Auction Status updated with id: {}", updatedAward.getId());
+                    return ResponseEntity.ok("success");
                 })
                 .orElseGet(() -> {
                     log.warn("Award not found for id: {}", awardId);

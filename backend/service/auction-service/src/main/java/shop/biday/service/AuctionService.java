@@ -21,13 +21,15 @@ public interface AuctionService {
 
     ResponseEntity<Slice<AuctionDto>> findByUser(String userInfoHeader, String period, Long cursor, Pageable pageable);
 
-    AuctionEntity updateState(Long id);
-
     boolean existsById(Long id);
 
     ResponseEntity<AuctionEntity> save(String userInfoHeader, AuctionDto auction);
 
     ResponseEntity<AuctionEntity> update(String userInfoHeader, AuctionDto auction);
+
+    ResponseEntity<AuctionEntity> updateCurrentBid(AuctionDto auction);
+
+    AuctionEntity updateState(Long id);
 
     ResponseEntity<String> deleteById(String userInfoHeader, Long id);
 

@@ -150,7 +150,7 @@ public class AuctionController {
             @Parameter(name = "UserInfo", description = "현재 로그인한 사용자 ",
                     example = "UserInfo{'id': 'abc342', 'name': 'kim', role: 'ROLE_USER'}"),
             @Parameter(examples = {
-                    @ExampleObject(name = "exampleProductModel", value = """ 
+                    @ExampleObject(name = "exampleAuctionModel", value = """ 
                         { 
                             "id" : "경매 id"
                             "userId" : "변경 불가, 판매자 userId",
@@ -168,6 +168,34 @@ public class AuctionController {
             @RequestBody AuctionDto auctionModel) {
         return auctionService.update(userInfoHeader, auctionModel);
     }
+
+    @PatchMapping("/updateCurrentBid")
+    @Operation(summary = "경매 현재 최고 입찰가 수정", description = "auction currentBid update")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "경매 수정 성공"),
+            @ApiResponse(responseCode = "403", description = "권한 없음"),
+            @ApiResponse(responseCode = "404", description = "경매 찾을 수 없음"),
+            @ApiResponse(responseCode = "500", description = "서버 오류")
+    })
+    @Parameters({
+            @Parameter(examples = {
+                    @ExampleObject(name = "exampleAuctionModel", value = """ 
+                        { 
+                            "id" : "경매 id"
+                            "userId" : "변경 불가, 판매자 userId",
+                            "sizeId" : "변경 불가, 경매로 등록할 상품의 sizeId, size의 findById 사용해서 선택!", 
+                            "description" : "변경 불가, 경매로 등록할 판매자 상품의 사진", 
+                            "startingBid" : "변경 불가, 경매 시작가, 상품 가격의 반값 or 40%로 시작",
+                            "currentBid" : "현재 최고 경매가",
+                            "startedAt" : "만약 이미 시작되었다면 변경 불가, 시작 날짜",
+                            "endedAt" : "만약 이미 시작되었다면 변경 불가, 종료 날짜"
+                        } 
+                    """)})
+    })
+    public ResponseEntity<AuctionEntity> updateCurrentBid(@RequestBody AuctionDto auctionModel) {
+        return auctionService.updateCurrentBid(auctionModel);
+    }
+
 
     @DeleteMapping
     @Operation(summary = "경매 삭제", description = "경매 삭제")
