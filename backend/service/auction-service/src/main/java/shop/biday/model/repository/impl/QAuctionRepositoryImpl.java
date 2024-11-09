@@ -77,7 +77,6 @@ public class QAuctionRepositoryImpl implements QAuctionRepository {
         // 커서 기반 조건 설정
         BooleanExpression cursorPredicate = cursor != null ? qAuction.id.lt(cursor) : null;
 
-        // QueryDSL 쿼리 빌더
         List<AuctionDto> auctions = queryFactory
                 .select(createAuctionDtoProjection())
                 .from(qAuction)

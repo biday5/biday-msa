@@ -64,9 +64,8 @@ public class QProductRepositoryImpl implements QProductRepository {
         );
     }
 
-    // TODO filter 프론트에서 전부 처리 가능하기 때문에, category랑 keyword만 보류 하고 나머지 다 지울 것
     @Override
-    public List<ProductDto> findProducts(Long categoryId, Long brandId, String keyword, String color, String order) {
+    public List<ProductDto> findByFilter(Long categoryId, Long brandId, String keyword, String color, String order) {
         return createBaseQuery(queryFactory, categoryId, brandId, keyword, color, order)
                 .fetch();
     }
