@@ -42,12 +42,6 @@ public class AuctionServiceImpl implements AuctionService {
     }
 
     @Override
-    public boolean existsById(Long id) {
-        log.info("Exists Auction by id: {}", id);
-        return auctionRepository.existsById(id);
-    }
-
-    @Override
     public Mono<AuctionDto> findByAuctionId(Long auctionId) {
         return Mono.fromCallable(() -> auctionRepository.findById(auctionId))
                 .subscribeOn(Schedulers.boundedElastic())
@@ -61,24 +55,9 @@ public class AuctionServiceImpl implements AuctionService {
     }
 
     @Override
-    public ResponseEntity<Slice<AuctionDto>> findByUser(String userInfoHeader, String period, Long cursor, Pageable pageable) {
-        log.info("Find All Auctions By User: {}", userInfoHeader);
-        return validateUser(userInfoHeader)
-                .map(user -> {
-                    Slice<AuctionDto> auctions = auctionRepository.findByUser(
-                            userInfoUtils.extractUserInfo(userInfoHeader).getUserId(),
-                            period,
-                            cursor,
-                            pageable
-                    );
-                    return auctions.isEmpty() ?
-                            ResponseEntity.status(HttpStatus.NOT_FOUND).body((Slice<AuctionDto>) null) : // 404 반환
-                            ResponseEntity.ok(auctions); // 200 반환
-                })
-                .orElseGet(() -> {
-                    log.warn("User not authorized: {}", userInfoHeader);
-                    return ResponseEntity.status(HttpStatus.FORBIDDEN).body((Slice<AuctionDto>) null); // 403 반환
-                });
+    public boolean existsById(Long id) {
+        log.info("Exists Auction by id: {}", id);
+        return auctionRepository.existsById(id);
     }
 
     @Override
@@ -102,6 +81,27 @@ public class AuctionServiceImpl implements AuctionService {
                 .orElseGet(() -> {
                     log.warn("No auctions found for SizeId: {}", sizeId);
                     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); // 404 반환
+                });
+    }
+
+    @Override
+    public ResponseEntity<Slice<AuctionDto>> findByUser(String userInfoHeader, String period, Long cursor, Pageable pageable) {
+        log.info("Find All Auctions By User: {}", userInfoHeader);
+        return validateUser(userInfoHeader)
+                .map(user -> {
+                    Slice<AuctionDto> auctions = auctionRepository.findByUser(
+                            userInfoUtils.extractUserInfo(userInfoHeader).getUserId(),
+                            period,
+                            cursor,
+                            pageable
+                    );
+                    return auctions.isEmpty() ?
+                            ResponseEntity.status(HttpStatus.NOT_FOUND).body((Slice<AuctionDto>) null) : // 404 반환
+                            ResponseEntity.ok(auctions); // 200 반환
+                })
+                .orElseGet(() -> {
+                    log.warn("User not authorized: {}", userInfoHeader);
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN).body((Slice<AuctionDto>) null); // 403 반환
                 });
     }
 
@@ -144,8 +144,7 @@ public class AuctionServiceImpl implements AuctionService {
 
                     String auctionUserId = existingAuction.getUserId();
                     if (!auctionUserId.equals(userInfoUtils.extractUserInfo(userInfoHeader).getUserId())) {
-                        log.error("User with ID {} does not have Update Authority for auction id: {}",
-                                userInfoUtils.extractUserInfo(userInfoHeader).getUserId(), auctionId);
+                        log.error("User with ID {} does not have Update Authority for auction id: {}", userInfoUtils.extractUserInfo(userInfoHeader).getUserId(), auctionId);
                         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(AuctionEntity.builder().build());
                     }
 
@@ -211,8 +210,7 @@ public class AuctionServiceImpl implements AuctionService {
                             });
 
                     if (!auction.getUserId().equals(userInfoUtils.extractUserInfo(userInfoHeader).getUserId())) {
-                        log.error("User with ID {} does not have Delete Authority for auction id: {}",
-                                userInfoUtils.extractUserInfo(userInfoHeader).getUserId(), id);
+                        log.error("User with ID {} does not have Delete Authority for auction id: {}", userInfoUtils.extractUserInfo(userInfoHeader).getUserId(), id);
                         return ResponseEntity.status(HttpStatus.FORBIDDEN).body("삭제 권한이 없습니다");
                     }
 
@@ -238,8 +236,7 @@ public class AuctionServiceImpl implements AuctionService {
                             });
 
                     if (!auction.getUserId().equals(userInfoUtils.extractUserInfo(userInfoHeader).getUserId())) {
-                        log.error("User with ID {} does not have Cancel Authority for auction id: {}",
-                                userInfoUtils.extractUserInfo(userInfoHeader).getUserId(), id);
+                        log.error("User with ID {} does not have Cancel Authority for auction id: {}", userInfoUtils.extractUserInfo(userInfoHeader).getUserId(), id);
                         return ResponseEntity.status(HttpStatus.FORBIDDEN).body("취소 권한이 없습니다");
                     }
 

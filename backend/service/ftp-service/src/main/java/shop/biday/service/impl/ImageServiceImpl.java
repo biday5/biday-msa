@@ -61,67 +61,25 @@ public class ImageServiceImpl implements ImageService {
                 });
     }
 
-//    @Override
-//    public ResponseEntity<String> uploadFileByAdmin(String userInfoHeader, List<MultipartFile> multipartFiles, String filePath, String type, Long referencedId) {
-//        log.info("Image upload By Admin started");
-//
-//        return validateRole(userInfoHeader, "ROLE_ADMIN")
-//                .map(validRole -> {
-//                    if (multipartFiles.size() > 3) {
-//                        throw new IllegalArgumentException("파일은 최대 3장까지만 업로드할 수 있습니다.");
-//                    }
-//                    return uploadFiles(multipartFiles, filePath, type, referencedId);
-//                })
-//                .orElseThrow(() -> new IllegalArgumentException("User does not have the necessary permissions or the role is invalid."));
-//    }
-//
-//    @Override
-//    public ResponseEntity<String> uploadFilesByUser(String role, List<MultipartFile> multipartFiles, String filePath, String type, Long referencedId) {
-//        log.info("Images upload By User started");
-//
-//        return validateRole(role, "ROLE_SELLER", "ROLE_USER")
-//                .map(validRole -> {
-//                    if (multipartFiles.size() > 3) {
-//                        throw new IllegalArgumentException("파일은 최대 3장까지만 업로드할 수 있습니다.");
-//                    }
-//                    return uploadFiles(multipartFiles, filePath, type, referencedId);
-//                })
-//                .orElseThrow(() -> new IllegalArgumentException("User does not have the necessary permissions or the role is invalid."));
-//    }
-//
-//    private ResponseEntity<String> uploadFiles(List<MultipartFile> multipartFiles, String filePath, String type, Long referencedId) {
-//        if (multipartFiles.isEmpty()) {
-//            log.error("File list is empty");
-//            return ResponseEntity.badRequest().body("파일이 비어있습니다.");
-//        }
-//
-//        boolean allFilesUploaded = true;
-//
-//        for (MultipartFile multipartFile : multipartFiles) {
-//            if (multipartFile.isEmpty()) {
-//                allFilesUploaded = false;
-//            } else {
-//                allFilesUploaded &= handleFileUpload(multipartFile, filePath, type, referencedId);
-//            }
-//        }
-//
-//        return allFilesUploaded ? ResponseEntity.ok("success") : ResponseEntity.status(500).body("fail");
-//    }
-
     @Override
     public ResponseEntity<String> uploadFileByAdmin(String userInfoHeader, List<MultipartFile> multipartFiles, String filePath, String type, Long referencedId) {
-        return uploadFile(userInfoHeader, multipartFiles, filePath, type, referencedId, "ROLE_ADMIN");
+        log.info("Image upload By Admin started");
+
+        return validateRole(userInfoHeader, "ROLE_ADMIN")
+                .map(validRole -> {
+                    if (multipartFiles.size() > 3) {
+                        throw new IllegalArgumentException("파일은 최대 3장까지만 업로드할 수 있습니다.");
+                    }
+                    return uploadFiles(multipartFiles, filePath, type, referencedId);
+                })
+                .orElseThrow(() -> new IllegalArgumentException("User does not have the necessary permissions or the role is invalid."));
     }
 
     @Override
     public ResponseEntity<String> uploadFilesByUser(String role, List<MultipartFile> multipartFiles, String filePath, String type, Long referencedId) {
-        return uploadFile(role, multipartFiles, filePath, type, referencedId, "ROLE_SELLER", "ROLE_USER");
-    }
+        log.info("Images upload By User started");
 
-    private ResponseEntity<String> uploadFile(String userInfoHeader, List<MultipartFile> multipartFiles, String filePath, String type, Long referencedId, String... roles) {
-        log.info("Image upload started");
-
-        return validateRole(userInfoHeader, roles)
+        return validateRole(role, "ROLE_SELLER", "ROLE_USER")
                 .map(validRole -> {
                     if (multipartFiles.size() > 3) {
                         throw new IllegalArgumentException("파일은 최대 3장까지만 업로드할 수 있습니다.");
@@ -137,8 +95,15 @@ public class ImageServiceImpl implements ImageService {
             return ResponseEntity.badRequest().body("파일이 비어있습니다.");
         }
 
-        boolean allFilesUploaded = multipartFiles.stream()
-                .allMatch(file -> file.isEmpty() || handleFileUpload(file, filePath, type, referencedId));
+        boolean allFilesUploaded = true;
+
+        for (MultipartFile multipartFile : multipartFiles) {
+            if (multipartFile.isEmpty()) {
+                allFilesUploaded = false;
+            } else {
+                allFilesUploaded &= handleFileUpload(multipartFile, filePath, type, referencedId);
+            }
+        }
 
         return allFilesUploaded ? ResponseEntity.ok("success") : ResponseEntity.status(500).body("fail");
     }
