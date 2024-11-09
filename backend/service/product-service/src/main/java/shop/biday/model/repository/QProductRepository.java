@@ -16,5 +16,5 @@ public interface QProductRepository {
 
     SizeModel findBySizeId(Long sizeId);
 
-    List<ProductDto> findProducts(Long categoryId, Long brandId, String keyword, String color, String order);
+    List<ProductDto> findByFilter(Long categoryId, Long brandId, String keyword, String color, String order);
 }

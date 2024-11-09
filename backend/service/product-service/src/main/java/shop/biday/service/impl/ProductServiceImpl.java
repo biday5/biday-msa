@@ -59,18 +59,18 @@ public class ProductServiceImpl implements ProductService {
                             .map(brEntity -> {
                                 Long brandId = brEntity.getId();
                                 log.info("Brand found with ID: {}", brandId);
-                                return productRepository.findProducts(categoryId, brandId, keyword, color, order);
+                                return productRepository.findByFilter(categoryId, brandId, keyword, color, order);
                             })
                             .orElseGet(() -> {
                                 log.warn("Brand not found: {}", brand);
-                                return productRepository.findProducts(categoryId, null, keyword, color, order);
+                                return productRepository.findByFilter(categoryId, null, keyword, color, order);
                             });
                 })
                 .orElseGet(() -> {
                     log.warn("Category not found: {}", category);
                     return brand != null ?
-                            productRepository.findProducts(null, brandRepository.findByNameIgnoreCase(brand).getId(), keyword, color, order) :
-                            productRepository.findProducts(null, null, keyword, color, order);
+                            productRepository.findByFilter(null, brandRepository.findByNameIgnoreCase(brand).getId(), keyword, color, order) :
+                            productRepository.findByFilter(null, null, keyword, color, order);
                 });
 
         return products.isEmpty() ?
